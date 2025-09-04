@@ -7,8 +7,8 @@ contact_links:
     url: https://discord.gg/proyecto-semilla
     about: Únete a nuestra comunidad en Discord para chat en tiempo real / Join our Discord community for real-time chat
   - name: 🔐 Reportar Vulnerabilidad de Seguridad / Report Security Vulnerability
-    url: mailto:security@proyecto-semilla.com
+    url: mailto:security@proyectosemilla.dev
     about: Para reportes privados de seguridad (NO uses issues públicos) / For private security reports (DO NOT use public issues)
   - name: 📚 Documentación / Documentation
-    url: https://docs.proyecto-semilla.com
+    url: https://docs.proyectosemilla.dev
     about: Revisa la documentación oficial antes de reportar / Check official documentation before reporting

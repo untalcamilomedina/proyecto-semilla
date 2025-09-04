@@ -44,8 +44,8 @@ La seguridad de **Proyecto Semilla** es nuestra máxima prioridad. Si descubres 
 **Por favor, NO reportes vulnerabilidades de seguridad a través de issues públicos de GitHub.**
 
 En su lugar, envía un email a:
-- **Email Principal**: security@proyecto-semilla.com
-- **Email Alternativo**: admin@proyecto-semilla.com
+- **Email Principal**: security@proyectosemilla.dev
+- **Email Alternativo**: admin@proyectosemilla.dev
 
 #### 📝 Información a Incluir
 
@@ -267,8 +267,8 @@ The security of **Proyecto Semilla** is our top priority. If you discover a secu
 **Please do NOT report security vulnerabilities through public GitHub issues.**
 
 Instead, send an email to:
-- **Main Email**: security@proyecto-semilla.com
-- **Alternative Email**: admin@proyecto-semilla.com
+- **Main Email**: security@proyectosemilla.dev
+- **Alternative Email**: admin@proyectosemilla.dev
 
 #### 📝 Information to Include
 
@@ -386,7 +386,7 @@ Para garantizar que tu instalación de **Proyecto Semilla** sea segura:
 Para recibir notificaciones de vulnerabilidades de seguridad:
 
 1. **GitHub**: Habilitar alertas de seguridad en el repositorio
-2. **Email**: Suscribirse a security-announcements@proyecto-semilla.com
+2. **Email**: Suscribirse a security-announcements@proyectosemilla.dev
 3. **RSS**: Seguir nuestro feed de seguridad
 4. **Discord**: Canal #security-announcements
 
@@ -396,9 +396,9 @@ Para recibir notificaciones de vulnerabilidades de seguridad:
 
 ### 👥 Equipo de Seguridad
 
-- **Security Lead**: security-lead@proyecto-semilla.com
-- **Incident Response**: incident-response@proyecto-semilla.com
-- **General Security**: security@proyecto-semilla.com
+- **Security Lead**: security-lead@proyectosemilla.dev
+- **Incident Response**: incident-response@proyectosemilla.dev
+- **General Security**: security@proyectosemilla.dev
 
 ### ⏰ Disponibilidad
 

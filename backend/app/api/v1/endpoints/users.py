@@ -8,6 +8,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -31,14 +32,14 @@ async def read_users(
     # Build query based on tenant filter
     if tenant_id:
         result = await db.execute(
-            "SELECT * FROM users WHERE tenant_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
-            (tenant_id, limit, skip)
+            text("SELECT * FROM users WHERE tenant_id = :tenant_id ORDER BY created_at DESC LIMIT :limit OFFSET :skip"),
+            {"tenant_id": tenant_id, "limit": limit, "skip": skip}
         )
     else:
         # For now, return all users (will be filtered by RLS later)
         result = await db.execute(
-            "SELECT * FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2",
-            (limit, skip)
+            text("SELECT * FROM users ORDER BY created_at DESC LIMIT :limit OFFSET :skip"),
+            {"limit": limit, "skip": skip}
         )
 
     users = result.fetchall()
@@ -51,13 +52,13 @@ async def read_users(
             "email": row[2],
             "first_name": row[4],
             "last_name": row[5],
-            "full_name": f"{row[4]} {row[5]}",
-            "is_active": row[6],
-            "is_verified": row[7],
+            "full_name": row[6],
+            "is_active": row[7],
+            "is_verified": row[8],
             "tenant_id": str(row[1]),
             "role_ids": [],  # Will be populated with actual roles
-            "created_at": row[11].isoformat() if row[11] else None,
-            "updated_at": row[12].isoformat() if row[12] else None
+            "created_at": row[12].isoformat() if row[12] else None,
+            "updated_at": row[13].isoformat() if row[13] else None
         }
         user_list.append(user_response)
 
@@ -75,8 +76,8 @@ async def create_user(
     """
     # Check if user already exists
     existing = await db.execute(
-        "SELECT id FROM users WHERE email = $1",
-        (user_in.email,)
+        text("SELECT id FROM users WHERE email = :email"),
+        {"email": user_in.email}
     )
 
     if existing.fetchone():
@@ -87,8 +88,8 @@ async def create_user(
 
     # Verify tenant exists
     tenant_result = await db.execute(
-        "SELECT id FROM tenants WHERE id = $1",
-        (user_in.tenant_id,)
+        text("SELECT id FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": user_in.tenant_id}
     )
 
     if not tenant_result.fetchone():
@@ -104,21 +105,21 @@ async def create_user(
     # Create user
     user_id = UUID()
     await db.execute(
-        """
+        text("""
         INSERT INTO users (id, tenant_id, email, hashed_password, first_name, last_name, full_name, is_active, is_verified)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        """,
-        (
-            user_id,
-            user_in.tenant_id,
-            user_in.email,
-            hashed_password,
-            user_in.first_name,
-            user_in.last_name,
-            f"{user_in.first_name} {user_in.last_name}",
-            True,
-            False
-        )
+        VALUES (:id, :tenant_id, :email, :hashed_password, :first_name, :last_name, :full_name, :is_active, :is_verified)
+        """),
+        {
+            "id": user_id,
+            "tenant_id": user_in.tenant_id,
+            "email": user_in.email,
+            "hashed_password": hashed_password,
+            "first_name": user_in.first_name,
+            "last_name": user_in.last_name,
+            "full_name": f"{user_in.first_name} {user_in.last_name}",
+            "is_active": True,
+            "is_verified": False
+        }
     )
 
     await db.commit()
@@ -149,8 +150,8 @@ async def read_user(
     Get user by ID
     """
     result = await db.execute(
-        "SELECT * FROM users WHERE id = $1",
-        (user_id,)
+        text("SELECT * FROM users WHERE id = :user_id"),
+        {"user_id": user_id}
     )
     user_data = result.fetchone()
 
@@ -162,12 +163,12 @@ async def read_user(
 
     # Get user roles
     roles_result = await db.execute(
-        """
+        text("""
         SELECT r.id FROM roles r
         JOIN user_roles ur ON r.id = ur.role_id
-        WHERE ur.user_id = $1
-        """,
-        (user_id,)
+        WHERE ur.user_id = :user_id
+        """),
+        {"user_id": user_id}
     )
     role_ids = [str(row[0]) for row in roles_result.fetchall()]
 
@@ -198,8 +199,8 @@ async def update_user(
     """
     # Check if user exists
     existing = await db.execute(
-        "SELECT * FROM users WHERE id = $1",
-        (user_id,)
+        text("SELECT * FROM users WHERE id = :user_id"),
+        {"user_id": user_id}
     )
 
     if not existing.fetchone():
@@ -303,8 +304,8 @@ async def delete_user(
 
     # Soft delete - mark as inactive
     await db.execute(
-        "UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1",
-        (user_id,)
+        text("UPDATE users SET is_active = false, updated_at = NOW() WHERE id = :user_id"),
+        {"user_id": user_id}
     )
 
     await db.commit()

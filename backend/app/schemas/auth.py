@@ -11,6 +11,7 @@ class Token(BaseModel):
     JWT token response
     """
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
 
 
@@ -96,3 +97,20 @@ class PasswordReset(BaseModel):
     """
     token: str
     new_password: str
+
+
+class RefreshTokenRequest(BaseModel):
+    """
+    Refresh token request
+    """
+    refresh_token: str
+
+
+class TokenResponse(BaseModel):
+    """
+    Complete token response with access and refresh tokens
+    """
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int  # seconds

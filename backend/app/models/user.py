@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, UUID
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, UUID, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -19,7 +19,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    tenant_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False, index=True)
 
     # Authentication
     email = Column(String(255), nullable=False, unique=True, index=True)

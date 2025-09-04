@@ -54,7 +54,7 @@ Este código de conducta aplica tanto a espacios del proyecto como a espacios p�
 
 Instancias de comportamiento abusivo, acosador o de otra manera inaceptable pueden ser reportadas a los líderes de la comunidad responsables del cumplimiento a través de:
 
-- **📧 Email**: conduct@proyecto-semilla.com
+- **📧 Email**: conduct@proyectosemilla.dev
 - **💬 Discord**: Mensaje directo a moderadores
 - **🐙 GitHub**: Reportar directamente en el issue o PR
 
@@ -146,7 +146,7 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at:
 
-- **📧 Email**: conduct@proyecto-semilla.com
+- **📧 Email**: conduct@proyectosemilla.dev
 - **💬 Discord**: Direct message to moderators
 - **🐙 GitHub**: Report directly on the issue or PR
 
@@ -206,9 +206,9 @@ Como proyecto orgullosamente latinoamericano, tenemos un compromiso especial con
 
 ### Equipo de Moderación / Moderation Team
 
-- **Email Principal / Main Email**: conduct@proyecto-semilla.com
+- **Email Principal / Main Email**: conduct@proyectosemilla.dev
 - **Discord**: Mensaje directo a @moderadores
-- **Casos Urgentes / Urgent Cases**: admin@proyecto-semilla.com
+- **Casos Urgentes / Urgent Cases**: admin@proyectosemilla.dev
 
 ### Tiempo de Respuesta / Response Time
 
@@ -230,5 +230,5 @@ Community Impact Guidelines were inspired by [Mozilla's code of conduct enforcem
 
 ---
 
-*Para preguntas sobre este código de conducta, contacta a conduct@proyecto-semilla.com*  
-*For questions about this code of conduct, contact conduct@proyecto-semilla.com*
+*Para preguntas sobre este código de conducta, contacta a conduct@proyectosemilla.dev*  
+*For questions about this code of conduct, contact conduct@proyectosemilla.dev*

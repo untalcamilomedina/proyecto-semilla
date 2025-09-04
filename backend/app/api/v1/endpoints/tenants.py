@@ -6,8 +6,9 @@ Multi-tenant management with proper authorization
 from typing import Any, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -25,36 +26,46 @@ router = APIRouter()
 
 @router.get("/", response_model=List[TenantResponse])
 async def read_tenants(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    current_user: User = Depends(get_current_user)
+    limit: int = Query(100, ge=1, le=1000)
 ) -> Any:
     """
     Retrieve tenants with pagination
     """
+    # Check authentication
+    user_id = getattr(request.state, 'user_id', None)
+    tenant_id = getattr(request.state, 'tenant_id', None)
+
+    if not user_id or not tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # For now, return all tenants (will be filtered by RLS later)
     result = await db.execute(
-        "SELECT * FROM tenants ORDER BY created_at DESC LIMIT $1 OFFSET $2",
-        (limit, skip)
+        text("SELECT * FROM tenants ORDER BY created_at DESC LIMIT :limit OFFSET :skip"),
+        {"limit": limit, "skip": skip}
     )
     tenants = result.fetchall()
 
-    # Convert to Tenant objects
+    # Convert to response format
     tenant_list = []
     for row in tenants:
-        tenant = Tenant(
-            id=row[0],
-            name=row[1],
-            slug=row[2],
-            description=row[3],
-            parent_tenant_id=row[4],
-            settings=row[5],
-            is_active=row[6],
-            created_at=row[7],
-            updated_at=row[8]
-        )
-        tenant_list.append(tenant)
+        tenant_list.append({
+            "id": str(row[0]),
+            "name": row[1],
+            "slug": row[2],
+            "description": row[3],
+            "parent_tenant_id": str(row[4]) if row[4] else None,
+            "settings": row[5] or "{}",
+            "is_active": row[6],
+            "created_at": row[7].isoformat() if row[7] else None,
+            "updated_at": row[8].isoformat() if row[8] else None
+        })
 
     return tenant_list
 
@@ -70,8 +81,8 @@ async def create_tenant(
     """
     # Check if slug already exists
     existing = await db.execute(
-        "SELECT id FROM tenants WHERE slug = $1",
-        (tenant_in.slug,)
+        text("SELECT id FROM tenants WHERE slug = :slug"),
+        {"slug": tenant_in.slug}
     )
 
     if existing.fetchone():
@@ -83,19 +94,19 @@ async def create_tenant(
     # Create tenant
     tenant_id = UUID()
     await db.execute(
-        """
+        text("""
         INSERT INTO tenants (id, name, slug, description, parent_tenant_id, settings, is_active)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        """,
-        (
-            tenant_id,
-            tenant_in.name,
-            tenant_in.slug,
-            tenant_in.description,
-            tenant_in.parent_tenant_id,
-            tenant_in.settings,
-            tenant_in.is_active
-        )
+        VALUES (:id, :name, :slug, :description, :parent_tenant_id, :settings, :is_active)
+        """),
+        {
+            "id": tenant_id,
+            "name": tenant_in.name,
+            "slug": tenant_in.slug,
+            "description": tenant_in.description,
+            "parent_tenant_id": tenant_in.parent_tenant_id,
+            "settings": tenant_in.settings,
+            "is_active": tenant_in.is_active
+        }
     )
 
     await db.commit()
@@ -125,8 +136,8 @@ async def read_tenant(
     """
     # Get tenant
     result = await db.execute(
-        "SELECT * FROM tenants WHERE id = $1",
-        (tenant_id,)
+        text("SELECT * FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
     tenant_data = result.fetchone()
 
@@ -138,15 +149,15 @@ async def read_tenant(
 
     # Get user count
     user_count_result = await db.execute(
-        "SELECT COUNT(*) FROM users WHERE tenant_id = $1",
-        (tenant_id,)
+        text("SELECT COUNT(*) FROM users WHERE tenant_id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
     user_count = user_count_result.fetchone()[0]
 
     # Get role count
     role_count_result = await db.execute(
-        "SELECT COUNT(*) FROM roles WHERE tenant_id = $1",
-        (tenant_id,)
+        text("SELECT COUNT(*) FROM roles WHERE tenant_id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
     role_count = role_count_result.fetchone()[0]
 
@@ -177,8 +188,8 @@ async def update_tenant(
     """
     # Check if tenant exists
     existing = await db.execute(
-        "SELECT * FROM tenants WHERE id = $1",
-        (tenant_id,)
+        text("SELECT * FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
 
     if not existing.fetchone():
@@ -225,16 +236,17 @@ async def update_tenant(
     update_query = f"""
     UPDATE tenants
     SET {', '.join(update_fields)}, updated_at = NOW()
-    WHERE id = ${param_count}
+    WHERE id = :tenant_id
     """
 
-    await db.execute(update_query, values)
+    values.append(tenant_id)
+    await db.execute(text(update_query), dict(zip([f"param_{i}" for i in range(len(values)-1)] + ["tenant_id"], values)))
     await db.commit()
 
     # Return updated tenant
     result = await db.execute(
-        "SELECT * FROM tenants WHERE id = $1",
-        (tenant_id,)
+        text("SELECT * FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
     updated_data = result.fetchone()
 
@@ -262,8 +274,8 @@ async def delete_tenant(
     """
     # Check if tenant exists
     existing = await db.execute(
-        "SELECT * FROM tenants WHERE id = $1",
-        (tenant_id,)
+        text("SELECT * FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
 
     if not existing.fetchone():
@@ -274,8 +286,8 @@ async def delete_tenant(
 
     # Soft delete - mark as inactive
     await db.execute(
-        "UPDATE tenants SET is_active = false, updated_at = NOW() WHERE id = $1",
-        (tenant_id,)
+        text("UPDATE tenants SET is_active = false, updated_at = NOW() WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
     )
 
     await db.commit()

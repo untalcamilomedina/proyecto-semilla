@@ -163,7 +163,7 @@ Ver la [guía de contribución](./CONTRIBUTING.md) para instrucciones detalladas
 ### 💬 Únete a la Conversación
 - 💬 **Discord**: [discord.gg/proyecto-semilla](https://discord.gg/proyecto-semilla)
 - 🐦 **Twitter**: [@ProyectoSemilla](https://twitter.com/ProyectoSemilla)
-- 📧 **Email**: hello@proyecto-semilla.com
+- 📧 **Email**: hello@proyectosemilla.dev
 
 ### 🎯 Canales por Idioma
 - 🇪🇸 **Español**: Canal principal para la comunidad hispanohablante
@@ -250,6 +250,6 @@ Cada línea de código, cada issue reportado, cada estrella en GitHub fortalece 
 
 ---
 
-*¿Preguntas? ¿Sugerencias? ¡Nos encantaría escucharte! Abre un [issue](../../issues) o únete a nuestra comunidad en [Discord](https://discord.gg/proyecto-semilla).*
+*¿Preguntas? ¿Sugerencias? ¡Nos encantaría escucharte! Visita [proyectosemilla.dev](https://proyectosemilla.dev), abre un [issue](../../issues) o únete a nuestra comunidad en [Discord](https://discord.gg/proyecto-semilla).*
 
-*Proyecto Semilla es un proyecto de Vibecoding - Innovación SaaS open-source desde Colombia para el mundo.*
+*Proyecto Semilla es un proyecto de Vibecoding - Innovación SaaS open-source desde Colombia para el mundo. Visita [proyectosemilla.dev](https://proyectosemilla.dev) para más información.*

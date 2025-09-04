@@ -1,0 +1,168 @@
+# 🤖 Configuración de Agentes Claude Code - Proyecto Semilla
+# Automatización de calidad, documentación y testing
+
+project:
+  name: "Proyecto Semilla"
+  version: "0.1.0"
+  standards_file: "DEVELOPMENT_STANDARDS.md"
+  roadmap_file: "../proyecto-semilla-privados/roadmap.md"
+
+agents:
+  # 🔍 Code Auditor Agent - Crítico para calidad
+  code_auditor:
+    enabled: true
+    priority: "critical"
+    triggers:
+      - "pull_request_opened"
+      - "pull_request_synchronize" 
+      - "push_to_main"
+    
+    checks:
+      security:
+        - rls_implementation: true
+        - jwt_validation: true
+        - input_sanitization: true
+        - sql_injection_prevention: true
+        - tenant_isolation: true
+      
+      code_quality:
+        - fastapi_patterns: true
+        - sqlalchemy_async: true
+        - pydantic_schemas: true
+        - error_handling: true
+        - logging_standards: true
+      
+      coverage:
+        minimum_threshold: 70
+        critical_paths: 80
+        
+      performance:
+        - database_queries: true
+        - n_plus_one_detection: true
+        - async_patterns: true
+        
+    auto_fix:
+      enabled: true
+      safe_fixes_only: true
+      
+    reporting:
+      format: "github_comment"
+      include_suggestions: true
+      severity_levels: ["critical", "high", "medium"]
+
+  # 📚 Wiki Maintenance Agent - Para transparencia pública  
+  wiki_maintenance:
+    enabled: true
+    priority: "high"
+    triggers:
+      - "milestone_closed"
+      - "release_published"
+      - "issue_closed_with_label:documentation"
+      - "manual_trigger"
+    
+    sync_targets:
+      - source: "../proyecto-semilla-privados/roadmap.md"
+        target: "wiki/Roadmap.md"
+        transform: "remove_private_sections"
+        
+      - source: "CHANGELOG.md"
+        target: "wiki/Release-Notes.md"
+        transform: "format_release_notes"
+        
+      - source: "README.md"
+        target: "wiki/Home.md" 
+        transform: "wiki_format"
+        
+    automation:
+      auto_update_progress: true
+      generate_metrics: true
+      update_contributor_list: true
+      
+    content_rules:
+      exclude_patterns:
+        - "PRIVATE:"
+        - "INTERNAL:"
+        - "TODO:"
+      include_public_roadmap: true
+      
+  # 🧪 Test Generator Agent - Fase 2 (v0.2.0)
+  test_generator:
+    enabled: false  # Activar después de v0.1.0
+    priority: "medium"
+    triggers:
+      - "new_endpoint_detected"
+      - "model_schema_changed"
+      - "service_class_added"
+      
+    generation_targets:
+      - unit_tests: true
+      - integration_tests: true
+      - rls_security_tests: true
+      - api_contract_tests: true
+      
+    test_patterns:
+      framework: "pytest"
+      async_support: true
+      fixtures_auto_generation: true
+      mock_external_services: true
+      
+    coverage_goals:
+      unit_tests: 85
+      integration_tests: 70
+      rls_tests: 95
+
+  # 🏗️ Architecture Guardian Agent - Fase 3 (v0.3.0)
+  architecture_guardian:
+    enabled: false  # Activar después de v0.2.0
+    priority: "medium"
+    triggers:
+      - "dependency_added"
+      - "database_migration"
+      - "api_breaking_change"
+      
+    validations:
+      - dependency_compatibility: true
+      - migration_safety: true
+      - breaking_change_detection: true
+      - pattern_adherence: true
+
+# 🔧 Configuración Global
+global_settings:
+  timezone: "America/Bogota"
+  language: "es"  # Comentarios en español
+  fallback_language: "en"
+  
+  notifications:
+    slack_webhook: null  # Configurar más adelante
+    email_alerts: false
+    github_issues: true
+    
+  logging:
+    level: "info"
+    include_execution_time: true
+    store_audit_history: true
+
+# 📊 Métricas y Reporting  
+metrics:
+  track_execution_time: true
+  measure_code_quality_improvement: true
+  count_auto_fixes: true
+  monitor_coverage_trends: true
+  
+  dashboards:
+    github_wiki: true
+    local_reports: true
+    
+# 🚀 Performance Settings
+performance:
+  parallel_execution: true
+  cache_analysis_results: true
+  incremental_processing: true
+  timeout_seconds: 300
+
+# 📋 Development Standards Integration
+standards_integration:
+  file_path: "DEVELOPMENT_STANDARDS.md"
+  auto_update_from_roadmap: true
+  validate_against_standards: true
+  suggest_standard_improvements: true

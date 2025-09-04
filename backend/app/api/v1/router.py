@@ -5,7 +5,7 @@ Combines all endpoint routers
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, tenants, users
+from app.api.v1.endpoints import auth, health, tenants, users, roles
 
 # Create main API router
 api_router = APIRouter()
@@ -13,7 +13,7 @@ api_router = APIRouter()
 # Include endpoint routers
 api_router.include_router(
     health.router,
-    prefix="/health",
+    prefix="",
     tags=["health"]
 )
 
@@ -35,5 +35,8 @@ api_router.include_router(
     tags=["users"]
 )
 
-# Future routers will be added here:
-# api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
+api_router.include_router(
+    roles.router,
+    prefix="/roles",
+    tags=["roles"]
+)

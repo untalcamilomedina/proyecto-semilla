@@ -252,10 +252,10 @@ ruff check .
 
 ## 📞 Soporte y Comunidad
 
-- **📚 Documentación**: [docs.proyecto-semilla.com/sdks](https://docs.proyecto-semilla.com/sdks)
+- **📚 Documentación**: [docs.proyectosemilla.dev/sdks](https://docs.proyectosemilla.dev/sdks)
 - **💬 Discord**: Canal #sdk-support
 - **🐛 Issues**: [GitHub Issues](https://github.com/proyecto-semilla/proyecto-semilla/issues)
-- **📧 Email**: sdk-support@proyecto-semilla.com
+- **📧 Email**: sdk-support@proyectosemilla.dev
 
 ---
 

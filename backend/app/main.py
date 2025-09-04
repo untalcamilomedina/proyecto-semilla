@@ -10,6 +10,8 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import settings
 from app.core.database import create_tables
+from app.core.logging import setup_logging
+from app.core.middleware import tenant_context_middleware, rate_limiting_middleware, logging_middleware
 from app.api.v1.router import api_router
 
 
@@ -21,6 +23,9 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     print("🚀 Starting Proyecto Semilla Backend...")
+
+    # Setup structured logging
+    setup_logging()
 
     # Create database tables
     await create_tables()
@@ -61,6 +66,11 @@ if not settings.DEBUG:
         allowed_hosts=settings.ALLOWED_HOSTS,
     )
 
+# Add custom middleware
+app.middleware("http")(logging_middleware)
+app.middleware("http")(rate_limiting_middleware)
+app.middleware("http")(tenant_context_middleware)
+
 # Include API routers
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
@@ -92,7 +102,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=7777,
         reload=True,
         log_level="info"
     )

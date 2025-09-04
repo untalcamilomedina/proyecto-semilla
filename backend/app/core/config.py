@@ -50,10 +50,15 @@ class Settings(BaseSettings):
 
     # Redis Configuration
     REDIS_URL: str = "redis://localhost:6379"
+    
+    # Rate Limiting Configuration
+    RATE_LIMIT_REQUESTS: int = 100  # requests per window
+    RATE_LIMIT_WINDOW: int = 60  # seconds
 
     # JWT Configuration
     JWT_SECRET: str = "your_jwt_secret_key_here_change_this_in_production"
     JWT_ALGORITHM: str = "HS256"
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # Email Configuration (future)
     SMTP_TLS: bool = True
@@ -61,11 +66,12 @@ class Settings(BaseSettings):
     SMTP_HOST: Optional[str] = None
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: Optional[str] = None
-    EMAILS_FROM_NAME: Optional[str] = None
+    EMAILS_FROM_EMAIL: Optional[str] = "noreply@proyectosemilla.dev"
+    EMAILS_FROM_NAME: Optional[str] = "Proyecto Semilla"
 
     # Logging
     LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: str = "json"  # json or text
 
     class Config:
         env_file = ".env"

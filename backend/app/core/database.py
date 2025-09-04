@@ -46,7 +46,7 @@ async def create_tables():
     """
     async with engine.begin() as conn:
         # Import all models to ensure they are registered
-        from app.models import Tenant, User, Role, UserRole  # noqa
+        from app.models import Tenant, User, Role, UserRole, RefreshToken  # noqa
 
         await conn.run_sync(Base.metadata.create_all)
 

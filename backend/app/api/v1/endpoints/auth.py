@@ -6,13 +6,13 @@ Login, registration, and token management
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import security
 from app.core.database import get_db
-from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse
+from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, RefreshTokenRequest
 from app.models.user import User
 from app.models.tenant import Tenant
 
@@ -28,29 +28,16 @@ async def login(
     OAuth2 compatible token login, get an access token for future requests
     """
     # Find user by email
-    user = await db.execute(
-        "SELECT * FROM users WHERE email = $1 AND is_active = true",
-        (form_data.username,)
-    )
-    user_data = user.fetchone()
+    from sqlalchemy import select
+    stmt = select(User).where(User.email == form_data.username, User.is_active == True)
+    result = await db.execute(stmt)
+    user_obj = result.scalar_one_or_none()
 
-    if not user_data:
+    if not user_obj:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password"
         )
-
-    # Convert to User object (simplified for now)
-    user_obj = User(
-        id=user_data[0],
-        tenant_id=user_data[1],
-        email=user_data[2],
-        hashed_password=user_data[3],
-        first_name=user_data[4],
-        last_name=user_data[5],
-        is_active=user_data[6],
-        is_verified=user_data[7]
-    )
 
     # Verify password
     if not security.verify_password(form_data.password, user_obj.hashed_password):
@@ -62,10 +49,26 @@ async def login(
     # Create access token
     access_token_expires = timedelta(minutes=security.settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        subject=user_obj.id, expires_delta=access_token_expires
+        subject=user_obj.id, tenant_id=user_obj.tenant_id, expires_delta=access_token_expires
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Create refresh token
+    refresh_token = security.create_refresh_token(user_obj)
+
+    # Store refresh token in database
+    await security.store_refresh_token(
+        db,
+        user_obj,
+        refresh_token,
+        user_agent=None,  # Could be extracted from request headers
+        ip_address=None   # Could be extracted from request
+    )
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
 
 
 @router.post("/register", response_model=UserResponse)
@@ -77,12 +80,11 @@ async def register(
     Register a new user
     """
     # Check if user already exists
-    existing_user = await db.execute(
-        "SELECT id FROM users WHERE email = $1",
-        (user_in.email,)
-    )
+    from sqlalchemy import select
+    stmt = select(User.id).where(User.email == user_in.email)
+    result = await db.execute(stmt)
 
-    if existing_user.fetchone():
+    if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exists"
@@ -110,25 +112,21 @@ async def register(
     from uuid import uuid4
     user_id = uuid4()
 
-    await db.execute(
-        """
-        INSERT INTO users (id, tenant_id, email, hashed_password, first_name, last_name, full_name, is_active, is_verified)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        """,
-        (
-            user_id,
-            user_in.tenant_id,
-            user_in.email,
-            hashed_password,
-            user_in.first_name,
-            user_in.last_name,
-            f"{user_in.first_name} {user_in.last_name}",
-            True,
-            False
-        )
+    new_user = User(
+        id=user_id,
+        tenant_id=user_in.tenant_id,
+        email=user_in.email,
+        hashed_password=hashed_password,
+        first_name=user_in.first_name,
+        last_name=user_in.last_name,
+        full_name=f"{user_in.first_name} {user_in.last_name}",
+        is_active=True,
+        is_verified=False
     )
 
+    db.add(new_user)
     await db.commit()
+    await db.refresh(new_user)
 
     # Return user data
     return {
@@ -146,34 +144,124 @@ async def register(
     }
 
 
-@router.post("/refresh-token", response_model=Token)
+@router.post("/refresh", response_model=Token)
 async def refresh_access_token(
-    current_user: User = Depends(security.get_current_user)
+    refresh_request: RefreshTokenRequest,
+    db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Refresh access token
+    Refresh access token using refresh token
     """
-    access_token = security.create_user_token(current_user)
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Verify refresh token
+    refresh_token_obj = await security.verify_refresh_token(db, refresh_request.refresh_token)
+    if not refresh_token_obj:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Get user
+    user = await db.get(User, refresh_token_obj.user_id)
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive",
+        )
+
+    # Create new access token
+    access_token_expires = timedelta(minutes=security.settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        subject=user.id, tenant_id=user.tenant_id, expires_delta=access_token_expires
+    )
+
+    # Create new refresh token
+    new_refresh_token = security.create_refresh_token(user)
+
+    # Revoke old refresh token
+    await security.revoke_refresh_token(db, refresh_request.refresh_token)
+
+    # Store new refresh token
+    await security.store_refresh_token(
+        db,
+        user,
+        new_refresh_token,
+        user_agent=None,
+        ip_address=None
+    )
+
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer"
+    }
+
+
+@router.post("/logout")
+async def logout(
+    refresh_request: RefreshTokenRequest,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Logout by revoking refresh token
+    """
+    # Revoke the refresh token
+    await security.revoke_refresh_token(db, refresh_request.refresh_token)
+
+    return {"message": "Successfully logged out"}
+
+
+@router.post("/logout-all")
+async def logout_all_devices(
+    current_user: User = Depends(security.get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Logout from all devices by revoking all refresh tokens for the user
+    """
+    await security.revoke_all_user_refresh_tokens(db, str(current_user.id))
+
+    return {"message": "Successfully logged out from all devices"}
 
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(
-    current_user: User = Depends(security.get_current_user)
+    request: Request,
+    db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
     Get current user information
     """
+    # Extract user_id and tenant_id from request state (set by middleware)
+    user_id = getattr(request.state, 'user_id', None)
+    tenant_id = getattr(request.state, 'tenant_id', None)
+
+    if not user_id or not tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Get user from database
+    user = await db.get(User, user_id)
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     return {
-        "id": str(current_user.id),
-        "email": current_user.email,
-        "first_name": current_user.first_name,
-        "last_name": current_user.last_name,
-        "full_name": current_user.full_name,
-        "is_active": current_user.is_active,
-        "is_verified": current_user.is_verified,
-        "tenant_id": str(current_user.tenant_id),
-        "role_ids": [str(role.id) for role in current_user.roles],
-        "created_at": current_user.created_at.isoformat(),
-        "updated_at": current_user.updated_at.isoformat()
+        "id": str(user.id),
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "full_name": user.full_name,
+        "is_active": user.is_active,
+        "is_verified": user.is_verified,
+        "tenant_id": str(user.tenant_id),
+        "role_ids": [],  # TODO: Implement roles
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+        "updated_at": user.updated_at.isoformat() if user.updated_at else None
     }

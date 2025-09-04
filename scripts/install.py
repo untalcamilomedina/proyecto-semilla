@@ -157,14 +157,27 @@ LOG_LEVEL=INFO
         print("\n🗄️ Configurando Base de Datos...")
 
         try:
-            # Levantar solo la base de datos
+            # Levantar servicios de base de datos
             subprocess.run([
-                "docker-compose", "up", "-d", "db"
+                "docker-compose", "up", "-d", "db", "redis"
             ], cwd=self.project_root, check=True)
 
-            print("⏳ Esperando a que PostgreSQL esté listo...")
+            print("⏳ Esperando a que los servicios estén listos...")
             import time
-            time.sleep(10)  # Esperar a que la DB esté lista
+            time.sleep(15)  # Esperar a que DB y Redis estén listos
+
+            # Ejecutar migraciones de Alembic
+            print("📦 Ejecutando migraciones de base de datos...")
+            result = subprocess.run([
+                "python3", "-m", "alembic", "upgrade", "head"
+            ], cwd=self.project_root / "backend", capture_output=True, text=True)
+
+            if result.returncode == 0:
+                print("✅ Migraciones ejecutadas correctamente")
+            else:
+                print("❌ Error en migraciones:")
+                print(result.stderr)
+                return False
 
             print("✅ Base de datos configurada correctamente")
             return True
@@ -178,12 +191,27 @@ LOG_LEVEL=INFO
         print("\n👤 Creación de Superadministrador")
         print("-" * 35)
 
-        if not self.get_yes_no("¿Quieres crear un superadministrador ahora?", True):
-            print("ℹ️ Puedes crear el superadministrador más tarde ejecutando el script de seeding")
+        if not self.get_yes_no("¿Quieres crear datos iniciales (superadmin + demo)?", True):
+            print("ℹ️ Puedes crear los datos iniciales más tarde ejecutando: python scripts/seed_data.py")
             return
 
-        print("Esta funcionalidad estará disponible en la próxima versión.")
-        print("Por ahora, puedes crear usuarios a través de la API una vez que el sistema esté ejecutándose.")
+        print("Ejecutando script de seeding...")
+        try:
+            import subprocess
+            result = subprocess.run([
+                "python3", "scripts/seed_data.py"
+            ], cwd=self.project_root, capture_output=True, text=True)
+
+            if result.returncode == 0:
+                print("✅ Datos iniciales creados exitosamente")
+                print(result.stdout)
+            else:
+                print("❌ Error creando datos iniciales")
+                print(result.stderr)
+
+        except Exception as e:
+            print(f"❌ Error ejecutando script de seeding: {e}")
+            print("Puedes ejecutar manualmente: python scripts/seed_data.py")
 
     def test_installation(self):
         """Probar la instalación"""
@@ -216,10 +244,13 @@ LOG_LEVEL=INFO
         print("1. Levantar todos los servicios:")
         print("   docker-compose up -d")
         print("\n2. Verificar que todo funciona:")
-        print("   - Backend API: http://localhost:8000")
-        print("   - Documentación: http://localhost:8000/docs")
-        print("   - Health check: http://localhost:8000/api/v1/health")
-        print("\n3. Crear tu primer tenant y usuario a través de la API")
+        print("   - Backend API: http://localhost:7777")
+        print("   - Documentación: http://localhost:7777/docs")
+        print("   - Health check: http://localhost:7777/api/v1/health")
+        print("   - Login: POST http://localhost:7777/api/v1/auth/login")
+        print("\n3. Credenciales de acceso:")
+        print("   - Super Admin: admin@proyectosemilla.dev / admin123")
+        print("   - Demo User: demo@demo-company.com / demo123")
         print("\n4. Acceder al frontend (una vez implementado):")
         print("   http://localhost:3000")
         print("\n📚 Para más información, consulta la documentación:")

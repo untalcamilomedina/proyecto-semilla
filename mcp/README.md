@@ -453,7 +453,7 @@ async def create_user(tenant_id: str, user_data: dict) -> dict:
 
 ### 📧 **Contacto**
 - **Discord**: Canal #mcp-support
-- **Email**: mcp-support@proyecto-semilla.com
+- **Email**: mcp-support@proyectosemilla.dev
 - **GitHub**: [Issues](https://github.com/proyecto-semilla/proyecto-semilla/issues)
 
 ---

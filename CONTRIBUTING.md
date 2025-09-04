@@ -275,7 +275,7 @@ Este código no está bien.
 #### Canales de Comunicación
 - 💬 **Discord**: [discord.gg/proyecto-semilla](https://discord.gg/proyecto-semilla)
 - 🐦 **Twitter**: [@ProyectoSemilla](https://twitter.com/ProyectoSemilla)
-- 📧 **Email**: contributors@proyecto-semilla.com
+- 📧 **Email**: contributors@proyectosemilla.dev
 
 #### Código de Conducta
 Este proyecto adopta el [Contributor Covenant](./CODE_OF_CONDUCT.md). Al participar, aceptas seguir este código.
@@ -505,7 +505,7 @@ Before opening a PR, verify:
 #### Communication Channels
 - 💬 **Discord**: [discord.gg/proyecto-semilla](https://discord.gg/proyecto-semilla)
 - 🐦 **Twitter**: [@ProyectoSemilla](https://twitter.com/ProyectoSemilla)
-- 📧 **Email**: contributors@proyecto-semilla.com
+- 📧 **Email**: contributors@proyectosemilla.dev
 
 #### Code of Conduct
 This project adopts the [Contributor Covenant](./CODE_OF_CONDUCT.md). By participating, you agree to follow this code.
