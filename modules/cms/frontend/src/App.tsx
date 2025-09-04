@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Dashboard from './components/Dashboard';
 import ArticleEditor from './components/ArticleEditor';
 import ThemeToggle from './components/ThemeToggle';
+import TestStyles from './components/TestStyles';
 import Button from './components/ui/Button';
 import { Article, Category, ArticleFormData } from './types';
 
@@ -107,7 +108,7 @@ function App() {
               path="/"
               element={
                 currentView === 'dashboard' ? (
-                  <Dashboard />
+                  <TestStyles />
                 ) : (
                   <ArticleEditor
                     article={editingArticle}
