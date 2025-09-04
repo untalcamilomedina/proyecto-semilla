@@ -1,0 +1,135 @@
+name: ❓ Pregunta / Question
+description: Haz una pregunta sobre el proyecto / Ask a question about the project
+title: "[QUESTION] "
+labels: ["question", "documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🇪🇸 Español / 🇺🇸 English
+        
+        Puedes escribir en español o inglés. / You can write in Spanish or English.
+        
+        ¿Tienes una pregunta sobre Proyecto Semilla? ¡Estamos aquí para ayudarte!
+        
+        Have a question about Proyecto Semilla? We're here to help!
+        
+        💡 **Tip**: Para discusiones más abiertas, considera usar [GitHub Discussions](../../discussions) en lugar de un issue.
+
+  - type: checkboxes
+    id: preliminary-checks
+    attributes:
+      label: ✅ Verificaciones Preliminares / Preliminary Checks
+      description: Por favor confirma que has realizado estas verificaciones / Please confirm you have done these checks
+      options:
+        - label: He buscado en la documentación existente / I searched the existing documentation
+          required: true
+        - label: He revisado las preguntas frecuentes (FAQ) / I checked the frequently asked questions (FAQ)
+          required: true
+        - label: He buscado en issues y discussions existentes / I searched existing issues and discussions
+          required: true
+
+  - type: dropdown
+    id: question-type
+    attributes:
+      label: 🏷️ Tipo de Pregunta / Question Type
+      description: ¿Qué tipo de pregunta es? / What type of question is this?
+      options:
+        - "🚀 Instalación y Setup / Installation and Setup"
+        - "⚙️ Configuración / Configuration"
+        - "🔧 Desarrollo / Development"
+        - "🏗️ Arquitectura / Architecture"
+        - "🔐 Seguridad / Security"
+        - "🐳 Docker y DevOps / Docker and DevOps"
+        - "📚 Documentación / Documentation"
+        - "🤝 Contribución / Contributing"
+        - "🚀 Deployment"
+        - "🐛 Troubleshooting"
+        - "💡 Mejor práctica / Best practice"
+        - "🆚 Comparación / Comparison"
+        - "📋 Otro / Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Tu Pregunta / Your Question
+      description: Haz tu pregunta de manera clara y específica / Ask your question clearly and specifically
+      placeholder: |
+        Ejemplo / Example:
+        ¿Cuál es la mejor manera de configurar múltiples tenants en producción? 
+        ¿Debo usar bases de datos separadas o schemas separados?
+        
+        What's the best way to configure multiple tenants in production?
+        Should I use separate databases or separate schemas?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 🎯 Contexto / Context
+      description: Proporciona contexto sobre tu situación / Provide context about your situation
+      placeholder: |
+        Ejemplo / Example:
+        Estoy desarrollando una aplicación para gestionar múltiples iglesias, cada una necesita 
+        sus propios usuarios y datos completamente aislados. Espero tener ~50 iglesias.
+        
+        I'm developing an application to manage multiple churches, each one needs 
+        their own users and completely isolated data. I expect to have ~50 churches.
+
+  - type: textarea
+    id: what-tried
+    attributes:
+      label: 🔍 ¿Qué has intentado? / What have you tried?
+      description: Si has intentado algo, compártelo / If you've tried anything, share it
+      placeholder: |
+        Ejemplo / Example:
+        He leído la documentación sobre Row-Level Security pero no estoy seguro si es suficiente 
+        para mi caso de uso específico.
+        
+        I've read the documentation about Row-Level Security but I'm not sure if it's enough 
+        for my specific use case.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🖥️ Tu Entorno / Your Environment
+      description: Si es relevante, comparte información sobre tu entorno / If relevant, share information about your environment
+      value: |
+        **Proyecto Semilla Version / Version**: 
+        **OS**: 
+        **Docker Version**: 
+        **PostgreSQL Version**: 
+        **Deployment**: (local/cloud/etc.)
+      render: markdown
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: ⏰ Urgencia / Urgency
+      description: ¿Qué tan urgente es tu pregunta? / How urgent is your question?
+      options:
+        - "🔴 Urgente - Bloqueando mi trabajo / Urgent - Blocking my work"
+        - "🟠 Importante - Necesito respuesta pronto / Important - Need answer soon"
+        - "🟡 Normal - Cuando tengan tiempo / Normal - When you have time"
+        - "🟢 Baja - No hay prisa / Low - No rush"
+
+  - type: checkboxes
+    id: help-improve
+    attributes:
+      label: 📚 Ayuda a Mejorar la Documentación / Help Improve Documentation
+      description: ¿Cómo podríamos hacer que esta información sea más fácil de encontrar? / How could we make this information easier to find?
+      options:
+        - label: Esta pregunta debería estar en el FAQ / This question should be in the FAQ
+        - label: Falta documentación sobre este tema / Documentation is missing on this topic
+        - label: La documentación existente no es clara / Existing documentation isn't clear
+        - label: Necesitamos más ejemplos / We need more examples
+        - label: Debería haber un tutorial sobre esto / There should be a tutorial about this
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 📝 Información Adicional / Additional Information
+      description: ¿Hay algo más que debamos saber? / Is there anything else we should know?
