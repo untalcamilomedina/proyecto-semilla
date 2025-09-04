@@ -108,7 +108,7 @@ function App() {
               path="/"
               element={
                 currentView === 'dashboard' ? (
-                  <TestStyles />
+                  <Dashboard />
                 ) : (
                   <ArticleEditor
                     article={editingArticle}
