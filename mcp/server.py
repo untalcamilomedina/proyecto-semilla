@@ -118,6 +118,17 @@ class ProyectoSemillaMCPServer:
             }
         )
 
+        # ========================================
+        # DOCUMENTATION TOOLS - AUTO-DOCUMENTATION
+        # ========================================
+
+        # Integrar herramientas de documentación
+        try:
+            from .tools.documentation_tools import register_documentation_tools
+            register_documentation_tools(self)
+        except ImportError as e:
+            logger.warning(f"No se pudieron cargar herramientas de documentación: {e}")
+
     def _register_core_resources(self):
         """Registrar recursos básicos del sistema"""
         # Resource: Architecture Overview
