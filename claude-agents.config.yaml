@@ -166,3 +166,38 @@ standards_integration:
   auto_update_from_roadmap: true
   validate_against_standards: true
   suggest_standard_improvements: true
+
+  # 🌐 Web Deployment Agent - proyectosemilla.dev
+  web_deployment:
+    enabled: true
+    priority: "high"
+    triggers:
+      - "release_published"
+      - "tag_pushed"
+      - "manual_web_update"
+    
+    deployment:
+      target_server: "82.197.85.42"
+      target_port: 65002
+      target_user: "u193949513"
+      target_path: "/home/u193949513/domains/proyectosemilla.dev/public_html/"
+      ssh_key: "~/.ssh/id_rsa"
+      
+    content_updates:
+      - file: "index.html"
+        sections: ["hero", "features", "roadmap", "repository"]
+      - file: "changelog.json"
+        format: "json"
+        auto_create: true
+      - file: "version.txt"
+        format: "plain" 
+        auto_create: true
+        
+    verification:
+      url: "https://proyectosemilla.dev"
+      check_patterns: ["version", "release_date", "github_link"]
+      timeout: 30
+      
+    backup:
+      enabled: true
+      retention_days: 30

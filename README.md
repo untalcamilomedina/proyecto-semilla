@@ -114,16 +114,14 @@ docker-compose up -d
 ## 📚 Documentación
 
 ### Para Desarrolladores
-- 📋 **[Roadmap Detallado](./roadmap.md)**: Plan completo hasta la v0.9.0
+- 📋 **[Roadmap Detallado](./ROADMAP.md)**: Plan completo hasta la v0.9.0
 - 🤝 **[Guía de Contribución](./CONTRIBUTING.md)**: Cómo contribuir al proyecto
-- 🏗️ **[Arquitectura del Sistema](./docs/architecture.md)**: Diseño técnico detallado
+- 🏗️ **[Documentación Técnica](./docs/README.md)**: Diseño técnico y guías
 - 🔐 **[Seguridad](./SECURITY.md)**: Políticas y mejores prácticas
 
 ### Para Usuarios
-- 🚀 **[Guía de Inicio](./docs/getting-started.md)**: Primeros pasos
-- ⚙️ **[Configuración](./docs/configuration.md)**: Personalización avanzada  
-- 🧩 **[Módulos](./docs/modules.md)**: Sistema de extensiones
-- ❓ **[FAQ](./docs/faq.md)**: Preguntas frecuentes
+- 🚀 **[Guías de Desarrollo](./docs/README.md)**: Documentación técnica completa
+- ⚙️ **[Estándares de Desarrollo](./DEVELOPMENT_STANDARDS.md)**: Buenas prácticas del proyecto
 
 ## 🗺️ Roadmap
 
@@ -133,7 +131,7 @@ Estamos siguiendo un plan de desarrollo estructurado en 3 fases principales:
 - **🎨 Fase 2 (v0.4.0 - v0.6.0)**: Flexibilidad - Personalización, i18n, Temas
 - **🚀 Fase 3 (v0.7.0 - v0.9.0)**: Ecosistema - Módulos, Marketplace, Enterprise
 
-Ver el [roadmap detallado](./roadmap.md) para más información sobre cada fase.
+Ver el [roadmap detallado](./ROADMAP.md) para más información sobre cada fase.
 
 ## 🤝 Contribuir
 
@@ -242,7 +240,7 @@ Cada línea de código, cada issue reportado, cada estrella en GitHub fortalece 
 
 ### 🌱 **¡Con Vibecoding, el futuro de las aplicaciones SaaS comienza aquí!**
 
-**[⭐ Dale una estrella](../../stargazers)** • **[🐛 Reporta un bug](../../issues)** • **[💡 Sugiere una característica](../../discussions)** • **[🤝 Únete como contributor](../../contributing.md)**
+**[⭐ Dale una estrella](../../stargazers)** • **[🐛 Reporta un bug](../../issues)** • **[💡 Sugiere una característica](../../discussions)** • **[🤝 Únete como contributor](./CONTRIBUTING.md)**
 
 **🇨🇴 Desarrollado con ❤️ por mentes brillantes latinoamericanas, impulsado por Vibecoding**
 
