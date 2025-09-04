@@ -55,6 +55,8 @@ services:
       CORS_ORIGINS: http://localhost:3000,http://frontend:3000
     volumes:
       - ./backend:/app
+      - ./tests:/app/tests
+      - ./pytest.ini:/app/pytest.ini
       - /app/__pycache__
     ports:
       - "7777:8000"

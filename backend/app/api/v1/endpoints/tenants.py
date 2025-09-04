@@ -4,7 +4,7 @@ Multi-tenant management with proper authorization
 """
 
 from typing import Any, List
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -92,11 +92,14 @@ async def create_tenant(
         )
 
     # Create tenant
-    tenant_id = UUID()
+    tenant_id = uuid4()
+    from datetime import datetime
+    now = datetime.utcnow()
+
     await db.execute(
         text("""
-        INSERT INTO tenants (id, name, slug, description, parent_tenant_id, settings, is_active)
-        VALUES (:id, :name, :slug, :description, :parent_tenant_id, :settings, :is_active)
+        INSERT INTO tenants (id, name, slug, description, parent_tenant_id, settings, is_active, created_at, updated_at)
+        VALUES (:id, :name, :slug, :description, :parent_tenant_id, :settings, :is_active, :created_at, :updated_at)
         """),
         {
             "id": tenant_id,
@@ -105,7 +108,9 @@ async def create_tenant(
             "description": tenant_in.description,
             "parent_tenant_id": tenant_in.parent_tenant_id,
             "settings": tenant_in.settings,
-            "is_active": tenant_in.is_active
+            "is_active": tenant_in.is_active,
+            "created_at": now,
+            "updated_at": now
         }
     )
 
@@ -120,8 +125,8 @@ async def create_tenant(
         "parent_tenant_id": tenant_in.parent_tenant_id,
         "settings": tenant_in.settings,
         "is_active": tenant_in.is_active,
-        "created_at": "2024-01-01T00:00:00Z",  # Placeholder
-        "updated_at": "2024-01-01T00:00:00Z"   # Placeholder
+        "created_at": now.isoformat(),
+        "updated_at": now.isoformat()
     }
 
 
@@ -200,37 +205,29 @@ async def update_tenant(
 
     # Build update query dynamically
     update_fields = []
-    values = []
-    param_count = 1
+    params = {"tenant_id": tenant_id}
 
     if tenant_in.name is not None:
-        update_fields.append(f"name = ${param_count}")
-        values.append(tenant_in.name)
-        param_count += 1
+        update_fields.append("name = :name")
+        params["name"] = tenant_in.name
 
     if tenant_in.description is not None:
-        update_fields.append(f"description = ${param_count}")
-        values.append(tenant_in.description)
-        param_count += 1
+        update_fields.append("description = :description")
+        params["description"] = tenant_in.description
 
     if tenant_in.settings is not None:
-        update_fields.append(f"settings = ${param_count}")
-        values.append(tenant_in.settings)
-        param_count += 1
+        update_fields.append("settings = :settings")
+        params["settings"] = tenant_in.settings
 
     if tenant_in.is_active is not None:
-        update_fields.append(f"is_active = ${param_count}")
-        values.append(tenant_in.is_active)
-        param_count += 1
+        update_fields.append("is_active = :is_active")
+        params["is_active"] = tenant_in.is_active
 
     if not update_fields:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No fields to update"
         )
-
-    # Add tenant_id to values
-    values.append(tenant_id)
 
     # Execute update
     update_query = f"""
@@ -239,8 +236,7 @@ async def update_tenant(
     WHERE id = :tenant_id
     """
 
-    values.append(tenant_id)
-    await db.execute(text(update_query), dict(zip([f"param_{i}" for i in range(len(values)-1)] + ["tenant_id"], values)))
+    await db.execute(text(update_query), params)
     await db.commit()
 
     # Return updated tenant

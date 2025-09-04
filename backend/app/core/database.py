@@ -15,7 +15,9 @@ engine = create_async_engine(
     settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
     echo=settings.DEBUG,
     future=True,
-    poolclass=StaticPool,
+    # Removed StaticPool - using default AsyncAdaptedQueuePool for better async support
+    pool_pre_ping=True,  # Verify connections before use
+    pool_recycle=300,    # Recycle connections every 5 minutes
 )
 
 # Create async session factory
@@ -23,6 +25,7 @@ async_session = sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
+    autoflush=False,  # Prevent automatic flushing that can cause context issues
 )
 
 # Base class for all models
@@ -32,12 +35,16 @@ Base = declarative_base()
 async def get_db() -> AsyncSession:
     """
     Dependency to get database session
+    Improved async context management to prevent greenlet issues
     """
-    async with async_session() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+    session = async_session()
+    try:
+        yield session
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
 
 
 async def create_tables():

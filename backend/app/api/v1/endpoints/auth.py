@@ -226,42 +226,23 @@ async def logout_all_devices(
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(
-    request: Request,
+    current_user: User = Depends(security.get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
     Get current user information
     """
-    # Extract user_id and tenant_id from request state (set by middleware)
-    user_id = getattr(request.state, 'user_id', None)
-    tenant_id = getattr(request.state, 'tenant_id', None)
-
-    if not user_id or not tenant_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Get user from database
-    user = await db.get(User, user_id)
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
+    # User is already authenticated via get_current_user dependency
     return {
-        "id": str(user.id),
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "full_name": user.full_name,
-        "is_active": user.is_active,
-        "is_verified": user.is_verified,
-        "tenant_id": str(user.tenant_id),
+        "id": str(current_user.id),
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "full_name": current_user.full_name,
+        "is_active": current_user.is_active,
+        "is_verified": current_user.is_verified,
+        "tenant_id": str(current_user.tenant_id),
         "role_ids": [],  # TODO: Implement roles
-        "created_at": user.created_at.isoformat() if user.created_at else None,
-        "updated_at": user.updated_at.isoformat() if user.updated_at else None
+        "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
+        "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None
     }

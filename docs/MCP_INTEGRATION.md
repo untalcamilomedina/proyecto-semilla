@@ -8,7 +8,7 @@
 
 ## 🎯 Objetivo
 
-Integrar nativamente el **Model Context Protocol (MCP)** para permitir que LLMs como Claude, GPT-4, y Gemini puedan:
+Integrar nativamente el **Model Context Protocol (MCP)** para permitir que LLMs como Claude, Gemini, OpenAI y los modelos más modernos puedan:
 
 1. **Entender la arquitectura** completa del proyecto
 2. **Generar módulos** siguiendo patrones establecidos  
