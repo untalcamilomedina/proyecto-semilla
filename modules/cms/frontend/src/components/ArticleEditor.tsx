@@ -410,7 +410,7 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     placeholder="Título para motores de búsqueda..."
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    {formData.seo_title.length}/60 caracteres
+                    {(formData.seo_title || '').length}/60 caracteres
                   </p>
                 </div>
                 <div>
@@ -425,7 +425,7 @@ const ArticleEditor: React.FC<ArticleEditorProps> = ({
                     placeholder="Descripción para motores de búsqueda..."
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    {formData.seo_description.length}/160 caracteres
+                    {(formData.seo_description || '').length}/160 caracteres
                   </p>
                 </div>
               </div>
