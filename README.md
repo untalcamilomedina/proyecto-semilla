@@ -6,7 +6,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 
-**Proyecto Semilla** es el punto de partida (boilerplate) open-source para crear aplicaciones de negocio SaaS multi-tenant. Construido con FastAPI, Next.js y Docker. Acelera tu desarrollo con una base segura y escalable.
+**Proyecto Semilla** es la primera plataforma SaaS multi-tenant diseñada nativamente para la era del Vibecoding. Construido con FastAPI, Next.js y MCP Protocol. No solo acelera tu desarrollo, **permite que los LLMs construyan tu aplicación** siguiendo mejores prácticas.
 
 > 🇨🇴 **Creado con el talento humano de un equipo lleno de ideas ✨ y la potencia de Vibecoding 🚀**
 
@@ -24,51 +24,61 @@
 
 ## 🎯 ¿Qué es Proyecto Semilla?
 
-Es el **"WordPress para aplicaciones de negocio"** de la era moderna. Una base sólida y bien documentada para que desarrolladores y startups puedan lanzar sus productos más rápido, sin sacrificar seguridad ni buenas prácticas.
+Es el **"WordPress para aplicaciones de negocio"** de la era del Vibecoding. Una plataforma que no solo te da código, **te da un compañero de desarrollo AI** que entiende tu arquitectura, lee tu documentación, y puede generar módulos completos production-ready.
 
 ### 🌟 Visión del Proyecto
 
-**Proyecto Semilla** nace del talento humano de mentes brillantes latinoamericanas 🇨🇴, impulsado por la potencia de **Vibecoding** 🚀. Somos el primer boilerplate SaaS multi-tenant 100% open-source creado en Colombia, con la misión de democratizar el desarrollo de aplicaciones enterprise y acelerar la innovación en la región hispanohablante.
+**Proyecto Semilla** nace del talento humano de mentes brillantes latinoamericanas 🇨🇴, impulsado por la potencia de **Vibecoding** 🚀. Somos la primera plataforma SaaS Vibecoding-native creada en Colombia, pionera en permitir que los LLMs construyan aplicaciones siguiendo arquitecturas enterprise y mejores prácticas documentadas.
 
-### 🏗️ Filosofía de Desarrollo
+### 🏗️ Filosofía Vibecoding-Native
 
-- **🌍 Comunidad Primero**: Desarrollo transparente con documentación impecable
-- **🔒 Seguridad por Diseño**: Implementación de mejores prácticas desde el núcleo  
-- **✨ Elegancia y Simplicidad**: Código limpio e interfaces intuitivas
-- **🔧 Agnóstico al Negocio**: Bloques de construcción universales
+- **🤖 LLM-First Architecture**: Diseñado para que los AIs entiendan y extiendan el sistema
+- **📚 Machine-Readable Documentation**: Documentación que leen humanos y LLMs por igual
+- **🔒 Seguridad por Diseño**: Mejores prácticas implementadas y verificables por AI
+- **🧩 Modular & Self-Documenting**: Cada módulo se explica a sí mismo para facilitar el Vibecoding
 
 ## ✨ Características
 
-### 🚀 Características Actuales (v0.1.0)
+### 🚀 Características Actuales (v0.1.0) - "Fundación Genesis"
 - ⚡ **Instalador Interactivo**: Setup automático con script CLI
 - 🏢 **Multi-tenancy**: Arquitectura completa con modelos SQLAlchemy
 - 👥 **Gestión de Usuarios**: CRUD completo con autenticación JWT
 - 🔐 **Sistema de Roles**: Modelos preparados para permisos granulares
 - 🐳 **Containerización**: Docker Compose completo (PostgreSQL + Redis + FastAPI)
-- 📱 **Backend API**: FastAPI con OpenAPI/Swagger documentation
+- 📱 **Backend API**: FastAPI con OpenAPI/Swagger documentation auto-documented
 - 🛡️ **Seguridad**: JWT authentication + password hashing + rate limiting
 - 📊 **Base de Datos**: PostgreSQL con Row-Level Security preparado
+- 🤖 **MCP-Ready**: Estructura preparada para Model Context Protocol
+- 📋 **LLM-Readable**: Documentación y código optimizado para comprensión de AIs
 
-### 🔮 Características Planificadas
+### 🔮 Roadmap Vibecoding-Native
 
-#### Fase 2: Flexibilidad (v0.4.0 - v0.6.0)
-- 🛠️ **Atributos Personalizados**: Sistema EAV para campos dinámicos
-- 🏷️ **Alias de Entidades**: Personalización de terminología por tenant
-- 🎨 **Temas Personalizables**: Branding completo por organización
+#### Fase 2: Vibecoding Core (v0.2.0 - v0.3.0) - **PRIORIDAD**
+- 🤖 **MCP Protocol Integration**: Comunicación nativa con LLMs
+- 📚 **SDK para LLMs**: Herramientas para que AIs construyan módulos
+- 🧠 **AI Documentation System**: Docs que se actualizan automáticamente
+- 🔍 **Code Understanding Engine**: LLMs entienden la arquitectura completa
 
-#### Fase 3: Ecosistema (v0.7.0 - v0.9.0)  
-- 🧩 **Sistema de Módulos**: Arquitectura de plugins extensible
-- 🏪 **Marketplace**: Catálogo de módulos de la comunidad
-- 🏢 **Características Enterprise**: Multi-DB, analytics avanzadas
+#### Fase 3: AI-First Development (v0.4.0 - v0.6.0)
+- 🛠️ **Module Generator**: "Claude, créame un sistema de facturación"
+- 🧪 **Auto-Testing with LLMs**: Tests generados y ejecutados por AI
+- 🎨 **AI-Driven Customization**: Personalización por comandos naturales
+- 📊 **Smart Analytics**: Insights generados automáticamente
+
+#### Fase 4: Vibecoding Ecosystem (v0.7.0 - v0.9.0)
+- 🏪 **AI Module Marketplace**: Módulos creados por la comunidad via Vibecoding
+- 🏢 **Enterprise AI Workflows**: Automatización completa del desarrollo
+- 🌐 **Multi-LLM Support**: Compatible con Claude, GPT, Gemini, y más
 
 ## 🛠️ Stack Tecnológico
 
 ### Backend
-- **🐍 Framework**: FastAPI (Python 3.11+)
+- **🐍 Framework**: FastAPI (Python 3.11+) - Optimizado para LLM understanding
 - **🗄️ Base de Datos**: PostgreSQL 15+ con Row-Level Security
-- **🔍 ORM**: SQLAlchemy 2.0+ con Alembic
+- **🔍 ORM**: SQLAlchemy 2.0+ con Alembic - Schema auto-documented
 - **⚡ Cache**: Redis para sesiones y cache
 - **🧪 Testing**: Pytest con coverage
+- **🤖 AI Integration**: MCP Protocol + LLM SDK (próximamente)
 
 ### Frontend  
 - **⚛️ Framework**: Next.js 14+ (App Router)
@@ -203,15 +213,16 @@ Gracias a todas las personas que han contribuido al proyecto:
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](./LICENSE) para detalles.
 
-## 🚀 ¿Por qué Proyecto Semilla?
+## 🚀 ¿Por qué Proyecto Semilla es Diferente?
 
-En el ecosistema de desarrollo moderno, configurar una aplicación SaaS multi-tenant desde cero puede tomar meses. **Proyecto Semilla** te permite:
+En el ecosistema de desarrollo moderno, otros boilerplates te dan código. **Proyecto Semilla** te da un compañero de desarrollo AI:
 
-- ⚡ **Lanzar en días, no meses**: Base de código production-ready
-- 🔒 **Seguridad desde el día 1**: Mejores prácticas implementadas
-- 📈 **Escalabilidad**: Arquitectura diseñada para crecer
-- 🌍 **Comunidad**: Respaldo de desarrolladores hispanohablantes
-- 💰 **Costo-efectivo**: Open source, sin licencias costosas
+- 🤖 **Vibecoding-Native**: Primera plataforma diseñada para desarrollo con LLMs
+- ⚡ **"Claude, créame un módulo X"**: Y el sistema lo entiende y lo construye
+- 📚 **Documentación Inteligente**: Que leen humanos y AIs por igual
+- 🏗️ **Arquitectura Self-Explanatory**: El código se explica a sí mismo
+- 🌍 **Comunidad Vibecoding**: Primera comunidad SaaS + AI en español
+- 💰 **Open Source**: Construido por y para la comunidad
 
 ---
 

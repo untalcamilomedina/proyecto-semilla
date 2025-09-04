@@ -8,13 +8,13 @@
 
 ## 🎯 Visión General
 
-Desarrollar **Proyecto Semilla**, el boilerplate open-source más completo para aplicaciones SaaS multi-tenant, posicionándolo como el "WordPress para aplicaciones de negocio" de la era moderna.
+Desarrollar **Proyecto Semilla**, la primera plataforma SaaS Vibecoding-native del mundo, pionera en permitir que LLMs construyan aplicaciones enterprise siguiendo mejores prácticas y arquitecturas auto-documentadas.
 
-### Principios Fundamentales
-- **🌍 Comunidad Primero**: Desarrollo transparente con documentación impecable
-- **🔒 Seguridad por Diseño**: Implementación de mejores prácticas desde el núcleo
-- **✨ Elegancia y Simplicidad**: Código limpio e interfaces intuitivas
-- **🔧 Agnóstico al Negocio**: Bloques de construcción universales
+### Principios Vibecoding-Native
+- **🤖 LLM-First Architecture**: Diseñado para que los AIs entiendan y extiendan el sistema
+- **📚 Machine-Readable Documentation**: Docs que leen humanos y LLMs por igual
+- **🔒 AI-Verifiable Security**: Mejores prácticas que los LLMs pueden validar automáticamente
+- **🧩 Self-Documenting Code**: Cada módulo se explica a sí mismo para facilitar Vibecoding
 
 ---
 
@@ -63,23 +63,27 @@ DevOps:
 - ✅ 15+ endpoints funcionales
 - ✅ Documentación OpenAPI/Swagger
 
-### v0.2.0 - "Identity" 👥
-**Estado**: 📅 **PRÓXIMAMENTE**
+### v0.2.0 - "Vibecoding Core" 🤖 ⭐ **NUEVA PRIORIDAD**
+**Estado**: 🚀 **INICIANDO DESARROLLO**
+
+**Objetivo**: Integración nativa con LLMs y Model Context Protocol
 
 **Características Planificadas**:
-- Sistema completo de usuarios
-- Autenticación avanzada (2FA, OAuth)
-- Gestión de sesiones
-- SDK Foundation (Python/JavaScript)
+- **MCP Protocol Integration**: Comunicación directa con Claude, GPT, y otros LLMs
+- **SDK para LLMs**: Herramientas para que AIs construyan módulos siguiendo patrones
+- **AI Documentation System**: Documentación que se actualiza automáticamente
+- **Code Understanding Engine**: LLMs pueden entender la arquitectura completa
 
-### v0.3.0 - "Permissions" 🔐
-**Estado**: 📅 **PLANIFICADO**
+### v0.3.0 - "AI-First Development" 🧠
+**Estado**: 📅 **PLANIFICADO** (después de MCP Core)
+
+**Objetivo**: Desarrollo asistido completamente por IA
 
 **Características Planificadas**:
-- Sistema de roles estilo Discord
-- Permisos granulares
-- Middleware de autorización
-- Interface de gestión de permisos
+- **Module Generator**: "Claude, créame un sistema de facturación"
+- **Auto-Testing with LLMs**: Tests generados y ejecutados por AI  
+- **AI-Driven Customization**: Personalización por comandos naturales
+- **Smart Refactoring**: Mejoras automáticas de código via LLMs
 
 ---
 
