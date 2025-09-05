@@ -1,0 +1,1183 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="7" failures="13" skipped="1" tests="28" time="3.402" timestamp="2025-09-05T12:11:52.297930" hostname="Mac-mini-de-Camilo.local"><testcase classname="tests.security.test_authentication.TestJWTAuthentication" name="test_valid_jwt_token_structure" time="0.137"><failure message="AttributeError: 'coroutine' object has no attribute 'get'">tests/security/test_authentication.py:19: in test_valid_jwt_token_structure
+    auth_header = auth_headers.get("Authorization", "")
+E   AttributeError: 'coroutine' object has no attribute 'get'</failure></testcase><testcase classname="tests.security.test_authentication.TestJWTAuthentication" name="test_jwt_token_expiration" time="0.014"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestJWTAuthentication" name="test_expired_token_rejection" time="0.044"><failure message="fastapi.exceptions.HTTPException">../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:98: in receive
+    return self.receive_nowait()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:93: in receive_nowait
+    raise WouldBlock
+E   anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:78: in call_next
+    message = await recv_stream.receive()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:118: in receive
+    raise EndOfStream
+E   anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+tests/security/test_authentication.py:70: in test_expired_token_rejection
+    response = test_client.get(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+backend/app/core/rate_limiting.py:423: in __call__
+    await self.app(scope, receive, send_with_headers)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:124: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:35: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/audit_logging.py:601: in log_request_middleware
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/middleware.py:101: in tenant_context_middleware
+    raise e
+backend/app/core/middleware.py:90: in tenant_context_middleware
+    raise HTTPException(
+E   fastapi.exceptions.HTTPException</failure></testcase><testcase classname="tests.security.test_authentication.TestJWTAuthentication" name="test_refresh_token_functionality" time="0.005"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestJWTAuthentication" name="test_invalid_refresh_token_rejection" time="0.037"><failure message="fastapi.exceptions.HTTPException">../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:98: in receive
+    return self.receive_nowait()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:93: in receive_nowait
+    raise WouldBlock
+E   anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:78: in call_next
+    message = await recv_stream.receive()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:118: in receive
+    raise EndOfStream
+E   anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+tests/security/test_authentication.py:103: in test_invalid_refresh_token_rejection
+    response = test_client.post(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:590: in post
+    return super().post(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1132: in post
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+backend/app/core/rate_limiting.py:423: in __call__
+    await self.app(scope, receive, send_with_headers)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:124: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:35: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/audit_logging.py:601: in log_request_middleware
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/middleware.py:101: in tenant_context_middleware
+    raise e
+backend/app/core/middleware.py:57: in tenant_context_middleware
+    raise HTTPException(
+E   fastapi.exceptions.HTTPException</failure></testcase><testcase classname="tests.security.test_authentication.TestPasswordSecurity" name="test_password_hashing" time="0.545" /><testcase classname="tests.security.test_authentication.TestPasswordSecurity" name="test_password_complexity_requirements" time="0.005"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestAuthorization" name="test_unauthorized_access_prevention" time="0.040"><failure message="fastapi.exceptions.HTTPException">../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:98: in receive
+    return self.receive_nowait()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:93: in receive_nowait
+    raise WouldBlock
+E   anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:78: in call_next
+    message = await recv_stream.receive()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:118: in receive
+    raise EndOfStream
+E   anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+tests/security/test_authentication.py:170: in test_unauthorized_access_prevention
+    response = test_client.get(endpoint)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+backend/app/core/rate_limiting.py:423: in __call__
+    await self.app(scope, receive, send_with_headers)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:124: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:35: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/audit_logging.py:601: in log_request_middleware
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/core/middleware.py:101: in tenant_context_middleware
+    raise e
+backend/app/core/middleware.py:57: in tenant_context_middleware
+    raise HTTPException(
+E   fastapi.exceptions.HTTPException</failure></testcase><testcase classname="tests.security.test_authentication.TestAuthorization" name="test_authorized_access_allowed" time="0.005"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestAuthorization" name="test_multi_tenant_data_isolation" time="0.035"><failure message="TypeError: 'coroutine' object is not iterable">tests/security/test_authentication.py:197: in test_multi_tenant_data_isolation
+    response = test_client.post(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:590: in post
+    return super().post(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1132: in post
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:801: in request
+    request = self.build_request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:347: in build_request
+    headers = self._merge_headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:414: in _merge_headers
+    merged_headers.update(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:199: in update
+    headers = Headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:79: in __init__
+    self._list = [
+E   TypeError: 'coroutine' object is not iterable</failure></testcase><testcase classname="tests.security.test_authentication.TestInputValidation" name="test_sql_injection_prevention" time="0.005"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestInputValidation" name="test_xss_prevention" time="0.036"><failure message="TypeError: 'coroutine' object is not iterable">tests/security/test_authentication.py:266: in test_xss_prevention
+    response = test_client.post(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:590: in post
+    return super().post(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1132: in post
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:801: in request
+    request = self.build_request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:347: in build_request
+    headers = self._merge_headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:414: in _merge_headers
+    merged_headers.update(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:199: in update
+    headers = Headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:79: in __init__
+    self._list = [
+E   TypeError: 'coroutine' object is not iterable</failure></testcase><testcase classname="tests.security.test_authentication.TestInputValidation" name="test_path_traversal_prevention" time="0.026"><failure message="TypeError: 'coroutine' object is not iterable">tests/security/test_authentication.py:296: in test_path_traversal_prevention
+    response = test_client.post(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:590: in post
+    return super().post(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1132: in post
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:801: in request
+    request = self.build_request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:347: in build_request
+    headers = self._merge_headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:414: in _merge_headers
+    merged_headers.update(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:199: in update
+    headers = Headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:79: in __init__
+    self._list = [
+E   TypeError: 'coroutine' object is not iterable</failure></testcase><testcase classname="tests.security.test_authentication.TestRateLimiting" name="test_rate_limiting_login_attempts" time="0.005"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestRateLimiting" name="test_rate_limiting_api_requests" time="0.042"><failure message="TypeError: 'coroutine' object is not iterable">tests/security/test_authentication.py:330: in test_rate_limiting_api_requests
+    response = test_client.get("/api/v1/articles", headers=auth_headers)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:801: in request
+    request = self.build_request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:347: in build_request
+    headers = self._merge_headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:414: in _merge_headers
+    merged_headers.update(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:199: in update
+    headers = Headers(headers)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_models.py:79: in __init__
+    self._list = [
+E   TypeError: 'coroutine' object is not iterable</failure></testcase><testcase classname="tests.security.test_authentication.TestSessionSecurity" name="test_token_leakage_prevention" time="0.006"><error message="failed on setup with &quot;RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop&quot;">tests/conftest.py:71: in test_client
+    with TestClient(app) as client:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:745: in __enter__
+    portal.call(self.wait_startup)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:780: in wait_startup
+    await receive()
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:771: in receive
+    self.task.result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:438: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:761: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:149: in __call__
+    await self.app(scope, receive, send)
+backend/app/core/rate_limiting.py:371: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:26: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py:75: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py:55: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:20: in __call__
+    raise e
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py:17: in __call__
+    await self.app(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:707: in __call__
+    await self.lifespan(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/routing.py:677: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+backend/app/main.py:34: in lifespan
+    await create_tables()
+backend/app/core/database.py:54: in create_tables
+    async with engine.begin() as conn:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:175: in __aenter__
+    return await self.gen.__anext__()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:1061: in begin
+    async with conn:
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/base.py:125: in __aenter__
+    return await self.start(is_ctxmanager=True)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/ext/asyncio/engine.py:270: in start
+    await greenlet_spawn(self.sync_engine.connect)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:190: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3268: in connect
+    return self._connection_cls(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:145: in __init__
+    self._dbapi_connection = engine.raw_connection()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py:3292: in raw_connection
+    return self.pool.connect()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:452: in connect
+    return _ConnectionFairy._checkout(self)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1378: in _checkout
+    del fairy
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/pool/base.py:1306: in _checkout
+    result = pool._dialect._do_ping_w_event(
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py:709: in _do_ping_w_event
+    return self.do_ping(dbapi_connection)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:1137: in do_ping
+    dbapi_connection.ping()
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:829: in ping
+    self._handle_exception(error)
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:810: in _handle_exception
+    raise error
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:827: in ping
+    _ = self.await_(self._async_ping())
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:125: in await_only
+    return current.driver.switch(awaitable)  # type: ignore[no-any-return]
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/_concurrency_py3k.py:185: in greenlet_spawn
+    value = await result
+../../../Library/Python/3.9/lib/python/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:836: in _async_ping
+    await tr.start()
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/transaction.py:146: in start
+    await self._connection.execute(query)
+../../../Library/Python/3.9/lib/python/site-packages/asyncpg/connection.py:350: in execute
+    result = await self._protocol.query(query, timeout)
+asyncpg/protocol/protocol.pyx:374: in query
+    ???
+E   RuntimeError: Task &lt;Task pending name='anyio.from_thread.BlockingPortal._call_func' coro=&lt;BlockingPortal._call_func() running at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217&gt; cb=[TaskGroup._spawn.&lt;locals&gt;.task_done() at /Users/untalcamilomedina/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py:661]&gt; got Future &lt;Future pending cb=[Protocol._on_waiter_completed()]&gt; attached to a different loop</error></testcase><testcase classname="tests.security.test_authentication.TestSessionSecurity" name="test_secure_headers" time="0.028"><failure message="AttributeError: '_StreamingResponse' object has no attribute 'body'">../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:98: in receive
+    return self.receive_nowait()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:93: in receive_nowait
+    raise WouldBlock
+E   anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:78: in call_next
+    message = await recv_stream.receive()
+../../../Library/Python/3.9/lib/python/site-packages/anyio/streams/memory.py:118: in receive
+    raise EndOfStream
+E   anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+tests/security/test_authentication.py:354: in test_secure_headers
+    response = test_client.get("/health")
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:499: in get
+    return super().get(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1041: in get
+    return self.request(
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:465: in request
+    return super().request(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:814: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:901: in send
+    response = self._send_handling_auth(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:929: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:966: in _send_handling_redirects
+    response = self._send_single_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/httpx/_client.py:1002: in _send_single_request
+    response = transport.handle_request(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:342: in handle_request
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/testclient.py:339: in handle_request
+    portal.call(self.app, scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+../../../Library/Python/3.9/lib/python/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+../../../Library/Python/3.9/lib/python/site-packages/fastapi/applications.py:1106: in __call__
+    await super().__call__(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/applications.py:122: in __call__
+    await self.middleware_stack(scope, receive, send)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:184: in __call__
+    raise exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py:162: in __call__
+    await self.app(scope, receive, _send)
+backend/app/core/rate_limiting.py:423: in __call__
+    await self.app(scope, receive, send_with_headers)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:124: in dispatch
+    response = await call_next(request)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:84: in call_next
+    raise app_exc
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:70: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+../../../Library/Python/3.9/lib/python/site-packages/starlette/middleware/base.py:108: in __call__
+    response = await self.dispatch_func(request, call_next)
+backend/app/middleware/compression.py:38: in dispatch
+    if len(response.body) &lt; self.minimum_size:
+E   AttributeError: '_StreamingResponse' object has no attribute 'body'</failure></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_configuration_security" time="0.000"><failure message="Failed: Security configuration test failed: assert 11520 &lt;= 1440&#10; +  where 11520 = Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json').ACCESS_TOKEN_EXPIRE_MINUTES">tests/security/test_basic_security.py:24: in test_configuration_security
+    assert settings.ACCESS_TOKEN_EXPIRE_MINUTES &lt;= 1440  # Max 24 hours
+E   AssertionError: assert 11520 &lt;= 1440
+E    +  where 11520 = Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json').ACCESS_TOKEN_EXPIRE_MINUTES
+
+During handling of the above exception, another exception occurred:
+tests/security/test_basic_security.py:31: in test_configuration_security
+    pytest.fail(f"Security configuration test failed: {e}")
+E   Failed: Security configuration test failed: assert 11520 &lt;= 1440
+E    +  where 11520 = Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json').ACCESS_TOKEN_EXPIRE_MINUTES</failure></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_password_security" time="0.511" /><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_jwt_token_security" time="0.000"><failure message="Failed: JWT security test failed: create_access_token() missing 1 required positional argument: 'tenant_id'">tests/security/test_basic_security.py:60: in test_jwt_token_security
+    token = create_access_token(data)
+E   TypeError: create_access_token() missing 1 required positional argument: 'tenant_id'
+
+During handling of the above exception, another exception occurred:
+tests/security/test_basic_security.py:70: in test_jwt_token_security
+    pytest.fail(f"JWT security test failed: {e}")
+E   Failed: JWT security test failed: create_access_token() missing 1 required positional argument: 'tenant_id'</failure></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_input_validation_imports" time="0.002" /><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_sql_injection_protection" time="0.000" /><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_https_configuration" time="0.000" /><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_sensitive_data_not_logged" time="0.000" /><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_rate_limiting_configuration" time="0.000"><failure message="Failed: Rate limiting test failed: assert False&#10; +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')">tests/security/test_basic_security.py:160: in test_rate_limiting_configuration
+    assert hasattr(settings, 'PROJECT_NAME')  # Basic config check
+E   AssertionError: assert False
+E    +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')
+
+During handling of the above exception, another exception occurred:
+tests/security/test_basic_security.py:163: in test_rate_limiting_configuration
+    pytest.fail(f"Rate limiting test failed: {e}")
+E   Failed: Rate limiting test failed: assert False
+E    +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')</failure></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_security_headers" time="0.000"><failure message="Failed: Security headers test failed: assert False&#10; +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')">tests/security/test_basic_security.py:173: in test_security_headers
+    assert hasattr(settings, 'PROJECT_NAME')
+E   AssertionError: assert False
+E    +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')
+
+During handling of the above exception, another exception occurred:
+tests/security/test_basic_security.py:176: in test_security_headers
+    pytest.fail(f"Security headers test failed: {e}")
+E   Failed: Security headers test failed: assert False
+E    +  where False = hasattr(Settings(API_V1_STR='/api/v1', SECRET_KEY='MjYLicdacgjf7ve1U72dGfg2loSlzQWDJhf1hGIySKE', ACCESS_TOKEN_EXPIRE_MINUTES=11520, SERVER_NAME='Proyecto Semilla', SERVER_HOST=Url('http://localhost/'), DEBUG=True, BACKEND_CORS_ORIGINS=[Url('http://localhost:3000/'), Url('http://localhost:8000/')], ALLOWED_HOSTS=['localhost', '127.0.0.1'], DATABASE_URL='postgresql://admin:changeme123@localhost:5432/proyecto_semilla', REDIS_URL='redis://localhost:6379', RATE_LIMIT_REQUESTS=100, RATE_LIMIT_WINDOW=60, JWT_SECRET='your_jwt_secret_key_here_change_this_in_production', JWT_ALGORITHM='HS256', REFRESH_TOKEN_EXPIRE_DAYS=30, SMTP_TLS=True, SMTP_PORT=None, SMTP_HOST=None, SMTP_USER=None, SMTP_PASSWORD=None, EMAILS_FROM_EMAIL='noreply@proyectosemilla.dev', EMAILS_FROM_NAME='Proyecto Semilla', LOG_LEVEL='INFO', LOG_FORMAT='json'), 'PROJECT_NAME')</failure></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_dependency_security" time="0.000"><skipped type="pytest.skip" message="Package python-jose not available">/Users/untalcamilomedina/Documents/GitHub/proyecto-semilla/tests/security/test_basic_security.py:197: Package python-jose not available</skipped></testcase><testcase classname="tests.security.test_basic_security.TestBasicSecurity" name="test_environment_variables_security" time="0.000" /></testsuite></testsuites>

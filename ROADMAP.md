@@ -15,6 +15,8 @@ Desarrollar **Proyecto Semilla**, la primera plataforma SaaS Vibecoding-native d
 - **📚 Machine-Readable Documentation**: Docs que leen humanos y LLMs por igual
 - **🔒 AI-Verifiable Security**: Mejores prácticas que los LLMs pueden validar automáticamente
 - **🧩 Self-Documenting Code**: Cada módulo se explica a sí mismo para facilitar Vibecoding
+- **🔧 Self-Maintenance System**: El sistema se mantiene automáticamente con Vibecoding
+- **🔮 Predictive Intelligence**: IA que predice y previene problemas antes de que ocurran
 
 ---
 
@@ -81,9 +83,12 @@ DevOps:
 
 **Características Planificadas**:
 - **Module Generator**: "Claude, créame un sistema de facturación"
-- **Auto-Testing with LLMs**: Tests generados y ejecutados por AI  
+- **Auto-Testing with LLMs**: Tests generados y ejecutados por AI
 - **AI-Driven Customization**: Personalización por comandos naturales
 - **Smart Refactoring**: Mejoras automáticas de código via LLMs
+- **Self-Maintenance System**: Sistema que se mantiene automáticamente con Vibecoding
+- **Predictive Updates**: Actualizaciones inteligentes de dependencias y versiones
+- **Auto-Healing Architecture**: Recuperación automática de fallos con IA
 
 ---
 
@@ -110,6 +115,19 @@ DevOps:
 - Personal Workspaces
 - Smart Onboarding System
 - Interface de usuario mejorada
+
+### v0.6.5 - "Intelligent Maintenance" 🔧 ⭐ **NUEVA CARACTERÍSTICA**
+**Estado**: 📅 **VISION FUTURE** (Q1 2026)
+
+**Objetivo**: Sistema de mantenimiento completamente automatizado con Vibecoding
+
+**Características Planificadas**:
+- **Self-Healing Architecture**: Recuperación automática de fallos con IA
+- **Predictive Maintenance**: Detección y solución de problemas antes de que ocurran
+- **Auto-Update System**: Actualizaciones inteligentes de dependencias y versiones
+- **Dependency Intelligence**: Monitoreo automático de vulnerabilidades y compatibilidad
+- **Performance Self-Optimization**: Ajustes automáticos de performance con ML
+- **AI-Driven Troubleshooting**: Diagnóstico y resolución automática de problemas
 
 ---
 

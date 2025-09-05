@@ -177,11 +177,11 @@ standards_integration:
       - "manual_web_update"
     
     deployment:
-      target_server: "82.197.85.42"
-      target_port: 65002
-      target_user: "u193949513"
-      target_path: "/home/u193949513/domains/proyectosemilla.dev/public_html/"
-      ssh_key: "~/.ssh/id_rsa"
+      target_server: "${DEPLOY_SERVER}"
+      target_port: "${DEPLOY_PORT}"
+      target_user: "${DEPLOY_USER}"
+      target_path: "${DEPLOY_PATH}"
+      ssh_key: "${SSH_KEY_PATH}"
       
     content_updates:
       - file: "index.html"

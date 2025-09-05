@@ -35,7 +35,13 @@ class AdvancedCompressionMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Skip compression for small responses
-        if len(response.body) < self.minimum_size:
+        # Handle different response types (StreamingResponse doesn't have .body)
+        try:
+            response_size = len(response.body) if hasattr(response, 'body') else self.minimum_size + 1
+            if response_size < self.minimum_size:
+                return response
+        except (AttributeError, TypeError):
+            # For streaming responses or other types, skip compression
             return response
 
         # Skip compression for already compressed content

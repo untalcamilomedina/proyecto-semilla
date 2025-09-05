@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="0.060" timestamp="2025-09-05T12:11:51.253695" hostname="Mac-mini-de-Camilo.local"><testcase classname="tests.health.test_database" name="test_database_connection" time="0.001"><failure message="AttributeError: 'async_generator' object has no attribute 'execute'">tests/health/test_database.py:14: in test_database_connection
+    result = await test_db.execute("SELECT 1 as test_value")
+E   AttributeError: 'async_generator' object has no attribute 'execute'</failure></testcase><testcase classname="tests.health.test_database" name="test_database_performance" time="0.000"><failure message="AttributeError: 'async_generator' object has no attribute 'execute'">tests/health/test_database.py:25: in test_database_performance
+    result = await test_db.execute("SELECT COUNT(*) FROM users")
+E   AttributeError: 'async_generator' object has no attribute 'execute'</failure></testcase><testcase classname="tests.health.test_database" name="test_database_tables_exist" time="0.000"><failure message="AttributeError: 'async_generator' object has no attribute 'execute'">tests/health/test_database.py:43: in test_database_tables_exist
+    result = await test_db.execute(f"SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}')")
+E   AttributeError: 'async_generator' object has no attribute 'execute'</failure></testcase><testcase classname="tests.health.test_database" name="test_database_indexes" time="0.000"><failure message="AttributeError: 'async_generator' object has no attribute 'execute'">tests/health/test_database.py:59: in test_database_indexes
+    result = await test_db.execute(f"SELECT EXISTS (SELECT 1 FROM sqlite_master WHERE type='index' AND name='{index}')")
+E   AttributeError: 'async_generator' object has no attribute 'execute'</failure></testcase><testcase classname="tests.health.test_database" name="test_row_level_security" time="0.000"><failure message="AttributeError: 'async_generator' object has no attribute 'execute'">tests/health/test_database.py:69: in test_row_level_security
+    result = await test_db.execute("SELECT COUNT(*) FROM users")
+E   AttributeError: 'async_generator' object has no attribute 'execute'</failure></testcase></testsuite></testsuites>
