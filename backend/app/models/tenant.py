@@ -39,6 +39,9 @@ class Tenant(Base):
     # Relationships
     users = relationship("User", back_populates="tenant", cascade="all, delete-orphan")
     roles = relationship("Role", back_populates="tenant", cascade="all, delete-orphan")
+    articles = relationship("Article", back_populates="tenant", cascade="all, delete-orphan")
+    categories = relationship("Category", back_populates="tenant", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="tenant", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Tenant(id={self.id}, name='{self.name}', slug='{self.slug}')>"

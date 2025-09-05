@@ -1,420 +1,594 @@
 """
-Proyecto Semilla MCP Server
-Permite que LLMs entiendan y extiendan automáticamente la plataforma
+Proyecto Semilla MCP Server - Model Context Protocol Implementation
+Permite que LLMs como Claude interactúen con Proyecto Semilla automáticamente
 """
 
 import asyncio
 import json
-import logging
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Sequence
 from datetime import datetime
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from mcp import Server, Tool, Resource, ResourceTemplate
+from mcp.types import (
+    TextContent,
+    ImageContent,
+    EmbeddedResource,
+    LoggingLevel
+)
+
+from proyecto_semilla import ProyectoSemillaClient
+from proyecto_semilla.models import (
+    ModuleSpec, ModuleCategory, Tenant, User,
+    ModuleStatus, GenerationResult
+)
+from proyecto_semilla.exceptions import (
+    ProyectoSemillaError, AuthenticationError,
+    APIError, ValidationError
+)
 
 
-class MCPTool:
-    """Representa una herramienta que LLMs pueden ejecutar"""
-
-    def __init__(self, name: str, description: str, function: Callable, parameters: Dict[str, Any]):
-        self.name = name
-        self.description = description
-        self.function = function
-        self.parameters = parameters
-
-    async def execute(self, **kwargs) -> Any:
-        """Ejecutar la herramienta con los parámetros proporcionados"""
-        try:
-            if asyncio.iscoroutinefunction(self.function):
-                return await self.function(**kwargs)
-            else:
-                return self.function(**kwargs)
-        except Exception as e:
-            logger.error(f"Error executing tool {self.name}: {e}")
-            return {"error": str(e)}
-
-
-class MCPResource:
-    """Representa un recurso que LLMs pueden consultar"""
-
-    def __init__(self, uri: str, name: str, description: str, content_function: Callable):
-        self.uri = uri
-        self.name = name
-        self.description = description
-        self.content_function = content_function
-
-    async def get_content(self) -> str:
-        """Obtener el contenido del recurso"""
-        try:
-            if asyncio.iscoroutinefunction(self.content_function):
-                return await self.content_function()
-            else:
-                return self.content_function()
-        except Exception as e:
-            logger.error(f"Error getting content for resource {self.uri}: {e}")
-            return f"Error: {str(e)}"
-
-
-class ProyectoSemillaMCPServer:
+class ProyectoSemillaMCPServer(Server):
     """
     MCP Server para Proyecto Semilla
-    Permite que LLMs entiendan y extiendan automáticamente la plataforma
+
+    Proporciona herramientas y recursos que permiten a LLMs:
+    - Generar módulos automáticamente desde especificaciones naturales
+    - Gestionar tenants, usuarios y módulos
+    - Actualizar documentación en tiempo real
+    - Monitorear estado del sistema
+    - Ejecutar operaciones administrativas
     """
 
-    def __init__(self, api_url: str = "http://localhost:8000", api_key: str = None):
-        self.api_url = api_url
-        self.api_key = api_key
-        self.tools: Dict[str, MCPTool] = {}
-        self.resources: Dict[str, MCPResource] = {}
-        self._register_core_tools()
-        self._register_core_resources()
-
-    def _register_core_tools(self):
-        """Registrar herramientas básicas del sistema"""
-        # Tool: Health Check
-        self.register_tool(
-            name="health_check",
-            description="Verificar el estado de salud del sistema Proyecto Semilla",
-            function=self._health_check,
-            parameters={}
-        )
-
-        # Tool: Get System Info
-        self.register_tool(
-            name="get_system_info",
-            description="Obtener información general del sistema",
-            function=self._get_system_info,
-            parameters={}
-        )
-
-        # Tool: Analyze Architecture
-        self.register_tool(
-            name="analyze_architecture",
-            description="Analizar la arquitectura completa de Proyecto Semilla",
-            function=self._analyze_architecture,
-            parameters={}
-        )
-
-        # Tool: List Tenants
-        self.register_tool(
-            name="list_tenants",
-            description="Listar todos los tenants disponibles",
-            function=self._list_tenants,
-            parameters={
-                "limit": {"type": "integer", "description": "Número máximo de tenants a retornar", "default": 10}
-            }
-        )
-
-        # Tool: Create Tenant
-        self.register_tool(
-            name="create_tenant",
-            description="Crear un nuevo tenant en el sistema",
-            function=self._create_tenant,
-            parameters={
-                "name": {"type": "string", "description": "Nombre del tenant", "required": True},
-                "slug": {"type": "string", "description": "Slug único del tenant", "required": True},
-                "description": {"type": "string", "description": "Descripción del tenant"}
-            }
-        )
-
-        # ========================================
-        # DOCUMENTATION TOOLS - AUTO-DOCUMENTATION
-        # ========================================
-
-        # Integrar herramientas de documentación
-        try:
-            from .tools.documentation_tools import register_documentation_tools
-            register_documentation_tools(self)
-        except ImportError as e:
-            logger.warning(f"No se pudieron cargar herramientas de documentación: {e}")
-
-    def _register_core_resources(self):
-        """Registrar recursos básicos del sistema"""
-        # Resource: Architecture Overview
-        self.register_resource(
-            uri="project://architecture",
-            name="Architecture Overview",
-            description="Vista general de la arquitectura de Proyecto Semilla",
-            content_function=self._get_architecture_overview
-        )
-
-        # Resource: Database Schema
-        self.register_resource(
-            uri="project://database/schema",
-            name="Database Schema",
-            description="Esquema completo de la base de datos",
-            content_function=self._get_database_schema
-        )
-
-        # Resource: API Endpoints
-        self.register_resource(
-            uri="project://api/endpoints",
-            name="API Endpoints",
-            description="Lista completa de endpoints disponibles",
-            content_function=self._get_api_endpoints
-        )
-
-    def register_tool(self, name: str, description: str, function: Callable, parameters: Dict[str, Any]):
-        """Registrar una nueva herramienta"""
-        tool = MCPTool(name, description, function, parameters)
-        self.tools[name] = tool
-        logger.info(f"Registered MCP tool: {name}")
-
-    def register_resource(self, uri: str, name: str, description: str, content_function: Callable):
-        """Registrar un nuevo recurso"""
-        resource = MCPResource(uri, name, description, content_function)
-        self.resources[uri] = resource
-        logger.info(f"Registered MCP resource: {uri}")
-
-    async def execute_tool(self, tool_name: str, **kwargs) -> Any:
-        """Ejecutar una herramienta por nombre"""
-        if tool_name not in self.tools:
-            return {"error": f"Tool '{tool_name}' not found"}
-
-        tool = self.tools[tool_name]
-        return await tool.execute(**kwargs)
-
-    async def get_resource(self, uri: str) -> str:
-        """Obtener el contenido de un recurso"""
-        if uri not in self.resources:
-            return f"Resource '{uri}' not found"
-
-        resource = self.resources[uri]
-        return await resource.get_content()
-
-    def list_tools(self) -> List[Dict[str, Any]]:
-        """Listar todas las herramientas disponibles"""
-        return [
-            {
-                "name": name,
-                "description": tool.description,
-                "parameters": tool.parameters
-            }
-            for name, tool in self.tools.items()
-        ]
-
-    def list_resources(self) -> List[Dict[str, Any]]:
-        """Listar todos los recursos disponibles"""
-        return [
-            {
-                "uri": uri,
-                "name": resource.name,
-                "description": resource.description
-            }
-            for uri, resource in self.resources.items()
-        ]
-
-    # Core Tool Implementations
-    async def _health_check(self) -> Dict[str, Any]:
-        """Verificar estado del sistema"""
-        return {
-            "status": "healthy",
-            "timestamp": datetime.utcnow().isoformat(),
-            "version": "0.1.0",
-            "mcp_server": "operational"
-        }
-
-    async def _get_system_info(self) -> Dict[str, Any]:
-        """Obtener información del sistema"""
-        return {
-            "name": "Proyecto Semilla",
-            "version": "0.1.0",
-            "description": "Primera plataforma SaaS Vibecoding-native",
-            "architecture": "Multi-tenant FastAPI + PostgreSQL + Redis",
-            "mcp_status": "active",
-            "vibecoding_ready": True
-        }
-
-    async def _analyze_architecture(self) -> Dict[str, Any]:
-        """Analizar arquitectura completa"""
-        return {
-            "overview": "Proyecto Semilla es una plataforma SaaS multi-tenant construida con FastAPI, PostgreSQL y Redis",
-            "components": {
-                "backend": "FastAPI con async SQLAlchemy",
-                "database": "PostgreSQL con Row-Level Security",
-                "cache": "Redis para sesiones y cache",
-                "auth": "JWT con refresh tokens",
-                "mcp": "Model Context Protocol para LLMs"
-            },
-            "patterns": [
-                "Repository pattern para data access",
-                "Dependency injection para servicios",
-                "Middleware para cross-cutting concerns",
-                "Async/await para I/O operations"
-            ],
-            "multi_tenant": {
-                "strategy": "Database-level isolation con RLS",
-                "context": "Tenant ID en JWT y request state",
-                "data_isolation": "Políticas RLS automáticas"
-            }
-        }
-
-    async def _list_tenants(self, limit: int = 10) -> List[Dict[str, Any]]:
-        """Listar tenants (mock implementation)"""
-        # En una implementación real, esto consultaría la base de datos
-        return [
-            {
-                "id": "demo-tenant-1",
-                "name": "Demo Company",
-                "slug": "demo-company",
-                "description": "Tenant de demostración",
-                "is_active": True
-            }
-        ]
-
-    async def _create_tenant(self, name: str, slug: str, description: str = None) -> Dict[str, Any]:
-        """Crear tenant (mock implementation)"""
-        # En una implementación real, esto crearía el tenant en la base de datos
-        return {
-            "id": f"tenant-{slug}",
-            "name": name,
-            "slug": slug,
-            "description": description,
-            "is_active": True,
-            "created_at": datetime.utcnow().isoformat()
-        }
-
-    # Core Resource Implementations
-    async def _get_architecture_overview(self) -> str:
-        """Obtener overview de arquitectura"""
-        return """
-# Arquitectura de Proyecto Semilla
-
-## Visión General
-Proyecto Semilla es la primera plataforma SaaS diseñada nativamente para la era del Vibecoding.
-
-## Componentes Principales
-- **Backend**: FastAPI con Python 3.11+
-- **Base de Datos**: PostgreSQL con Row-Level Security
-- **Cache**: Redis para sesiones y datos temporales
-- **Autenticación**: JWT con refresh tokens
-- **MCP**: Model Context Protocol para integración con LLMs
-
-## Patrones Arquitecturales
-- **Multi-tenancy**: Aislamiento a nivel de base de datos
-- **Repository Pattern**: Abstracción de acceso a datos
-- **Dependency Injection**: Inyección de dependencias para testabilidad
-- **Async/Await**: Operaciones I/O no bloqueantes
-
-## Características Únicas
-- **Vibecoding-Native**: Diseñado para desarrollo asistido por IA
-- **Auto-Documentación**: Documentación que se mantiene automáticamente
-- **Self-Improving**: El sistema aprende y mejora con el uso
+    def __init__(
+        self,
+        instance_url: str = "http://localhost:7777",
+        api_key: Optional[str] = None,
+        auto_auth: bool = True
+    ):
         """
+        Initialize MCP Server
 
-    async def _get_database_schema(self) -> str:
-        """Obtener esquema de base de datos"""
-        return """
-# Esquema de Base de Datos - Proyecto Semilla
+        Args:
+            instance_url: URL of Proyecto Semilla instance
+            api_key: API key for authentication
+            auto_auth: Automatically authenticate when needed
+        """
+        super().__init__("proyecto-semilla-mcp")
 
-## Tablas Principales
+        self.instance_url = instance_url
+        self.api_key = api_key
+        self.auto_auth = auto_auth
+        self.client: Optional[ProyectoSemillaClient] = None
+        self.authenticated = False
+
+        # Initialize tools and resources
+        self._register_tools()
+        self._register_resources()
+
+        self.logger.info("Proyecto Semilla MCP Server initialized")
+
+    async def _ensure_client(self) -> ProyectoSemillaClient:
+        """Ensure Proyecto Semilla client is initialized and authenticated"""
+        if self.client is None:
+            self.client = ProyectoSemillaClient(
+                base_url=self.instance_url,
+                api_key=self.api_key,
+                auto_refresh=True
+            )
+
+        if self.auto_auth and not self.authenticated:
+            try:
+                # Health check to verify connection
+                health = await self.client.health_check()
+                if health['status'] == 'healthy':
+                    self.authenticated = True
+                    self.logger.info("Successfully connected to Proyecto Semilla")
+                else:
+                    raise APIError(f"Health check failed: {health}")
+            except Exception as e:
+                self.logger.error(f"Failed to connect to Proyecto Semilla: {e}")
+                raise
+
+        return self.client
+
+    def _register_tools(self):
+        """Register all MCP tools"""
+
+        # Tool 1: Generate Module
+        @self.tool("generate_module")
+        async def generate_module(
+            name: str,
+            description: str,
+            category: str,
+            features: List[str],
+            entities: Optional[List[Dict[str, Any]]] = None
+        ) -> str:
+            """
+            Generate a complete module from natural language specification
+
+            Args:
+                name: Module name (snake_case)
+                description: Human-readable description
+                category: Module category (cms, inventory, crm, etc.)
+                features: List of features to implement
+                entities: Optional list of entities to create
+
+            Returns:
+                Success message with generation details
+            """
+            try:
+                client = await self._ensure_client()
+
+                # Validate category
+                try:
+                    module_category = ModuleCategory(category.lower())
+                except ValueError:
+                    valid_categories = [cat.value for cat in ModuleCategory]
+                    return f"Error: Invalid category '{category}'. Valid categories: {', '.join(valid_categories)}"
+
+                # Create module specification
+                spec = ModuleSpec(
+                    name=name,
+                    display_name=name.replace('_', ' ').title(),
+                    description=description,
+                    category=module_category,
+                    features=features,
+                    entities=entities or []
+                )
+
+                # Generate module
+                result = await client.generate_module(spec)
+
+                return f"""✅ Module '{result.module_name}' generated successfully!
+
+📊 Generation Summary:
+• Files Created: {result.files_created}
+• APIs Generated: {result.apis_generated}
+• UI Components: {result.ui_components_created}
+• Execution Time: {result.execution_time_seconds:.2f}s
+
+🎯 Features Implemented:
+{chr(10).join(f'• {feature}' for feature in features)}
+
+The module is ready for deployment and use!"""
+
+            except ValidationError as e:
+                return f"❌ Validation Error: {e.message}"
+            except AuthenticationError:
+                return "❌ Authentication Error: Please check your API credentials"
+            except APIError as e:
+                return f"❌ API Error: {e.message}"
+            except Exception as e:
+                self.logger.error(f"Module generation failed: {e}")
+                return f"❌ Unexpected error during module generation: {str(e)}"
+
+        # Tool 2: List Tenants
+        @self.tool("list_tenants")
+        async def list_tenants() -> str:
+            """
+            Get list of all available tenants
+
+            Returns:
+                Formatted list of tenants with details
+            """
+            try:
+                client = await self._ensure_client()
+                tenants = await client.get_tenants()
+
+                if not tenants:
+                    return "📭 No tenants found in the system"
+
+                result = f"🏢 **Available Tenants ({len(tenants)})**\n\n"
+                for tenant in tenants:
+                    result += f"**{tenant.name}**\n"
+                    result += f"• Slug: `{tenant.slug}`\n"
+                    result += f"• Status: {'✅ Active' if tenant.is_active else '❌ Inactive'}\n"
+                    result += f"• Created: {tenant.created_at.strftime('%Y-%m-%d')}\n\n"
+
+                return result
+
+            except AuthenticationError:
+                return "❌ Authentication Error: Admin access required for tenant listing"
+            except Exception as e:
+                return f"❌ Error listing tenants: {str(e)}"
+
+        # Tool 3: Create User
+        @self.tool("create_user")
+        async def create_user(
+            email: str,
+            password: str,
+            tenant_id: str,
+            first_name: Optional[str] = None,
+            last_name: Optional[str] = None
+        ) -> str:
+            """
+            Create a new user in specified tenant
+
+            Args:
+                email: User email address
+                password: User password
+                tenant_id: Tenant ID where user will be created
+                first_name: Optional first name
+                last_name: Optional last name
+
+            Returns:
+                Success message with user details
+            """
+            try:
+                client = await self._ensure_client()
+
+                from proyecto_semilla.models import UserCreate
+                user_data = UserCreate(
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    tenant_id=tenant_id
+                )
+
+                user = await client.create_user(user_data)
+
+                result = f"✅ User created successfully!\n\n"
+                result += f"👤 **{user.full_name or user.email}**\n"
+                result += f"• Email: {user.email}\n"
+                result += f"• Tenant: {user.tenant_id}\n"
+                result += f"• Status: {'✅ Active' if user.is_active else '❌ Inactive'}\n"
+                result += f"• Email Verified: {'✅ Yes' if user.is_verified else '❌ No'}\n"
+
+                return result
+
+            except ValidationError as e:
+                return f"❌ Validation Error: {e.message}"
+            except Exception as e:
+                return f"❌ Error creating user: {str(e)}"
+
+        # Tool 4: Get Module Status
+        @self.tool("get_module_status")
+        async def get_module_status(module_name: str) -> str:
+            """
+            Check status of a generated module
+
+            Args:
+                module_name: Name of the module to check
+
+            Returns:
+                Detailed status information
+            """
+            try:
+                client = await self._ensure_client()
+                status = await client.get_module_status(module_name)
+
+                result = f"📦 **Module: {module_name}**\n\n"
+                result += f"**Status:** {status.status.upper()}\n"
+                result += f"**Description:** {status.description}\n\n"
+
+                if status.files_count:
+                    result += f"📁 **Files:** {status.files_count}\n"
+                if status.api_endpoints_count:
+                    result += f"🔌 **API Endpoints:** {status.api_endpoints_count}\n"
+                if status.ui_components_count:
+                    result += f"🖥️ **UI Components:** {status.ui_components_count}\n"
+
+                result += f"\n🕒 **Last Updated:** {status.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
+                return result
+
+            except Exception as e:
+                return f"❌ Error getting module status: {str(e)}"
+
+        # Tool 5: Deploy Module
+        @self.tool("deploy_module")
+        async def deploy_module(module_name: str, tenant_id: str) -> str:
+            """
+            Deploy module to specific tenant
+
+            Args:
+                module_name: Name of module to deploy
+                tenant_id: Target tenant ID
+
+            Returns:
+                Deployment result
+            """
+            try:
+                client = await self._ensure_client()
+                success = await client.deploy_module(module_name, tenant_id)
+
+                if success:
+                    return f"✅ Module '{module_name}' deployed successfully to tenant '{tenant_id}'!\n\nThe module is now available for use in the specified tenant."
+                else:
+                    return f"❌ Failed to deploy module '{module_name}' to tenant '{tenant_id}'"
+
+            except Exception as e:
+                return f"❌ Error deploying module: {str(e)}"
+
+        # Tool 6: Update Documentation
+        @self.tool("update_documentation")
+        async def update_documentation(module_name: str) -> str:
+            """
+            Update auto-generated documentation for module
+
+            Args:
+                module_name: Name of module to update docs for
+
+            Returns:
+                Documentation update result
+            """
+            try:
+                client = await self._ensure_client()
+                result = await client.update_module_docs(module_name)
+
+                update_msg = f"✅ Documentation updated for module '{module_name}'!\n\n"
+                update_msg += f"📚 **Files Updated:** {result['files_updated']}\n"
+
+                if result.get('readme_generated'):
+                    update_msg += "• README.md generated/updated\n"
+                if result.get('api_docs_generated'):
+                    update_msg += "• API documentation updated\n"
+                if result.get('index_updated'):
+                    update_msg += "• Main index updated\n"
+
+                return update_msg
+
+            except Exception as e:
+                return f"❌ Error updating documentation: {str(e)}"
+
+        # Tool 7: Analyze Codebase
+        @self.tool("analyze_codebase")
+        async def analyze_codebase() -> str:
+            """
+            Analyze current codebase structure and provide insights
+
+            Returns:
+                Comprehensive codebase analysis
+            """
+            try:
+                client = await self._ensure_client()
+
+                # Get system information
+                health = await client.health_check()
+                tenants = await client.get_tenants()
+                modules = await client.list_modules()
+
+                analysis = "🔍 **Proyecto Semilla Codebase Analysis**\n\n"
+
+                # System Health
+                analysis += f"🏥 **System Health:** {health['status'].upper()}\n"
+                analysis += f"📊 **Response Time:** {health['response_time']:.2f}s\n"
+                analysis += f"🏷️ **Version:** {health.get('version', 'Unknown')}\n\n"
+
+                # Tenants
+                analysis += f"🏢 **Tenants:** {len(tenants)}\n"
+                active_tenants = sum(1 for t in tenants if t.is_active)
+                analysis += f"✅ **Active:** {active_tenants}\n\n"
+
+                # Modules
+                analysis += f"📦 **Modules:** {len(modules)}\n"
+                if modules:
+                    status_counts = {}
+                    for module in modules:
+                        status_counts[module.status] = status_counts.get(module.status, 0) + 1
+
+                    for status, count in status_counts.items():
+                        analysis += f"• {status.title()}: {count}\n"
+
+                # Recommendations
+                analysis += "\n💡 **Recommendations:**\n"
+                if health['status'] != 'healthy':
+                    analysis += "• System health needs attention\n"
+                if len(tenants) == 0:
+                    analysis += "• Consider creating demo tenants\n"
+                if len(modules) == 0:
+                    analysis += "• Generate your first module to get started\n"
+
+                return analysis
+
+            except Exception as e:
+                return f"❌ Error analyzing codebase: {str(e)}"
+
+        # Tool 8: Generate API Tests
+        @self.tool("generate_api_tests")
+        async def generate_api_tests(module_name: str) -> str:
+            """
+            Generate comprehensive API tests for module
+
+            Args:
+                module_name: Name of module to generate tests for
+
+            Returns:
+                Test generation result
+            """
+            try:
+                client = await self._ensure_client()
+
+                # This would integrate with a test generation service
+                # For now, return a placeholder
+                return f"🧪 Test generation for module '{module_name}' is not yet implemented.\n\nThis feature will be available in a future update."
+
+            except Exception as e:
+                return f"❌ Error generating API tests: {str(e)}"
+
+        # Tool 9: Optimize Performance
+        @self.tool("optimize_performance")
+        async def optimize_performance(module_name: str) -> str:
+            """
+            Analyze and optimize module performance
+
+            Args:
+                module_name: Name of module to optimize
+
+            Returns:
+                Performance optimization results
+            """
+            try:
+                client = await self._ensure_client()
+
+                # This would integrate with a performance analysis service
+                # For now, return a placeholder
+                return f"⚡ Performance optimization for module '{module_name}' is not yet implemented.\n\nThis feature will be available in a future update."
+
+            except Exception as e:
+                return f"❌ Error optimizing performance: {str(e)}"
+
+    def _register_resources(self):
+        """Register MCP resources"""
+
+        # Resource 1: Architecture Overview
+        @self.resource("proyecto-semilla://architecture")
+        async def get_architecture() -> str:
+            """Get current system architecture information"""
+            try:
+                client = await self._ensure_client()
+
+                # Get basic system info
+                health = await client.health_check()
+                tenants = await client.get_tenants()
+
+                architecture = f"""# Proyecto Semilla Architecture
+
+## System Overview
+- **Status**: {health['status']}
+- **Version**: {health.get('version', 'Unknown')}
+- **Tenants**: {len(tenants)}
+- **Base URL**: {self.instance_url}
+
+## Multi-Tenant Architecture
+Proyecto Semilla implements a robust multi-tenant architecture with:
+- Row-Level Security (RLS) for data isolation
+- Tenant-specific configurations
+- Shared infrastructure with tenant boundaries
+
+## Module System
+- Dynamic module loading and deployment
+- Auto-generated APIs and UI components
+- Type-safe module specifications
+- Real-time documentation updates
+
+## Vibecoding Integration
+- MCP Protocol for LLM integration
+- Auto-generation from natural language
+- Type-safe SDK for programmatic access
+- Comprehensive error handling and validation
+"""
+
+                return architecture
+
+            except Exception as e:
+                return f"Error retrieving architecture: {str(e)}"
+
+        # Resource 2: Database Schema
+        @self.resource("proyecto-semilla://database/schema")
+        async def get_database_schema() -> str:
+            """Get current database schema information"""
+            schema = """# Database Schema - Proyecto Semilla
+
+## Core Tables
 
 ### tenants
-- id: UUID (PK)
+- id: UUID (Primary Key)
 - name: VARCHAR(100)
 - slug: VARCHAR(50) UNIQUE
-- description: TEXT
-- parent_tenant_id: UUID (FK)
 - settings: JSONB
 - is_active: BOOLEAN
-- created_at: TIMESTAMPTZ
-- updated_at: TIMESTAMPTZ
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
 
 ### users
-- id: UUID (PK)
-- tenant_id: UUID (FK → tenants)
+- id: UUID (Primary Key)
+- tenant_id: UUID (Foreign Key)
 - email: VARCHAR(255) UNIQUE
-- hashed_password: VARCHAR(255)
-- first_name: VARCHAR(100)
-- last_name: VARCHAR(100)
-- full_name: VARCHAR(201)
+- first_name: VARCHAR(50)
+- last_name: VARCHAR(50)
 - is_active: BOOLEAN
 - is_verified: BOOLEAN
-- preferences: JSONB
-- last_login: TIMESTAMPTZ
-- login_count: INTEGER
-- created_at: TIMESTAMPTZ
-- updated_at: TIMESTAMPTZ
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
 
-### refresh_tokens
-- id: UUID (PK)
-- user_id: UUID (FK → users)
-- tenant_id: UUID (FK → tenants)
-- token: VARCHAR(500) UNIQUE
-- is_revoked: BOOLEAN
-- expires_at: TIMESTAMPTZ
-- user_agent: VARCHAR(500)
-- ip_address: VARCHAR(45)
-- created_at: TIMESTAMPTZ
-- revoked_at: TIMESTAMPTZ
+### modules
+- id: UUID (Primary Key)
+- name: VARCHAR(100)
+- display_name: VARCHAR(100)
+- description: TEXT
+- category: VARCHAR(50)
+- version: VARCHAR(20)
+- status: VARCHAR(20)
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
 
-## Políticas RLS (Row-Level Security)
-- tenant_isolation_policy: Aísla datos por tenant_id
-- user_tenant_isolation: Vincula usuarios a su tenant
-        """
+## Security Features
+- Row-Level Security (RLS) enabled
+- Tenant-based data isolation
+- JWT authentication with refresh tokens
+- API key authentication support
 
-    async def _get_api_endpoints(self) -> str:
-        """Obtener lista de endpoints"""
-        return """
-# API Endpoints - Proyecto Semilla v0.1.0
+## Indexes
+- tenants(slug) - UNIQUE
+- users(tenant_id, email) - UNIQUE
+- users(tenant_id) - Performance
+- modules(name) - UNIQUE
+"""
+            return schema
 
-## Autenticación
-- `POST /api/v1/auth/login` - Login con email/password
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `POST /api/v1/auth/logout` - Logout de dispositivo actual
-- `POST /api/v1/auth/logout-all` - Logout de todos los dispositivos
-- `GET /api/v1/auth/me` - Información del usuario actual
+        # Resource 3: API Endpoints
+        @self.resource("proyecto-semilla://api/endpoints")
+        async def get_api_endpoints() -> str:
+            """Get all available API endpoints"""
+            endpoints = """# API Endpoints - Proyecto Semilla
+
+## Authentication
+- `POST /auth/login` - User login
+- `POST /auth/refresh` - Refresh access token
+- `POST /auth/logout` - User logout
 
 ## Tenants
-- `GET /api/v1/tenants/` - Listar tenants (con paginación)
-- `POST /api/v1/tenants/` - Crear nuevo tenant
-- `GET /api/v1/tenants/{id}` - Obtener tenant por ID
-- `PUT /api/v1/tenants/{id}` - Actualizar tenant
-- `DELETE /api/v1/tenants/{id}` - Eliminar tenant (soft delete)
+- `GET /tenants/` - List all tenants (admin)
+- `POST /tenants/` - Create tenant (admin)
+- `GET /tenants/{id}` - Get tenant details
+- `PUT /tenants/{id}` - Update tenant
+- `DELETE /tenants/{id}` - Delete tenant
 
-## Health
-- `GET /health` - Health check del sistema
+## Users
+- `GET /users/` - List users (filtered by tenant)
+- `POST /users/` - Create user
+- `GET /users/{id}` - Get user details
+- `PUT /users/{id}` - Update user
+- `DELETE /users/{id}` - Delete user
 
-## MCP (Model Context Protocol)
-- `GET /mcp/tools` - Listar herramientas MCP disponibles
-- `POST /mcp/tools/{name}/execute` - Ejecutar herramienta MCP
-- `GET /mcp/resources` - Listar recursos MCP disponibles
-- `GET /mcp/resources/{uri}` - Obtener contenido de recurso MCP
-        """
+## Modules
+- `POST /modules/generate` - Generate new module
+- `GET /modules/` - List all modules
+- `GET /modules/{name}/status` - Get module status
+- `POST /modules/{name}/deploy` - Deploy module to tenant
+- `POST /modules/{name}/update-docs` - Update module documentation
 
+## Health & Monitoring
+- `GET /health` - System health check
+- `GET /` - API information
 
-# Función de utilidad para crear servidor MCP
-def create_mcp_server(api_url: str = "http://localhost:8000", api_key: str = None) -> ProyectoSemillaMCPServer:
-    """Crear instancia del servidor MCP"""
-    return ProyectoSemillaMCPServer(api_url, api_key)
+## Response Format
+All endpoints return JSON with the following structure:
+```json
+{
+  "success": true|false,
+  "data": { ... } | null,
+  "message": "Optional message",
+  "errors": ["Error messages"] | null
+}
+```
 
+## Authentication
+Include Bearer token in Authorization header:
+```
+Authorization: Bearer <your-jwt-token>
+```
 
-# Ejemplo de uso
-if __name__ == "__main__":
-    async def main():
-        # Crear servidor MCP
-        server = create_mcp_server()
+## Rate Limiting
+- 100 requests per minute per IP
+- 1000 requests per hour per user
+"""
+            return endpoints
 
-        # Listar herramientas disponibles
-        tools = server.list_tools()
-        print(f"🛠️  Herramientas MCP disponibles: {len(tools)}")
-        for tool in tools:
-            print(f"  - {tool['name']}: {tool['description']}")
-
-        # Listar recursos disponibles
-        resources = server.list_resources()
-        print(f"📚 Recursos MCP disponibles: {len(resources)}")
-        for resource in resources:
-            print(f"  - {resource['uri']}: {resource['name']}")
-
-        # Ejecutar health check
-        health = await server.execute_tool("health_check")
-        print(f"🏥 Health Check: {health}")
-
-        # Obtener información del sistema
-        info = await server.execute_tool("get_system_info")
-        print(f"ℹ️  System Info: {info}")
-
-    # Ejecutar ejemplo
-    asyncio.run(main())
+    async def run(self):
+        """Run the MCP server"""
+        self.logger.info("Starting Proyecto Semilla MCP Server...")
+        # Server run logic would go here
+        # This would integrate with the MCP protocol
