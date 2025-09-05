@@ -56,7 +56,7 @@ async def validate_imports():
         log("✅ Metrics module imported successfully")
 
         # Test alerting
-        from app.core.alerting import IntelligentAlertManager
+        from app.core.alerting import AlertingEngine
         log("✅ Alerting module imported successfully")
 
         return True
@@ -100,10 +100,11 @@ async def validate_functionality():
         log("✅ Rate limiting configuration working")
 
         # Test circuit breaker
-        from app.core.circuit_breaker import CircuitBreaker
+        from app.core.circuit_breaker import CircuitBreaker, CircuitBreakerConfig
 
-        cb = CircuitBreaker(failure_threshold=3, recovery_timeout=5)
-        log(f"✅ Circuit breaker created: {cb.state}")
+        config = CircuitBreakerConfig(failure_threshold=3, recovery_timeout=5)
+        cb = CircuitBreaker(config)
+        log(f"✅ Circuit breaker created: {cb.state.value}")
 
         return True
 
