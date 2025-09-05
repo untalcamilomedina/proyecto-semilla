@@ -21,9 +21,11 @@ from .exceptions import (
     APIError,
     ValidationError
 )
+from .docs import AutoDocumentation
 
 __all__ = [
     "ProyectoSemillaClient",
+    "AutoDocumentation",
     "Tenant",
     "User",
     "ModuleSpec",
