@@ -49,7 +49,7 @@ class TestMetrics:
 
         assert metrics.cache_hits == 2
         assert metrics.cache_misses == 1
-        assert metrics.get_cache_hit_rate() == 66.67  # 2/3 * 100
+        assert round(metrics.get_cache_hit_rate(), 2) == 66.67  # 2/3 * 100
 
     def test_error_rate_calculation(self):
         """Test error rate calculation"""

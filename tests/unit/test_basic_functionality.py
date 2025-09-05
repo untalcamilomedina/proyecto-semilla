@@ -13,7 +13,7 @@ def test_string_operations():
     """Test basic string operations"""
     test_string = "Proyecto Semilla"
 
-    assert len(test_string) == 15
+    assert len(test_string) == 16
     assert test_string.upper() == "PROYECTO SEMILLA"
     assert test_string.lower() == "proyecto semilla"
     assert "Semilla" in test_string
