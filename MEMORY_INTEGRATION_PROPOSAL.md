@@ -2,7 +2,7 @@
 
 **Fecha**: Septiembre 2025  
 **Propuesta**: Integración con servidor MCP de memoria n8n  
-**URL**: `https://n8n.untalcamilomedina.com/mcp/utcm-mcp-memory`  
+**URL**: `[SERVIDOR MCP PRIVADO]`  
 **Transport**: `httpStreamable`  
 
 ---
@@ -39,7 +39,7 @@
     "memory-graph": {
       "transport": {
         "type": "httpStreamable", 
-        "uri": "https://n8n.untalcamilomedina.com/mcp/utcm-mcp-memory"
+        "uri": "[SERVIDOR_MCP_PRIVADO]"
       },
       "env": {
         "AUTH_TOKEN": "{{MEMORY_GRAPH_TOKEN}}"
