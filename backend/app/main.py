@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.core.database import create_tables
 from app.core.logging import setup_logging
 from app.core.middleware import tenant_context_middleware, rate_limiting_middleware, logging_middleware
+from app.middleware.compression import AdvancedCompressionMiddleware, HTTP2ServerPushMiddleware
 from app.api.v1.router import api_router
 
 
@@ -70,6 +71,10 @@ if not settings.DEBUG:
 app.middleware("http")(logging_middleware)
 app.middleware("http")(rate_limiting_middleware)
 app.middleware("http")(tenant_context_middleware)
+
+# Add performance middleware (Sprint 5)
+app.add_middleware(AdvancedCompressionMiddleware, minimum_size=1000)
+app.add_middleware(HTTP2ServerPushMiddleware)
 
 # Include API routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

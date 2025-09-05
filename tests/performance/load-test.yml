@@ -1,0 +1,81 @@
+config:
+  target: 'http://localhost:7777'
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm-up"
+
+    # Normal load
+    - duration: 300
+      arrivalRate: 20
+      name: "Normal Load"
+
+    # Peak load
+    - duration: 120
+      arrivalRate: 50
+      name: "Peak Load"
+
+    # Stress test
+    - duration: 60
+      arrivalRate: 100
+      name: "Stress Test"
+
+scenarios:
+  - name: "API Load Test"
+    weight: 60
+    requests:
+      - get:
+          url: "/api/v1/articles"
+          headers:
+            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBwcm95ZWN0by1zZW1pbGxhLmNvbSIsInRlbmFudF9pZCI6IjEwMTBmZjEwLTY4NGYtNGI4ZS1hNzM5LTQ4N2JmZjEwMDAwMCIsImV4cCI6MTc0NjA4MzIwMH0"
+          capture:
+            json: "$.data"
+            as: "articles"
+
+      - get:
+          url: "/api/v1/categories"
+          headers:
+            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBwcm95ZWN0by1zZW1pbGxhLmNvbSIsInRlbmFudF9pZCI6IjEwMTBmZjEwLTY4NGYtNGI4ZS1hNzM5LTQ4N2JmZjEwMDAwMCIsImV4cCI6MTc0NjA4MzIwMH0"
+
+      - get:
+          url: "/api/v1/dashboard"
+          headers:
+            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBwcm95ZWN0by1zZW1pbGxhLmNvbSIsInRlbmFudF9pZCI6IjEwMTBmZjEwLTY4NGYtNGI4ZS1hNzM5LTQ4N2JmZjEwMDAwMCIsImV4cCI6MTc0NjA4MzIwMH0"
+
+  - name: "Authentication Test"
+    weight: 30
+    requests:
+      - post:
+          url: "/api/v1/auth/login"
+          json:
+            email: "admin@proyecto-semilla.com"
+            password: "admin123"
+          capture:
+            json: "$.access_token"
+            as: "token"
+
+      - get:
+          url: "/api/v1/auth/me"
+          headers:
+            Authorization: "Bearer {{ token }}"
+
+  - name: "CRUD Operations Test"
+    weight: 10
+    requests:
+      - post:
+          url: "/api/v1/articles"
+          headers:
+            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBwcm95ZWN0by1zZW1pbGxhLmNvbSIsInRlbmFudF9pZCI6IjEwMTBmZjEwLTY4NGYtNGI4ZS1hNzM5LTQ4N2JmZjEwMDAwMCIsImV4cCI6MTc0NjA4MzIwMH0"
+          json:
+            title: "Load Test Article {{ $randomInt }}"
+            content: "Content for load testing {{ $randomString }}"
+            slug: "load-test-{{ $randomInt }}"
+            status: "draft"
+
+      - get:
+          url: "/api/v1/articles/{{ $randomInt }}"
+          headers:
+            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBwcm95ZWN0by1zZW1pbGxhLmNvbSIsInRlbmFudF9pZCI6IjEwMTBmZjEwLTY4NGYtNGI4ZS1hNzM5LTQ4N2JmZjEwMDAwMCIsImV4cCI6MTc0NjA4MzIwMH0"
+
+processor: "./tests/performance/processor.js"
