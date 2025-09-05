@@ -1,5 +1,5 @@
 """
-Main application file for Proyecto Semilla Backend
+import jsonMain application file for Proyecto Semilla Backend
 FastAPI application with multi-tenant support
 """
 
@@ -16,7 +16,7 @@ from app.core.rate_limiting import RateLimitMiddleware, configure_default_limits
 from app.core.audit_logging import init_audit_logging, shutdown_audit_logging, log_request_middleware
 from app.middleware.compression import AdvancedCompressionMiddleware, HTTP2ServerPushMiddleware
 from app.api.v1.router import api_router
-
+from app.websocket.collaboration import collaboration_manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -126,3 +126,30 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+# WebSocket endpoints for real-time collaboration
+@app.websocket("/ws/rooms/{room_id}")
+async def websocket_room_endpoint(websocket: WebSocket, room_id: str):
+    """WebSocket endpoint for real-time collaboration in rooms"""
+    try:
+        # Extract user info from query parameters (in production, use proper auth)
+        user_id = websocket.query_params.get("user_id", "anonymous")
+        user_name = websocket.query_params.get("user_name", "Anonymous User")
+
+        await collaboration_manager.connect_to_room(websocket, room_id, user_id, user_name)
+
+        while True:
+            try:
+                data = await websocket.receive_text()
+                message = json.loads(data)
+                await collaboration_manager.handle_message(room_id, user_id, message)
+            except json.JSONDecodeError:
+                await websocket.send_json({"error": "Invalid JSON format"})
+            except Exception as e:
+                logger.error(f"Error handling message: {e}")
+                break
+
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+    finally:
+        await collaboration_manager.disconnect_from_room(room_id, user_id)
+
