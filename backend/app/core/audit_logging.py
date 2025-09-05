@@ -38,9 +38,9 @@ class AuditEventSeverity(Enum):
 @dataclass
 class AuditEvent:
     """Audit event data structure"""
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
     event_type: AuditEventType
     severity: AuditEventSeverity = AuditEventSeverity.MEDIUM
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: datetime = field(default_factory=datetime.utcnow)
     user_id: Optional[str] = None
     tenant_id: Optional[str] = None
@@ -301,29 +301,30 @@ class AuditLogger:
                             user_id, tenant_id, session_id, ip_address, user_agent,
                             resource, action, status, description, metadata, tags, hash
                         ) VALUES (
-                            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-                            $11, $12, $13, $14, $15, $16, $17
+                            :id, :event_id, :event_type, :severity, :timestamp,
+                            :user_id, :tenant_id, :session_id, :ip_address, :user_agent,
+                            :resource, :action, :status, :description, :metadata, :tags, :hash
                         )
                     """),
-                    [
-                        str(uuid.uuid4()),
-                        event.id,
-                        event.event_type.value,
-                        event.severity.value,
-                        event.timestamp,
-                        event.user_id,
-                        event.tenant_id,
-                        event.session_id,
-                        event.ip_address,
-                        event.user_agent,
-                        event.resource,
-                        event.action,
-                        event.status,
-                        event.description,
-                        json.dumps(event.metadata),
-                        event.tags,
-                        event_hash
-                    ]
+                    {
+                        "id": str(uuid.uuid4()),
+                        "event_id": event.id,
+                        "event_type": event.event_type.value,
+                        "severity": event.severity.value,
+                        "timestamp": event.timestamp,
+                        "user_id": event.user_id,
+                        "tenant_id": event.tenant_id,
+                        "session_id": event.session_id,
+                        "ip_address": event.ip_address,
+                        "user_agent": event.user_agent,
+                        "resource": event.resource,
+                        "action": event.action,
+                        "status": event.status,
+                        "description": event.description,
+                        "metadata": json.dumps(event.metadata),
+                        "tags": event.tags,
+                        "hash": event_hash
+                    }
                 )
                 await db.commit()
                 break
