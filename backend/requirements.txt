@@ -33,3 +33,7 @@ structlog==23.2.0
 
 # CORS
 python-multipart==0.0.6
+
+# MCP Protocol Support
+mcp==1.0.0
+pydantic>=2.5.0

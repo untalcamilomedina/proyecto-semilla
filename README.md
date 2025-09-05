@@ -1,7 +1,7 @@
 # Proyecto Semilla 🌱
 
 [![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Versión](https://img.shields.io/badge/versión-0.4.0-green.svg)](https://github.com/proyecto-semilla/releases)
+[![Versión](https://img.shields.io/badge/versión-0.5.0-green.svg)](https://github.com/proyecto-semilla/releases)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
