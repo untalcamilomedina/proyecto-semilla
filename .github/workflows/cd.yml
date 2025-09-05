@@ -1,0 +1,167 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy-staging:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push backend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: proyecto-semilla-backend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build backend image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./backend
+
+        # Push images
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build and push frontend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: proyecto-semilla-frontend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build frontend image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./frontend
+
+        # Push images
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Deploy to staging
+      run: |
+        # Update staging environment
+        aws ecs update-service \
+          --cluster proyecto-semilla-staging \
+          --service proyecto-semilla-backend \
+          --force-new-deployment
+
+        aws ecs update-service \
+          --cluster proyecto-semilla-staging \
+          --service proyecto-semilla-frontend \
+          --force-new-deployment
+
+    - name: Health check
+      run: |
+        # Wait for deployment
+        sleep 60
+
+        # Check backend health
+        curl -f https://staging-api.proyecto-semilla.dev/health || exit 1
+
+        # Check frontend health
+        curl -f https://staging.proyecto-semilla.dev || exit 1
+
+  deploy-production:
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    needs: [deploy-staging]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Deploy to production
+      run: |
+        # Update production environment
+        aws ecs update-service \
+          --cluster proyecto-semilla-production \
+          --service proyecto-semilla-backend \
+          --force-new-deployment
+
+        aws ecs update-service \
+          --cluster proyecto-semilla-production \
+          --service proyecto-semilla-frontend \
+          --force-new-deployment
+
+    - name: Health check
+      run: |
+        # Wait for deployment
+        sleep 120
+
+        # Check production health
+        curl -f https://api.proyecto-semilla.dev/health || exit 1
+        curl -f https://proyecto-semilla.dev || exit 1
+
+    - name: Run smoke tests
+      run: |
+        # Run basic smoke tests on production
+        npm install -g artillery
+        artillery run tests/performance/smoke-test.yml
+
+  rollback:
+    if: failure() && github.event_name == 'workflow_run'
+    runs-on: ubuntu-latest
+    environment: production
+    needs: [deploy-production]
+    steps:
+    - name: Rollback production
+      run: |
+        # Rollback to previous version
+        aws ecs update-service \
+          --cluster proyecto-semilla-production \
+          --service proyecto-semilla-backend \
+          --force-new-deployment \
+          --task-definition previous-task-definition
+
+        aws ecs update-service \
+          --cluster proyecto-semilla-production \
+          --service proyecto-semilla-frontend \
+          --force-new-deployment \
+          --task-definition previous-task-definition
+
+    - name: Notify rollback
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        text: "Production deployment failed, rollback initiated"
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  notify:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    steps:
+    - name: Notify deployment status
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
