@@ -56,7 +56,7 @@ log_test_result() {
 echo -e "${YELLOW}📝 Running Unit Tests...${NC}"
 UNIT_START_TIME=$(date +%s)
 
-if python -m pytest tests/unit/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/unit-tests.xml" > "$TEST_RESULTS_DIR/unit-tests.log" 2>&1; then
+if PYTHONPATH="$PWD/backend:$PYTHONPATH" python3 -m pytest tests/unit/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/unit-tests.xml" > "$TEST_RESULTS_DIR/unit-tests.log" 2>&1; then
     log_test_result "UNIT_TESTS" "PASS" $(($(date +%s) - UNIT_START_TIME))
 else
     log_test_result "UNIT_TESTS" "FAIL" $(($(date +%s) - UNIT_START_TIME))
@@ -67,7 +67,7 @@ fi
 echo -e "${YELLOW}🔗 Running Integration Tests...${NC}"
 INTEGRATION_START_TIME=$(date +%s)
 
-if python -m pytest tests/integration/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/integration-tests.xml" > "$TEST_RESULTS_DIR/integration-tests.log" 2>&1; then
+if PYTHONPATH="$PWD/backend:$PYTHONPATH" python3 -m pytest tests/integration/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/integration-tests.xml" > "$TEST_RESULTS_DIR/integration-tests.log" 2>&1; then
     log_test_result "INTEGRATION_TESTS" "PASS" $(($(date +%s) - INTEGRATION_START_TIME))
 else
     log_test_result "INTEGRATION_TESTS" "FAIL" $(($(date +%s) - INTEGRATION_START_TIME))
@@ -94,7 +94,7 @@ fi
 echo -e "${YELLOW}❤️ Running Health Checks...${NC}"
 HEALTH_START_TIME=$(date +%s)
 
-if python -m pytest tests/health/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/health-checks.xml" > "$TEST_RESULTS_DIR/health-checks.log" 2>&1; then
+if PYTHONPATH="$PWD/backend:$PYTHONPATH" python3 -m pytest tests/health/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/health-checks.xml" > "$TEST_RESULTS_DIR/health-checks.log" 2>&1; then
     log_test_result "HEALTH_CHECKS" "PASS" $(($(date +%s) - HEALTH_START_TIME))
 else
     log_test_result "HEALTH_CHECKS" "FAIL" $(($(date +%s) - HEALTH_START_TIME))
@@ -105,7 +105,7 @@ fi
 echo -e "${YELLOW}🔒 Running Security Tests...${NC}"
 SECURITY_START_TIME=$(date +%s)
 
-if python -m pytest tests/security/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/security-tests.xml" > "$TEST_RESULTS_DIR/security-tests.log" 2>&1; then
+if PYTHONPATH="$PWD/backend:$PYTHONPATH" python3 -m pytest tests/security/ -v --tb=short --junitxml="$TEST_RESULTS_DIR/security-tests.xml" > "$TEST_RESULTS_DIR/security-tests.log" 2>&1; then
     log_test_result "SECURITY_TESTS" "PASS" $(($(date +%s) - SECURITY_START_TIME))
 else
     log_test_result "SECURITY_TESTS" "FAIL" $(($(date +%s) - SECURITY_START_TIME))
