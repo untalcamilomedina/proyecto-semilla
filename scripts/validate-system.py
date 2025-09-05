@@ -44,19 +44,19 @@ async def validate_imports():
         log("✅ Circuit breaker module imported successfully")
 
         # Test auto recovery
-        from app.core.auto_recovery import AutoRecoveryManager
+        from app.core.auto_recovery import AutoRecoveryEngine
         log("✅ Auto recovery module imported successfully")
 
         # Test error handler
-        from app.core.error_handler import ErrorBoundary
+        from app.core.error_handler import ErrorHandler
         log("✅ Error handler module imported successfully")
 
         # Test metrics
-        from app.core.metrics import collect_performance_metrics
+        from app.core.metrics import VibecodingMetrics
         log("✅ Metrics module imported successfully")
 
         # Test alerting
-        from app.core.alerting import AlertManager
+        from app.core.alerting import IntelligentAlertManager
         log("✅ Alerting module imported successfully")
 
         return True
@@ -163,7 +163,12 @@ async def main():
     duration = end_time - start_time
 
     log("=" * 50)
-    log("📊 VALIDATION RESULTS SUMMARY"    log(".2f"    log("✅ Imports: PASSED"    log("✅ Functionality: PASSED"    log("✅ Security: PASSED"    log("=" * 50)
+    log("📊 VALIDATION RESULTS SUMMARY")
+    log(f"⏱️  Duration: {duration:.2f} seconds")
+    log("✅ Imports: PASSED")
+    log("✅ Functionality: PASSED")
+    log("✅ Security: PASSED")
+    log("=" * 50)
     log("🎉 Proyecto Semilla validation completed successfully!")
     log("All core systems are operational and ready for production.")
 
