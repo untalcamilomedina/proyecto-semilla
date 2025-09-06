@@ -18,7 +18,7 @@ Versión: 1.0.0
 Idioma: Español (con soporte i18n)
 """
 
-from .discovery_engine import DiscoveryEngine
+from .discovery_engine import DiscoveryEngine, discover_project_architecture
 from .i18n_manager import I18nManager
 from .analyzers.database_analyzer import DatabaseAnalyzer
 from .analyzers.api_pattern_detector import APIPatternDetector
@@ -28,6 +28,7 @@ from .analyzers.pattern_recognizer import PatternRecognizer
 
 __all__ = [
     'DiscoveryEngine',
+    'discover_project_architecture',
     'I18nManager', 
     'DatabaseAnalyzer',
     'APIPatternDetector',

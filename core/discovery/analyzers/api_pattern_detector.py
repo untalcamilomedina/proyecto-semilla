@@ -400,10 +400,10 @@ class APIPatternDetector:
                                 router_info.prefix = router_config.get("prefix", "")
                                 router_info.tags = router_config.get("tags", [])
             
-            # Buscar endpoints decorados
+            # Buscar endpoints decorados (incluyendo async functions)
             endpoints = []
             for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     endpoint_info = self._analyze_endpoint_function(node, content)
                     if endpoint_info:
                         endpoint_info.file_path = str(router_file)
@@ -433,7 +433,7 @@ class APIPatternDetector:
         
         return config
     
-    def _analyze_endpoint_function(self, func_node: ast.FunctionDef, content: str) -> Optional[EndpointInfo]:
+    def _analyze_endpoint_function(self, func_node: ast.AST, content: str) -> Optional[EndpointInfo]:
         """Analiza una función que puede ser un endpoint"""
         # Buscar decoradores de router
         http_method = None

@@ -848,16 +848,17 @@ class SecurityMapper:
         # Puntos por middleware de seguridad
         score += min(self.analysis_result.total_middleware * 2, 10)
         
-        # Penalizaciones por vulnerabilidades
-        for vuln in self.analysis_result.vulnerabilities:
-            if vuln.severity == 'critical':
-                score -= 15
-            elif vuln.severity == 'high':
-                score -= 10
-            elif vuln.severity == 'medium':
-                score -= 5
-            elif vuln.severity == 'low':
-                score -= 2
+        # Penalizaciones por vulnerabilidades (limitadas para evitar scores negativos excesivos)
+        critical_count = sum(1 for vuln in self.analysis_result.vulnerabilities if vuln.severity == 'critical')
+        high_count = sum(1 for vuln in self.analysis_result.vulnerabilities if vuln.severity == 'high')
+        medium_count = sum(1 for vuln in self.analysis_result.vulnerabilities if vuln.severity == 'medium')
+        low_count = sum(1 for vuln in self.analysis_result.vulnerabilities if vuln.severity == 'low')
+        
+        # Aplicar penalizaciones escaladas para evitar scores excesivamente bajos
+        score -= min(critical_count * 15, 30)  # Máximo 30 puntos por vulnerabilidades críticas
+        score -= min(high_count * 10, 20)     # Máximo 20 puntos por vulnerabilidades altas
+        score -= min(medium_count * 2, 15)    # Máximo 15 puntos por vulnerabilidades medias
+        score -= min(low_count * 0.5, 10)     # Máximo 10 puntos por vulnerabilidades bajas
         
         # Asegurar que el score esté entre 0-100
         self.analysis_result.security_score = max(0, min(100, score))
