@@ -1,0 +1,70 @@
+{
+  "analysis": {
+    "starting": "🔍 Analyzing project architecture...",
+    "completed": "✅ Architecture analysis completed",
+    "failed": "❌ Error during architecture analysis",
+    "title": "🏗️ **Architecture Analysis - Proyecto Semilla**"
+  },
+  "database": {
+    "title": "📊 **Database Layer**",
+    "analyzing": "📊 Database schema detected",
+    "multitenant": "Multi-tenant architecture with RLS",
+    "uuid_pattern": "UUID pattern for primary keys",
+    "entities": "{count} main entities detected",
+    "relationships": "Relationships: {types} consistent",
+    "rls_detected": "Row-Level Security (RLS) implemented",
+    "policies": "{count} RLS policies found"
+  },
+  "api": {
+    "title": "🔌 **API Layer**",
+    "analyzing": "🔌 API patterns identified",
+    "fastapi": "FastAPI with automatic OpenAPI generation",
+    "repository": "Repository pattern used consistently",
+    "auth": "JWT authentication with role-based permissions",
+    "endpoints": "RESTful endpoints following /api/v1/{resource} pattern",
+    "routes": "{count} routes found",
+    "middleware": "Middleware for {types} configured"
+  },
+  "frontend": {
+    "title": "🎨 **Frontend Layer**",
+    "analyzing": "🎨 Frontend architecture analyzed",
+    "react": "React with TypeScript",
+    "components": "Component-based architecture",
+    "styling": "Tailwind CSS for styling",
+    "state": "State management with Context API",
+    "pages": "{count} pages found",
+    "components_count": "{count} components detected"
+  },
+  "security": {
+    "title": "🔒 **Security Model**",
+    "analyzing": "🔒 Security model analyzed",
+    "rls": "Row-Level Security (RLS) for tenant isolation",
+    "jwt": "JWT tokens with refresh mechanism",
+    "rbac": "Role-based access control (RBAC)",
+    "api_keys": "Support for API key authentication",
+    "policies": "{count} security policies found",
+    "roles": "{count} roles defined"
+  },
+  "recommendations": {
+    "title": "💡 **Recommendations for new modules**",
+    "user_tenant_role": "Use existing User-Tenant-Role pattern",
+    "repository_pattern": "Follow Repository pattern for data access",
+    "rls_policies": "Implement RLS policies for multi-tenancy",
+    "router_structure": "Add to existing API router structure",
+    "testing": "Implement unit and integration tests",
+    "documentation": "Document API endpoints with OpenAPI"
+  },
+  "errors": {
+    "file_not_found": "File not found: {file}",
+    "invalid_path": "Invalid path: {path}",
+    "parsing_error": "Error parsing file: {file}",
+    "database_connection": "Database connection error",
+    "missing_dependency": "Missing dependency: {dependency}"
+  },
+  "patterns": {
+    "detected": "Pattern detected: {pattern}",
+    "recommended": "Recommended pattern: {pattern}",
+    "inconsistent": "Inconsistency detected in: {area}",
+    "best_practice": "Best practice identified: {practice}"
+  }
+}
