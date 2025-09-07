@@ -10,12 +10,12 @@ from pydantic import BaseModel
 import uuid
 from datetime import datetime
 
-from app.database import get_db
+from app.core.database import get_db
 from app.models.collaboration import (
     CollaborationRoom, RoomParticipant, RoomMessage,
     UserCursor, CollaborativeSession
 )
-from app.core.auth import get_current_user
+from app.core.security import get_current_user
 
 
 router = APIRouter(prefix="/api/v1/collaboration", tags=["collaboration"])

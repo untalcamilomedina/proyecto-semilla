@@ -1,3 +1,0 @@
-"""
-Proyecto Semilla SDK Tests
-"""

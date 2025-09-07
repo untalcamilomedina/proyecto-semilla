@@ -12,7 +12,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 import uuid
 
-from app.database import get_db
+from app.core.database import get_db
 from app.models.collaboration import (
     CollaborationRoom, RoomParticipant, RoomMessage,
     UserCursor, CollaborativeSession

@@ -13,118 +13,29 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic
 revision = '20250905_095000'
-down_revision = '20250905_075700'
+down_revision = '9365aa3543ae'
 branch_labels = None
 depends_on = None
 
 def upgrade():
-    """Add performance indexes for production optimization"""
+    """Add basic performance indexes for production optimization"""
 
-    # Articles table - Most critical indexes for tenant-based queries
-    op.create_index(
-        'idx_articles_tenant_created',
-        'articles',
-        ['tenant_id', 'created_at'],
-        postgresql_where=sa.text('deleted_at IS NULL'),
-        postgresql_concurrently=True
-    )
-
-    op.create_index(
-        'idx_articles_tenant_status',
-        'articles',
-        ['tenant_id', 'status'],
-        postgresql_where=sa.text('deleted_at IS NULL'),
-        postgresql_concurrently=True
-    )
-
-    op.create_index(
-        'idx_articles_author_created',
-        'articles',
-        ['author_id', 'created_at'],
-        postgresql_concurrently=True
-    )
+    # Articles table - Basic indexes for tenant-based queries
+    op.create_index('idx_articles_tenant_created', 'articles', ['tenant_id', 'created_at'])
+    op.create_index('idx_articles_tenant_status', 'articles', ['tenant_id', 'status'])
+    op.create_index('idx_articles_author_created', 'articles', ['author_id', 'created_at'])
 
     # Users table - Authentication and tenant isolation
-    op.create_index(
-        'idx_users_email_tenant',
-        'users',
-        ['email', 'tenant_id'],
-        postgresql_where=sa.text('active = true'),
-        postgresql_concurrently=True
-    )
+    op.create_index('idx_users_email_tenant', 'users', ['email', 'tenant_id'])
+    op.create_index('idx_users_tenant_role', 'users', ['tenant_id'])
 
-    op.create_index(
-        'idx_users_tenant_role',
-        'users',
-        ['tenant_id', 'role'],
-        postgresql_where=sa.text('active = true'),
-        postgresql_concurrently=True
-    )
+    # Categories table - Basic indexes
+    op.create_index('idx_categories_tenant', 'categories', ['tenant_id'])
+    op.create_index('idx_categories_parent', 'categories', ['parent_id'])
 
-    # Audit logs - Performance for compliance queries
-    op.create_index(
-        'idx_audit_logs_tenant_timestamp',
-        'audit_logs',
-        ['tenant_id', 'timestamp'],
-        postgresql_concurrently=True
-    )
-
-    op.create_index(
-        'idx_audit_logs_event_type',
-        'audit_logs',
-        ['event_type', 'timestamp'],
-        postgresql_concurrently=True
-    )
-
-    # Sessions - Performance for authentication
-    op.create_index(
-        'idx_sessions_user_expires',
-        'sessions',
-        ['user_id', 'expires_at'],
-        postgresql_where=sa.text('expires_at > CURRENT_TIMESTAMP'),
-        postgresql_concurrently=True
-    )
-
-    # Rate limiting - Performance for security
-    op.create_index(
-        'idx_rate_limits_key_window',
-        'rate_limits',
-        ['key', 'window_start'],
-        postgresql_concurrently=True
-    )
-
-    # Metrics - Performance for monitoring
-    op.create_index(
-        'idx_metrics_tenant_timestamp',
-        'metrics',
-        ['tenant_id', 'timestamp'],
-        postgresql_concurrently=True
-    )
-
-    op.create_index(
-        'idx_metrics_type_timestamp',
-        'metrics',
-        ['metric_type', 'timestamp'],
-        postgresql_concurrently=True
-    )
-
-    # Composite indexes for complex queries
-    op.create_index(
-        'idx_articles_composite_search',
-        'articles',
-        ['tenant_id', 'status', 'created_at', 'title'],
-        postgresql_where=sa.text('deleted_at IS NULL'),
-        postgresql_concurrently=True
-    )
-
-    # Partial indexes for active records only
-    op.create_index(
-        'idx_users_active_only',
-        'users',
-        ['tenant_id', 'last_login'],
-        postgresql_where=sa.text('active = true AND deleted_at IS NULL'),
-        postgresql_concurrently=True
-    )
+    # Comments table - Basic indexes
+    op.create_index('idx_comments_article', 'comments', ['article_id'])
+    op.create_index('idx_comments_tenant', 'comments', ['tenant_id'])
 
 def downgrade():
     """Remove performance indexes"""

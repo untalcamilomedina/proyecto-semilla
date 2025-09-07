@@ -6,7 +6,7 @@ Real-time collaboration features and session management
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.database import Base
+from app.core.database import Base
 
 
 class CollaborationRoom(Base):
@@ -61,7 +61,7 @@ class RoomMessage(Base):
     user_name = Column(String(255), nullable=False)
     message_type = Column(String(50), default="text")  # text, system, file, code
     content = Column(Text, nullable=False)
-    metadata = Column(JSON, default=dict)
+    message_metadata = Column(JSON, default=dict)
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
