@@ -151,7 +151,7 @@ const mockReviews = [
   }
 ];
 
-export const Marketplace: React.FC = () => {
+const Marketplace: React.FC = () => {
   const [plugins, setPlugins] = useState(mockPlugins);
   const [categories] = useState(mockCategories);
   const [selectedPlugin, setSelectedPlugin] = useState<any>(null);
@@ -371,3 +371,5 @@ export const Marketplace: React.FC = () => {
     </div>
   );
 };
+
+export default Marketplace;

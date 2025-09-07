@@ -55,7 +55,7 @@ async def create_tables():
         # Import all models to ensure they are registered
         from app.models import Tenant, User, Role, UserRole, RefreshToken  # noqa
 
-        await conn.run_sync(Base.metadata.create_all)
+        # await conn.run_sync(Base.metadata.create_all)
 
 
 async def drop_tables():

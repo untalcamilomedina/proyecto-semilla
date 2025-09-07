@@ -4,6 +4,7 @@ Uses Pydantic settings for environment variable management
 """
 
 import secrets
+import os
 from typing import List, Optional, Union
 
 from pydantic import AnyHttpUrl, field_validator, ValidationInfo
@@ -46,7 +47,7 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1"]
 
     # Database Configuration
-    DATABASE_URL: str = "postgresql://admin:changeme123@localhost:5432/proyecto_semilla"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://admin:changeme123@localhost:5432/proyecto_semilla")
 
     # Redis Configuration
     REDIS_URL: str = "redis://localhost:6379"
