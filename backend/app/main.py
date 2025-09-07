@@ -4,7 +4,9 @@ FastAPI application with multi-tenant support
 """
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+import json
+import logging
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
@@ -17,6 +19,9 @@ from app.core.audit_logging import init_audit_logging, shutdown_audit_logging, l
 from app.middleware.compression import AdvancedCompressionMiddleware, HTTP2ServerPushMiddleware
 from app.api.v1.router import api_router
 from app.websocket.collaboration import collaboration_manager
+
+# Setup logger
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

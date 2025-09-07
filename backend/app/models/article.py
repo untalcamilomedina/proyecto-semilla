@@ -29,7 +29,7 @@ class Article(Base):
 
     # Metadata
     author_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
-    category_id = Column(UUID(as_uuid=True), nullable=True, index=True)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"), nullable=True, index=True)
 
     # SEO
     seo_title = Column(String(60), nullable=True)
@@ -56,6 +56,7 @@ class Article(Base):
     # Relationships
     tenant = relationship("Tenant", back_populates="articles")
     author = relationship("User", back_populates="articles")
+    category = relationship("Category", back_populates="articles")
     comments = relationship("Comment", back_populates="article", cascade="all, delete-orphan")
 
     # Indexes for performance
@@ -97,7 +98,7 @@ class Category(Base):
 
     # Relationships
     tenant = relationship("Tenant", back_populates="categories")
-    articles = relationship("Article", backref="category_ref")
+    articles = relationship("Article", back_populates="category")
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}', slug='{self.slug}')>"

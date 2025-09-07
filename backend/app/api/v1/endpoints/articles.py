@@ -4,6 +4,7 @@ Articles CRUD endpoints for CMS functionality
 
 from typing import Any, List
 from uuid import UUID
+import json
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +40,7 @@ async def read_articles(
     """
     Retrieve articles with optional filtering
     """
-    # Build query
+    # Build query with named parameters
     query = """
     SELECT
         a.*,
@@ -48,24 +49,22 @@ async def read_articles(
     FROM articles a
     LEFT JOIN users u ON a.author_id = u.id
     LEFT JOIN categories c ON a.category_id = c.id
-    WHERE a.tenant_id = $1
+    WHERE a.tenant_id = :tenant_id
     """
 
-    params = [str(current_user.tenant_id)]
-    param_count = 1
+    params = {"tenant_id": str(current_user.tenant_id)}
 
     if status_filter:
-        param_count += 1
-        query += f" AND a.status = ${param_count}"
-        params.append(status_filter)
+        query += " AND a.status = :status_filter"
+        params["status_filter"] = status_filter
 
     if category_id:
-        param_count += 1
-        query += f" AND a.category_id = ${param_count}"
-        params.append(str(category_id))
+        query += " AND a.category_id = :category_id"
+        params["category_id"] = str(category_id)
 
-    query += f" ORDER BY a.created_at DESC LIMIT ${param_count + 1} OFFSET ${param_count + 2}"
-    params.extend([limit, skip])
+    query += " ORDER BY a.created_at DESC LIMIT :limit OFFSET :offset"
+    params["limit"] = limit
+    params["offset"] = skip
 
     result = await db.execute(text(query), params)
     articles = result.fetchall()
@@ -90,7 +89,7 @@ async def read_articles(
             "view_count": row[13],
             "comment_count": row[14],
             "like_count": row[15],
-            "tags": row[16] or [],
+            "tags": json.loads(row[16]) if row[16] else [],
             "published_at": row[17],
             "created_at": row[18],
             "updated_at": row[19],
@@ -152,7 +151,7 @@ async def create_article(
             str(article_id), str(current_user.tenant_id), article_in.title, article_in.slug,
             article_in.content, article_in.excerpt, str(current_user.id), str(article_in.category_id) if article_in.category_id else None,
             article_in.seo_title, article_in.seo_description, article_in.featured_image,
-            article_in.status, article_in.is_featured, 0, 0, 0, article_in.tags
+            article_in.status, article_in.is_featured, 0, 0, 0, json.dumps(article_in.tags) if article_in.tags else None
         ]
     )
 
@@ -208,7 +207,7 @@ async def read_article(
         "view_count": row[13],
         "comment_count": row[14],
         "like_count": row[15],
-        "tags": row[16] or [],
+        "tags": json.loads(row[16]) if row[16] else [],
         "published_at": row[17],
         "created_at": row[18],
         "updated_at": row[19],
@@ -312,7 +311,7 @@ async def update_article(
 
     if article_in.tags is not None:
         update_fields.append(f"tags = ${param_count}")
-        values.append(article_in.tags)
+        values.append(json.dumps(article_in.tags))
         param_count += 1
 
     if not update_fields:

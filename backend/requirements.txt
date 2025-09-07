@@ -1,39 +1,36 @@
 # FastAPI y servidor ASGI
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
 
 # Base de datos
-psycopg2-binary==2.9.9
-asyncpg==0.29.0
-sqlalchemy==2.0.23
-alembic==1.12.1
-greenlet==3.0.3
+psycopg2-binary>=2.9.9
+asyncpg>=0.29.0
+sqlalchemy>=2.0.23
+alembic>=1.12.1
+greenlet>=3.0.3
 
 # Autenticación y seguridad
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
 
 # Validación
-pydantic==2.5.0
+pydantic>=2.5.0
 pydantic[email]
-pydantic-settings==2.1.0
+pydantic-settings>=2.1.0
 
 # Utilidades
-python-dotenv==1.0.0
-redis==5.0.1
+python-dotenv>=1.0.0
+redis>=5.0.1
 
 # Desarrollo y testing
-pytest==7.4.3
-httpx==0.25.2
-pytest-asyncio==0.21.1
+pytest>=7.4.3
+httpx>=0.25.2
+pytest-asyncio>=0.21.1
 
 # Logging y monitoreo
-structlog==23.2.0
-
-# CORS
-python-multipart==0.0.6
+structlog>=23.2.0
 
 # MCP Protocol Support
-mcp==1.0.0
-pydantic>=2.5.0
+mcp>=1.0.0
+anyio>=4.6

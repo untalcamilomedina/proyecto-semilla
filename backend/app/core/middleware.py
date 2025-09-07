@@ -39,7 +39,7 @@ async def tenant_context_middleware(request: Request, call_next):
     Extracts tenant_id from JWT and sets it in database session
     """
     # Skip middleware for health checks and docs
-    if request.url.path in ["/api/v1/health", "/api/v1/health/detailed", "/docs", "/redoc", "/openapi.json", "/api/v1/openapi.json"]:
+    if request.url.path in ["/api/v1/health", "/api/v1/health/detailed", "/docs", "/redoc", "/openapi.json", "/api/v1/openapi.json", "/", "/health"]:
         return await call_next(request)
 
     # Skip for auth endpoints that don't require tenant context

@@ -35,17 +35,18 @@ async def read_categories(
     """
     query = """
     SELECT * FROM categories
-    WHERE tenant_id = $1
+    WHERE tenant_id = :tenant_id
     """
 
-    params = [str(current_user.tenant_id)]
+    params = {"tenant_id": str(current_user.tenant_id)}
 
     if not include_inactive:
         query += " AND is_active = true"
 
     query += " ORDER BY order_index ASC, created_at DESC"
-    query += f" LIMIT $2 OFFSET $3"
-    params.extend([limit, skip])
+    query += " LIMIT :limit OFFSET :offset"
+    params["limit"] = limit
+    params["offset"] = skip
 
     result = await db.execute(text(query), params)
     categories = result.fetchall()

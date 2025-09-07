@@ -322,7 +322,7 @@ class AuditLogger:
                         "status": event.status,
                         "description": event.description,
                         "metadata": json.dumps(event.metadata),
-                        "tags": event.tags,
+                        "tags": json.dumps(event.tags),
                         "hash": event_hash
                     }
                 )
