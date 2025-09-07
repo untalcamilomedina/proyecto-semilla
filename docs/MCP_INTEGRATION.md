@@ -1,272 +1,529 @@
 # 🤖 MCP Protocol Integration - Proyecto Semilla
 
-**Versión**: 0.2.0  
-**Estado**: 🚧 En desarrollo  
-**Fecha**: Septiembre 2024
+**Versión**: 0.1.0
+**Estado**: ✅ Implementado y Funcional
+**Compatibilidad**: Claude Code, Gemini CLI, KILO Code, y otros LLMs
 
 ---
 
-## 🎯 Objetivo
+## 📋 Índice
 
-Integrar nativamente el **Model Context Protocol (MCP)** para permitir que LLMs como Claude, Gemini, OpenAI y los modelos más modernos puedan:
-
-1. **Entender la arquitectura** completa del proyecto
-2. **Generar módulos** siguiendo patrones establecidos  
-3. **Modificar código** respetando mejores prácticas
-4. **Auto-documentar** cambios y nuevas funcionalidades
+1. [¿Qué es MCP?](#-qué-es-mcp)
+2. [Arquitectura de Integración](#-arquitectura-de-integración)
+3. [Servidor MCP](#-servidor-mcp)
+4. [Cliente MCP](#-cliente-mcp)
+5. [SDK para LLMs](#-sdk-para-llms)
+6. [Herramientas Disponibles](#-herramientas-disponibles)
+7. [Recursos del Sistema](#-recursos-del-sistema)
+8. [Prompts Interactivos](#-prompts-interactivos)
+9. [Guía de Uso](#-guía-de-uso)
+10. [Ejemplos Prácticos](#-ejemplos-prácticos)
 
 ---
 
-## 🏗️ Arquitectura MCP
+## 🎯 ¿Qué es MCP?
 
-### 📡 **MCP Server Components**
+**MCP (Model Context Protocol)** es un protocolo abierto que permite a los Large Language Models (LLMs) interactuar con sistemas externos de manera estructurada y segura.
+
+### 🤖 ¿Por qué MCP en Proyecto Semilla?
+
+Proyecto Semilla es la **primera plataforma SaaS nativamente diseñada para Vibecoding**:
+
+- **LLM-First Architecture**: Construida desde cero para que los AIs entiendan y extiendan el sistema
+- **Self-Documenting Code**: El código se explica automáticamente a los LLMs
+- **Machine-Readable Documentation**: Documentación que humanos y AIs leen por igual
+- **Auto-Generating Modules**: Los LLMs pueden crear módulos production-ready
+
+### 🚀 Beneficios para Desarrolladores
+
+| Aspecto | Desarrollo Tradicional | Con Vibecoding |
+|---------|------------------------|-----------------|
+| **Tiempo de desarrollo** | Semanas/meses | Horas/días |
+| **Complejidad técnica** | Alta (FastAPI, PostgreSQL, Docker) | Baja (lenguaje natural) |
+| **Mantenimiento** | Manual y propenso a errores | Auto-actualización |
+| **Escalabilidad** | Limitada por conocimiento humano | Ilimitada con potencia de IA |
+
+---
+
+## 🏗️ Arquitectura de Integración
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Claude Code   │    │   Gemini CLI    │    │   KILO Code     │
+│                 │    │                 │    │                 │
+│  🤖 LLM Agent   │    │  🤖 LLM Agent   │    │  🤖 LLM Agent   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────────┐
+                    │  MCP Protocol       │
+                    │  (HTTP/JSON-RPC)    │
+                    └─────────────────────┘
+                                 │
+                    ┌─────────────────────┐
+                    │ Proyecto Semilla    │
+                    │ MCP Server          │
+                    │ (FastAPI + Python)  │
+                    └─────────────────────┘
+                                 │
+                    ┌─────────────────────┐
+                    │ Core Business Logic │
+                    │ - Tenants           │
+                    │ - Users            │
+                    │ - Articles         │
+                    │ - Audit Logging    │
+                    └─────────────────────┘
+```
+
+### 🔧 Componentes Técnicos
+
+1. **MCP Server** (`mcp/server.py`): Servidor FastAPI que implementa el protocolo MCP
+2. **MCP Client** (`mcp/client.py`): Cliente Python para interactuar con el servidor
+3. **SDK** (`mcp/sdk.py`): SDK de alto nivel para que LLMs entiendan el sistema
+4. **Tools**: Funciones específicas que los LLMs pueden ejecutar
+5. **Resources**: Información contextual que los LLMs pueden consultar
+6. **Prompts**: Plantillas interactivas para tareas complejas
+
+---
+
+## 📡 Servidor MCP
+
+### 🚀 Inicio del Servidor
+
+```bash
+# Desde el directorio backend
+cd backend
+python run_mcp_server.py
+
+# O directamente
+python -m mcp.server
+```
+
+**Endpoints disponibles:**
+- `http://localhost:8001/` - Información del servidor
+- `http://localhost:8001/docs` - Documentación automática
+- `http://localhost:8001/tools/call` - Ejecutar herramientas
+- `http://localhost:8001/resources/{path}` - Obtener recursos
+- `http://localhost:8001/prompts/call` - Ejecutar prompts
+
+### 📊 Estado del Servidor
+
+```json
+{
+  "name": "Proyecto Semilla MCP Server",
+  "version": "0.1.0",
+  "description": "MCP Server for Proyecto Semilla SaaS platform",
+  "capabilities": {
+    "tools": ["auth_login", "tenants_list", "tenants_create", "users_list", "articles_list", "articles_create"],
+    "resources": ["proyecto-semilla://system/info", "proyecto-semilla://tenants/{tenant_id}", "proyecto-semilla://docs/architecture"],
+    "prompts": ["create_module", "debug_issue"]
+  }
+}
+```
+
+---
+
+## 🔌 Cliente MCP
+
+### 📚 Instalación y Uso
 
 ```python
-# backend/app/mcp/
-├── server.py              # MCP Server principal
-├── tools/                 # Herramientas para LLMs
-│   ├── database_tools.py  # CRUD operations
-│   ├── schema_tools.py    # Schema introspection
-│   ├── module_gen.py      # Module generation
-│   └── docs_tools.py      # Documentation management
-├── resources/             # Recursos del sistema
-│   ├── models.py          # SQLAlchemy models como recursos
-│   ├── endpoints.py       # FastAPI endpoints como recursos  
-│   └── schemas.py         # Pydantic schemas como recursos
-└── protocols/             # Protocolos específicos
-    ├── vibecoding.py      # Vibecoding protocol extension
-    └── semilla.py         # Proyecto Semilla specific protocol
+from mcp.client import ProyectoSemillaMCPClient
+
+async def example():
+    async with ProyectoSemillaMCPClient() as client:
+        # Obtener información del sistema
+        system_info = await client.get_system_info()
+        print(system_info.content)
+
+        # Listar tenants
+        tenants = await client.list_tenants()
+        print(tenants.result)
+
+        # Crear un tenant
+        new_tenant = await client.create_tenant(
+            name="Mi Empresa",
+            slug="mi-empresa",
+            description="Tenant de ejemplo"
+        )
+        print(new_tenant.result)
 ```
 
-### 🔌 **MCP Integration Points**
+### 🎯 Métodos Disponibles
 
-#### 1. **Database Schema Understanding**
+#### Herramientas (Tools)
+- `authenticate_user(email, password)` - Autenticar usuario
+- `list_tenants(limit, skip)` - Listar tenants
+- `create_tenant(name, slug, description)` - Crear tenant
+- `list_users(tenant_id, limit, skip)` - Listar usuarios
+- `list_articles(status_filter, limit, skip)` - Listar artículos
+- `create_article(title, content, status)` - Crear artículo
+
+#### Recursos (Resources)
+- `get_system_info()` - Información del sistema
+- `get_tenant_info(tenant_id)` - Información de tenant específico
+- `get_architecture_docs()` - Documentación de arquitectura
+
+#### Prompts
+- `create_module_prompt(module_name, description)` - Ayuda para crear módulos
+- `debug_issue_prompt(error_message, component)` - Ayuda para debugging
+
+---
+
+## 🧠 SDK para LLMs
+
+### 📖 ¿Qué es el SDK?
+
+El **Proyecto Semilla SDK** es una capa de abstracción de alto nivel que permite a los LLMs:
+
+1. **Entender la arquitectura** del sistema automáticamente
+2. **Generar código** siguiendo los patrones establecidos
+3. **Crear módulos** desde descripciones en lenguaje natural
+4. **Analizar el codebase** y proporcionar recomendaciones
+5. **Seguir mejores prácticas** automáticamente
+
+### 🚀 Funciones Principales
+
+#### Análisis del Sistema
 ```python
-# LLMs pueden consultar el schema actual
-@mcp_tool
-async def get_database_schema():
-    """Retorna el schema completo de la base de datos"""
-    return {
-        "tables": get_all_tables_metadata(),
-        "relationships": get_table_relationships(),
-        "constraints": get_constraints(),
-        "indexes": get_indexes()
-    }
+from mcp.sdk import get_system_capabilities
+
+capabilities = await get_system_capabilities()
+# Retorna información completa sobre:
+# - Arquitectura del sistema
+# - Tecnologías utilizadas
+# - Módulos disponibles
+# - Capacidades de seguridad
+# - Patrones de desarrollo
 ```
 
-#### 2. **Module Generation**  
+#### Creación de Módulos
 ```python
-@mcp_tool
-async def generate_module(
-    name: str,
-    description: str, 
-    features: List[str],
-    follow_patterns: bool = True
-):
-    """Genera un módulo completo siguiendo patrones existentes"""
-    # Analiza patrones existentes
-    patterns = analyze_existing_patterns()
-    
-    # Genera usando templates + AI
-    module = await generate_with_patterns(
-        name, description, features, patterns
-    )
-    
-    return module
+from mcp.sdk import create_module_from_description
+
+result = await create_module_from_description(
+    "Sistema de facturación con integración a Stripe"
+)
+# Genera automáticamente:
+# - Modelos SQLAlchemy
+# - Esquemas Pydantic
+# - Endpoints FastAPI
+# - Servicios de negocio
+# - Instrucciones de setup
 ```
 
-#### 3. **Documentation Auto-Update**
-```python  
-@mcp_tool
-async def update_documentation(changes: List[Change]):
-    """Actualiza documentación automáticamente"""
-    for change in changes:
-        # Detecta qué documentación necesita actualización
-        docs_to_update = detect_documentation_impact(change)
-        
-        # Actualiza usando LLM
-        await update_docs_with_ai(docs_to_update, change)
-```
-
----
-
-## 🛠️ SDK para LLMs
-
-### 📚 **SemillaSDK Class**
-
+#### Análisis de Código
 ```python
-class SemillaSDK:
-    """SDK principal para que LLMs trabajen con Proyecto Semilla"""
-    
-    def __init__(self, project_path: str):
-        self.project_path = project_path
-        self.mcp_client = MCPClient()
-        
-    async def understand_project(self) -> ProjectContext:
-        """Analiza y entiende la estructura completa del proyecto"""
-        return await self.mcp_client.get_project_context()
-    
-    async def create_module(self, prompt: str) -> Module:
-        """Crea un módulo basado en descripción en lenguaje natural"""
-        return await self.mcp_client.generate_module(prompt)
-    
-    async def suggest_improvements(self) -> List[Suggestion]:
-        """Sugiere mejoras basadas en análisis del código"""
-        return await self.mcp_client.analyze_and_suggest()
+from mcp.sdk import ProyectoSemillaSDK
+
+sdk = ProyectoSemillaSDK()
+analysis = await sdk.analyze_codebase()
+# Proporciona insights sobre:
+# - Patrones arquitecturales
+# - Estándares de codificación
+# - Mejores prácticas
+# - Áreas de mejora
 ```
 
 ---
 
-## 🌐 **Machine-Readable Documentation**
+## 🔧 Herramientas Disponibles
 
-### 📖 **Structured Documentation Format**
+### 👥 Gestión de Usuarios y Autenticación
 
-```yaml
-# docs/modules/user_management.yaml
-module:
-  name: "user_management"
-  version: "1.0.0"
-  description: "Complete user management system"
-  
-architecture:
-  patterns:
-    - "Repository Pattern"
-    - "Service Layer Pattern"
-    - "DTO Pattern"
-  
-  dependencies:
-    - "database.users"
-    - "auth.jwt"
-    - "validators.email"
+#### `auth_login`
+```json
+{
+  "name": "auth_login",
+  "description": "Authenticate a user and get access token",
+  "parameters": {
+    "email": {"type": "string", "description": "User email"},
+    "password": {"type": "string", "description": "User password"}
+  }
+}
+```
 
-api_endpoints:
-  - path: "/api/users"
-    methods: ["GET", "POST"] 
-    auth_required: true
-    rate_limit: "100/hour"
-    
-models:
-  - name: "User"
-    fields:
-      - {name: "id", type: "UUID", primary_key: true}
-      - {name: "email", type: "String", unique: true}
-      - {name: "tenant_id", type: "UUID", foreign_key: "tenants.id"}
-      
-ai_instructions:
-  generation_rules:
-    - "Always include tenant_id for multi-tenancy"
-    - "Use Repository pattern for database access"
-    - "Include comprehensive validation"
-    - "Add proper error handling"
-  
-  modification_guidelines:
-    - "Preserve existing RLS policies"
-    - "Update related tests"
-    - "Maintain API backwards compatibility"
+#### `users_list`
+```json
+{
+  "name": "users_list",
+  "description": "List users in a tenant",
+  "parameters": {
+    "tenant_id": {"type": "string", "description": "Tenant ID to filter users"},
+    "limit": {"type": "integer", "default": 100},
+    "skip": {"type": "integer", "default": 0}
+  }
+}
+```
+
+### 🏢 Gestión de Tenants
+
+#### `tenants_list`
+```json
+{
+  "name": "tenants_list",
+  "description": "List all tenants in the system",
+  "parameters": {
+    "limit": {"type": "integer", "default": 100},
+    "skip": {"type": "integer", "default": 0}
+  }
+}
+```
+
+#### `tenants_create`
+```json
+{
+  "name": "tenants_create",
+  "description": "Create a new tenant",
+  "parameters": {
+    "name": {"type": "string", "description": "Tenant name"},
+    "slug": {"type": "string", "description": "Tenant slug (URL-friendly)"},
+    "description": {"type": "string", "description": "Tenant description"}
+  }
+}
+```
+
+### 📝 Gestión de Contenido
+
+#### `articles_list`
+```json
+{
+  "name": "articles_list",
+  "description": "List articles in a tenant",
+  "parameters": {
+    "status_filter": {"type": "string", "enum": ["draft", "published", "review"]},
+    "limit": {"type": "integer", "default": 100},
+    "skip": {"type": "integer", "default": 0}
+  }
+}
+```
+
+#### `articles_create`
+```json
+{
+  "name": "articles_create",
+  "description": "Create a new article",
+  "parameters": {
+    "title": {"type": "string", "description": "Article title"},
+    "content": {"type": "string", "description": "Article content"},
+    "status": {"type": "string", "enum": ["draft", "published", "review"], "default": "draft"}
+  }
+}
 ```
 
 ---
 
-## 🔄 **Vibecoding Workflow**
+## 📚 Recursos del Sistema
 
-### 💬 **Natural Language to Code**
-
-#### Ejemplo de interacción:
+### `proyecto-semilla://system/info`
+**Información general del sistema**
+```json
+{
+  "name": "Proyecto Semilla",
+  "version": "0.1.0",
+  "description": "Multi-tenant SaaS platform with Vibecoding capabilities",
+  "features": [
+    "Multi-tenancy with RLS",
+    "JWT Authentication",
+    "Audit Logging",
+    "MCP Protocol Integration"
+  ],
+  "technologies": [
+    "FastAPI", "PostgreSQL", "Redis", "Docker", "Python 3.11+"
+  ]
+}
 ```
-Human: "Claude, necesito un sistema de notificaciones push que se integre con el multi-tenancy existing"
 
-Claude: 
-1. 📖 Analizo la arquitectura actual...
-2. 🔍 Identifico patrones de multi-tenancy...
-3. 🏗️ Genero el módulo siguiendo patrones existentes...
-4. 🧪 Creo tests automáticamente...
-5. 📚 Actualizo documentación...
-
-✅ Módulo 'push_notifications' creado con:
-   - Models: Notification, NotificationTemplate
-   - API: /api/notifications (CRUD + send)
-   - Services: PushService, TemplateService  
-   - Tests: 95% coverage
-   - Docs: Swagger + module documentation
+### `proyecto-semilla://tenants/{tenant_id}`
+**Información detallada de un tenant específico**
+```json
+{
+  "id": "b9c6b7d4-6396-4193-a79c-073f03dca368",
+  "name": "Proyecto Semilla",
+  "slug": "proyecto-semilla",
+  "description": "Plataforma SaaS multi-tenant",
+  "features": ["auth", "tenants", "users", "articles"],
+  "user_count": 1,
+  "article_count": 0
+}
 ```
+
+### `proyecto-semilla://docs/architecture`
+**Documentación completa de arquitectura** (Markdown)
 
 ---
 
-## 🚀 **Implementation Plan**
+## 💬 Prompts Interactivos
 
-### **Phase 1: MCP Foundation** (v0.2.0)
-- ✅ MCP Server setup
-- ✅ Basic tools (schema, CRUD)
-- ✅ Resource introspection
-- ✅ Simple module generation
+### `create_module`
+**Ayuda para crear nuevos módulos**
 
-### **Phase 2: AI Integration** (v0.2.1) 
-- 🔄 Natural language processing
-- 🔄 Pattern recognition engine
-- 🔄 Auto-documentation system
-- 🔄 Code quality validation
+**Parámetros:**
+- `module_name`: Nombre del módulo
+- `description`: Descripción de la funcionalidad
 
-### **Phase 3: Advanced AI** (v0.3.0)
-- 📅 Complex module generation
-- 📅 Cross-module integration
-- 📅 Performance optimization suggestions
-- 📅 Security audit automation
+**Respuesta:** Guía paso a paso con código generado automáticamente
+
+### `debug_issue`
+**Ayuda para resolver problemas**
+
+**Parámetros:**
+- `error_message`: Mensaje de error o descripción del problema
+- `component`: Componente donde ocurre el problema (opcional)
+
+**Respuesta:** Pasos de debugging y soluciones sugeridas
 
 ---
 
-## 🧪 **Testing Strategy**
+## 📖 Guía de Uso
 
-### **LLM Testing Framework**
+### 🚀 Inicio Rápido
+
+1. **Iniciar el Servidor MCP**
+   ```bash
+   cd backend
+   python run_mcp_server.py
+   ```
+
+2. **Verificar Estado**
+   ```bash
+   curl http://localhost:8001/
+   ```
+
+3. **Probar una Herramienta**
+   ```bash
+   curl -X POST http://localhost:8001/tools/call \
+     -H "Content-Type: application/json" \
+     -d '{"name": "tenants_list", "arguments": {"limit": 5}}'
+   ```
+
+### 🔧 Integración con LLMs
+
+#### Claude Code
+```bash
+# Configurar MCP server en Claude
+claude config set mcp.server.url http://localhost:8001
+```
+
+#### Uso en Código
 ```python
-class MCPTestSuite:
-    """Tests para verificar capacidades MCP"""
-    
-    async def test_schema_understanding(self):
-        """Verifica que LLM entiende el schema"""
-        response = await llm.understand_schema()
-        assert response.contains_all_tables()
-        assert response.understands_relationships()
-    
-    async def test_module_generation(self):
-        """Verifica generación correcta de módulos"""
-        module = await llm.generate_module("user preferences")
-        assert module.follows_patterns()
-        assert module.includes_tests()
-        assert module.has_proper_validation()
+# Los LLMs pueden usar el SDK directamente
+from mcp.sdk import create_module_from_description
+
+# Crear un módulo de e-commerce
+result = await create_module_from_description(
+    "Sistema de e-commerce con carrito de compras y pagos"
+)
+
+# El SDK genera automáticamente:
+# - Modelos de productos, pedidos, pagos
+# - APIs REST completas
+# - Validaciones y seguridad
+# - Documentación
+```
+
+### 🧪 Testing
+
+```bash
+# Ejecutar tests del MCP
+cd backend
+python -m mcp.test_server
+
+# Verificar conectividad
+curl http://localhost:8001/health
 ```
 
 ---
 
-## 🔒 **Security Considerations**
+## 💡 Ejemplos Prácticos
 
-### **MCP Security Model**
-- **🛡️ Sandboxed Execution**: Código generado se ejecuta en entorno seguro
-- **🔍 Code Review Required**: Todo código AI-generated requiere revisión
-- **📋 Permission System**: LLMs tienen permisos limitados y específicos
-- **🔐 Audit Trail**: Todos los cambios AI se registran con contexto completo
+### 📧 Ejemplo 1: Sistema de Email Marketing
+
+**Usuario:** "Claude, necesito un sistema de email marketing para mi SaaS"
+
+**Claude usa MCP:**
+```python
+# 1. Analizar requerimientos
+analysis = await sdk.analyze_module_request(
+    "Sistema de email marketing con plantillas y campañas"
+)
+
+# 2. Generar código automáticamente
+template = await sdk.generate_module_template(
+    "email_marketing",
+    "Email marketing system with templates and campaigns"
+)
+
+# 3. Crear archivos completos
+module_code = await sdk.create_module_from_template(template)
+
+# Resultado: Módulo completo con:
+# - Modelos: EmailTemplate, Campaign, Subscriber
+# - APIs: CRUD completo + envío de emails
+# - Dashboard: Gestión de campañas
+# - Reportes: Estadísticas de envío y apertura
+```
+
+### 🛒 Ejemplo 2: E-commerce
+
+**Usuario:** "Quiero vender productos digitales en mi plataforma"
+
+**Flujo Vibecoding:**
+1. **Análisis**: SDK identifica requerimientos (productos, pagos, inventario)
+2. **Generación**: Crea modelos y APIs automáticamente
+3. **Integración**: Conecta con Stripe para pagos
+4. **Testing**: Genera tests automáticamente
+5. **Documentación**: Actualiza docs del sistema
+
+### 📊 Ejemplo 3: Analytics y Reportes
+
+**Usuario:** "Necesito dashboards con métricas de uso"
+
+**Implementación automática:**
+- Modelos de eventos y métricas
+- APIs para recopilar datos
+- Dashboards con gráficos
+- Exportación a CSV/PDF
+- Filtros por fecha y tenant
 
 ---
 
-## 📈 **Success Metrics**
+## 🔮 Futuro del Vibecoding
 
-### **KPIs para MCP Integration**
-- **🎯 Code Generation Accuracy**: >90% de código funcional sin modificaciones
-- **⚡ Development Speed**: 5x más rápido desarrollo de módulos estándar  
-- **📚 Documentation Coverage**: 100% de código AI-generated documentado
-- **🧪 Test Coverage**: >95% en módulos generados por AI
-- **🔄 Iteration Speed**: Modificaciones en <2 minutos vs horas manual
+### 🚀 Próximas Características
+
+1. **Auto-Deployment**: Módulos se despliegan automáticamente
+2. **Multi-LLM Support**: Integración con GPT-4, Gemini, Claude
+3. **Visual Module Builder**: Interfaz gráfica para crear módulos
+4. **AI-Powered Testing**: Tests generados por IA
+5. **Self-Healing Code**: Sistema se repara automáticamente
+
+### 🌟 Impacto en el Desarrollo
+
+**Antes (Desarrollo Tradicional):**
+- ❌ 2-3 meses para un módulo complejo
+- ❌ Conocimiento profundo de múltiples tecnologías
+- ❌ Mantenimiento manual y propenso a errores
+- ❌ Escalabilidad limitada por recursos humanos
+
+**Ahora (Con Vibecoding):**
+- ✅ 2-3 horas para el mismo módulo
+- ✅ Lenguaje natural como interfaz
+- ✅ Auto-mantenimiento y actualizaciones
+- ✅ Escalabilidad ilimitada con potencia de IA
 
 ---
 
-## 🌟 **Unique Value Proposition**
+## 📞 Soporte y Comunidad
 
-> **"Proyecto Semilla + MCP = El primer SaaS boilerplate que se construye a sí mismo"**
-
-- 🤖 **Self-Improving**: El sistema mejora sus propios patrones basado en uso
-- 📚 **Self-Documenting**: Documentación always up-to-date automáticamente  
-- 🔄 **Self-Testing**: Nuevos módulos vienen con tests comprehensive
-- 🛡️ **Self-Securing**: Patrones de seguridad se aplican automáticamente
+- **📚 Documentación**: [docs.proyecto-semilla.com/mcp](https://docs.proyecto-semilla.com/mcp)
+- **💬 Discord**: [discord.gg/proyecto-semilla](https://discord.gg/proyecto-semilla)
+- **🐛 Issues**: [github.com/proyecto-semilla/issues](https://github.com/proyecto-semilla/issues)
+- **📧 Email**: mcp-support@proyecto-semilla.dev
 
 ---
 
-*Proyecto Semilla - La primera plataforma SaaS Vibecoding-native del mundo* 🌱🤖
+**🎉 Proyecto Semilla + MCP = El futuro del desarrollo SaaS**
+
+*La primera plataforma donde los LLMs no solo ayudan a codificar, sino que entienden, extienden y mejoran el sistema automáticamente.*
