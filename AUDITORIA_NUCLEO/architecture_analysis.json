@@ -1,0 +1,429 @@
+{
+  "metadata": {
+    "project_path": "/Users/untalcamilomedina/Documents/GitHub/proyecto-semilla",
+    "timestamp": "2025-09-05 23:27:48",
+    "discovery_version": "1.0.0",
+    "duration_seconds": 5.782977104187012,
+    "locale": "es"
+  },
+  "architecture_summary": {
+    "architecture_type": "Full-Stack Standard",
+    "complexity_level": "Media",
+    "maturity_level": "Madura",
+    "technology_stack": {
+      "backend": "FastAPI + SQLAlchemy",
+      "frontend": "Next.js",
+      "database": "PostgreSQL",
+      "styling": "tailwind",
+      "auth": "Unknown"
+    },
+    "key_features": [
+      "Multi-tenant Architecture",
+      "Row-Level Security",
+      "OpenAPI Documentation",
+      "TypeScript"
+    ],
+    "key_metrics": {
+      "total_models": 14,
+      "total_endpoints": 49,
+      "total_components": 11,
+      "security_score": 50.0,
+      "patterns_detected": 7
+    },
+    "strengths": [
+      "Uso consistente de patrones arquitectónicos",
+      "Type safety con TypeScript"
+    ],
+    "areas_for_improvement": [
+      "Fortalecer modelo de seguridad"
+    ],
+    "recommended_next_steps": []
+  },
+  "component_analysis": {
+    "database": {
+      "total_models": 14,
+      "multi_tenant": true,
+      "uses_uuid": true,
+      "has_relationships": true,
+      "patterns": [
+        "Pattern detected: Multi-Tenant Architecture",
+        "Pattern detected: UUID Primary Keys",
+        "Pattern detected: Automatic Timestamps",
+        "Pattern detected: Consistent Relationships"
+      ],
+      "recommendations": [
+        "Implement RLS policies for multi-tenancy",
+        "Use existing User-Tenant-Role pattern",
+        "Considerar agregar índices adicionales para foreign keys",
+        "Follow Repository pattern for data access",
+        "Implement unit and integration tests"
+      ],
+      "models": [
+        {
+          "name": "User",
+          "table": "users",
+          "columns": 14,
+          "relationships": 4,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "UserRole",
+          "table": "user_roles",
+          "columns": 4,
+          "relationships": 2,
+          "multi_tenant": false,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "Tenant",
+          "table": "tenants",
+          "columns": 9,
+          "relationships": 5,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "Role",
+          "table": "roles",
+          "columns": 11,
+          "relationships": 2,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "RefreshToken",
+          "table": "refresh_tokens",
+          "columns": 10,
+          "relationships": 0,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "CollaborationRoom",
+          "table": "collaboration_rooms",
+          "columns": 11,
+          "relationships": 3,
+          "multi_tenant": true,
+          "uuid": false,
+          "timestamps": true
+        },
+        {
+          "name": "RoomParticipant",
+          "table": "room_participants",
+          "columns": 9,
+          "relationships": 1,
+          "multi_tenant": false,
+          "uuid": false,
+          "timestamps": false
+        },
+        {
+          "name": "RoomMessage",
+          "table": "room_messages",
+          "columns": 8,
+          "relationships": 1,
+          "multi_tenant": false,
+          "uuid": false,
+          "timestamps": true
+        },
+        {
+          "name": "UserCursor",
+          "table": "user_cursors",
+          "columns": 11,
+          "relationships": 1,
+          "multi_tenant": false,
+          "uuid": false,
+          "timestamps": false
+        },
+        {
+          "name": "ConflictResolution",
+          "table": "conflict_resolutions",
+          "columns": 11,
+          "relationships": 0,
+          "multi_tenant": false,
+          "uuid": false,
+          "timestamps": true
+        },
+        {
+          "name": "CollaborativeSession",
+          "table": "collaborative_sessions",
+          "columns": 9,
+          "relationships": 1,
+          "multi_tenant": false,
+          "uuid": false,
+          "timestamps": true
+        },
+        {
+          "name": "Article",
+          "table": "articles",
+          "columns": 20,
+          "relationships": 3,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "Category",
+          "table": "categories",
+          "columns": 11,
+          "relationships": 2,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        },
+        {
+          "name": "Comment",
+          "table": "comments",
+          "columns": 12,
+          "relationships": 3,
+          "multi_tenant": true,
+          "uuid": true,
+          "timestamps": true
+        }
+      ]
+    },
+    "api": {
+      "total_routers": 9,
+      "total_endpoints": 49,
+      "total_middleware": 2,
+      "authenticated_endpoints": 0,
+      "crud_endpoints": 38,
+      "websocket_endpoints": 0,
+      "api_version": "v1",
+      "uses_openapi": true,
+      "uses_cors": true,
+      "uses_auth": false,
+      "auth_type": "",
+      "patterns": [
+        "Pattern detected: FastAPI con OpenAPI",
+        "Pattern detected: RESTful API",
+        "Pattern detected: CRUD Operations",
+        "Pattern detected: CORS Configuration",
+        "Pattern detected: Custom Middleware"
+      ],
+      "recommendations": [
+        "Considerar implementar autenticación para endpoints sensibles",
+        "Add to existing API router structure",
+        "Implement unit and integration tests"
+      ],
+      "routers": [
+        {
+          "name": "health",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 2
+        },
+        {
+          "name": "categories",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 6
+        },
+        {
+          "name": "articles",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 6
+        },
+        {
+          "name": "users",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 5
+        },
+        {
+          "name": "auth",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 6
+        },
+        {
+          "name": "roles",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 7
+        },
+        {
+          "name": "tenants",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 5
+        },
+        {
+          "name": "collaboration",
+          "prefix": "/api/v1/collaboration",
+          "tags": [
+            "collaboration"
+          ],
+          "endpoints_count": 12
+        },
+        {
+          "name": "router",
+          "prefix": "",
+          "tags": [],
+          "endpoints_count": 0
+        }
+      ]
+    },
+    "frontend": {
+      "framework": "Next.js",
+      "typescript_usage": true,
+      "total_components": 11,
+      "total_pages": 2,
+      "total_hooks": 33,
+      "styling_approach": "tailwind",
+      "state_management": [
+        "Zustand"
+      ],
+      "ui_libraries": [
+        "Radix UI"
+      ],
+      "form_libraries": [
+        "React Hook Form"
+      ],
+      "testing_libraries": [
+        "React Testing Library",
+        "Jest",
+        "Playwright"
+      ],
+      "routing_type": "app-router",
+      "internationalization": true,
+      "patterns": [
+        "Pattern detected: Next.js",
+        "Pattern detected: TypeScript",
+        "Pattern detected: Functional Components",
+        "Pattern detected: Tailwind Styling",
+        "Pattern detected: Zustand State Management",
+        "Pattern detected: Custom Hooks",
+        "Pattern detected: Internationalization"
+      ],
+      "recommendations": []
+    },
+    "security": {
+      "security_score": 50.0,
+      "uses_jwt": true,
+      "uses_refresh_tokens": true,
+      "uses_rbac": false,
+      "uses_rls": true,
+      "uses_cors": true,
+      "uses_rate_limiting": true,
+      "multi_tenant_security": true,
+      "total_roles": 4,
+      "total_permissions": 0,
+      "total_rls_policies": 13,
+      "total_vulnerabilities": 1485,
+      "patterns": [
+        "Pattern detected: JWT Authentication",
+        "Pattern detected: Refresh Token Mechanism",
+        "Pattern detected: Row-Level Security (RLS)",
+        "Pattern detected: Multi-Tenant Security Model",
+        "Pattern detected: CORS Configuration",
+        "Pattern detected: Rate Limiting"
+      ],
+      "recommendations": [
+        "Implementar sistema de roles y permisos (RBAC)",
+        "Corregir 4 vulnerabilidades de alta severidad"
+      ],
+      "vulnerabilities_by_severity": {
+        "critical": 0,
+        "high": 4,
+        "medium": 1481,
+        "low": 0
+      }
+    },
+    "patterns": {
+      "architecture_score": 6.0,
+      "maintainability_score": 7.3,
+      "consistency_score": 6.5,
+      "complexity_score": 1.4100000000000001,
+      "patterns_detected": 7,
+      "anti_patterns_detected": 4,
+      "smart_recommendations": 4,
+      "consistency_issues": 3,
+      "risk_areas": [
+        "Calidad del código - múltiples anti-patrones detectados",
+        "Seguridad - puntuación baja, vulnerable a ataques"
+      ],
+      "top_patterns": [
+        {
+          "name": "Repository Pattern",
+          "confidence": 1.0,
+          "type": "design_pattern"
+        },
+        {
+          "name": "MVC Pattern",
+          "confidence": 1.0,
+          "type": "architectural_pattern"
+        },
+        {
+          "name": "Microservices",
+          "confidence": 1.0,
+          "type": "architectural_pattern"
+        },
+        {
+          "name": "Multi-Tenant Architecture",
+          "confidence": 1.0,
+          "type": "architectural_pattern"
+        },
+        {
+          "name": "Factory Pattern",
+          "confidence": 0.8750000000000004,
+          "type": "design_pattern"
+        }
+      ],
+      "top_recommendations": [
+        {
+          "title": "Mejorar puntuación de seguridad",
+          "priority": "high",
+          "category": "security"
+        },
+        {
+          "title": "Corregir God Object",
+          "priority": "high",
+          "category": "maintainability"
+        },
+        {
+          "title": "Corregir Spaghetti Code",
+          "priority": "high",
+          "category": "maintainability"
+        },
+        {
+          "title": "Implementar Repository Pattern",
+          "priority": "medium",
+          "category": "architecture"
+        }
+      ]
+    }
+  },
+  "integration": {
+    "insights": [
+      {
+        "type": "integration",
+        "severity": "info",
+        "title": "Autenticación JWT Backend-Frontend",
+        "description": "Backend usa JWT, verificar integración con frontend"
+      }
+    ],
+    "cross_recommendations": [
+      "Implementar testing de integración end-to-end para validar flujos completos",
+      "Configurar monitoreo y logging distribuido entre backend y frontend",
+      "Implementar security headers, CSP y validación consistente frontend-backend",
+      "Mejorar puntuación de seguridad",
+      "Corregir God Object",
+      "Corregir Spaghetti Code"
+    ]
+  },
+  "metrics": {
+    "overall_architecture_score": 7.05,
+    "maintainability_score": 7.3,
+    "security_score": 5.0,
+    "consistency_score": 6.5,
+    "files_analyzed": 0,
+    "errors_encountered": 0
+  }
+}
