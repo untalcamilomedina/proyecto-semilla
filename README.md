@@ -6,7 +6,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 
-**Proyecto Semilla** es la primera plataforma SaaS multi-tenant diseñada nativamente para la era del Vibecoding. Construido con FastAPI, Next.js y MCP Protocol. No solo acelera tu desarrollo, **permite que los LLMs construyan tu aplicación** siguiendo mejores prácticas.
+**Proyecto Semilla** es la **primera plataforma Vibecoding-native del mundo** que democratiza enterprise development. Permite que **cualquier persona pueda crear módulos empresariales complejos** simplemente conversando con IA, sin conocimiento técnico profundo. Construido con FastAPI, Next.js y MCP Protocol.
 
 > 🇨🇴 **Creado con el talento humano de un equipo lleno de ideas ✨ y la potencia de Vibecoding 🚀**
 

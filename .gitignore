@@ -170,6 +170,15 @@ cover/
 .claude/
 
 # ==========================================
+# AI CONTEXT FILES (NEVER COMMIT)
+# ==========================================
+GEMINI_CONTEXT.md
+GEMINI_PRIVATE.md
+*_PRIVATE.md
+PROTOCOLO_DESARROLLO_GEMINI_CLI.md
+*INSTRUCCIONES_*.md
+
+# ==========================================
 # CUSTOM EXCLUDES
 # ==========================================
 
