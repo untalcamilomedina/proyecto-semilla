@@ -369,7 +369,7 @@ export const PluginDetails: React.FC<PluginDetailsProps> = ({
                             <span>Pros:</span>
                           </div>
                           <ul className="text-sm text-gray-600 ml-4">
-                            {review.pros.map((pro, index) => (
+                            {review.pros.map((pro: string, index: number) => (
                               <li key={index}>• {pro}</li>
                             ))}
                           </ul>
@@ -382,7 +382,7 @@ export const PluginDetails: React.FC<PluginDetailsProps> = ({
                             <span>Contras:</span>
                           </div>
                           <ul className="text-sm text-gray-600 ml-4">
-                            {review.cons.map((con, index) => (
+                            {review.cons.map((con: string, index: number) => (
                               <li key={index}>• {con}</li>
                             ))}
                           </ul>

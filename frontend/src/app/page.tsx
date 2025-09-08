@@ -1,12 +1,130 @@
 'use client';
 
 import { useArticles, useArticleStats } from '../hooks/useArticles';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { apiClient } from '../lib/api-client';
 
 export default function Home() {
   const [statusFilter, setStatusFilter] = useState<'draft' | 'published' | 'review'>('published');
-  const { data: articles, isLoading, error } = useArticles({ status_filter: statusFilter, limit: 10 });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginForm, setLoginForm] = useState({ email: 'demo@demo-company.com', password: 'demo123' });
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  const { data: articles, isLoading, error } = useArticles(
+    isAuthenticated ? { status_filter: statusFilter, limit: 10 } : undefined
+  );
   const { data: stats } = useArticleStats();
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError('');
+
+    try {
+      await apiClient.login({
+        email: loginForm.email,
+        password: loginForm.password
+      });
+      setIsAuthenticated(true);
+    } catch (error: any) {
+      setLoginError(error.detail || 'Login failed');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLogout = () => {
+    apiClient.logout();
+    setIsAuthenticated(false);
+    setLoginForm({ email: 'demo@demo-company.com', password: 'demo123' });
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full space-y-8">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Proyecto Semilla 🌱
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Plataforma Vibecoding-native para desarrollo empresarial
+            </p>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              Crea módulos empresariales conversando con IA
+            </p>
+          </div>
+          <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+            <div className="rounded-md shadow-sm -space-y-px">
+              <div>
+                <label htmlFor="email" className="sr-only">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Email"
+                  value={loginForm.email}
+                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Contraseña
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Contraseña"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {loginError && (
+              <div className="text-red-600 text-sm text-center">
+                {loginError}
+              </div>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {isLoggingIn ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              </button>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Credenciales de demo:<br />
+                <strong>Email:</strong> demo@demo-company.com<br />
+                <strong>Contraseña:</strong> demo123
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -19,7 +137,15 @@ export default function Home() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Error loading articles: {error.message}</div>
+        <div className="text-red-500 text-center">
+          <div>Error loading articles: {error.message}</div>
+          <button
+            onClick={handleLogout}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     );
   }
@@ -28,9 +154,17 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Proyecto Semilla CMS</h1>
-          <p className="text-gray-600 mt-2">Multi-tenant SaaS platform dashboard</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Proyecto Semilla 🌱</h1>
+            <p className="text-gray-600 mt-2">Plataforma Vibecoding-native para desarrollo empresarial</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            Cerrar Sesión
+          </button>
         </div>
 
         {/* Stats Cards */}

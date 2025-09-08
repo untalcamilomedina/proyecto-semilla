@@ -74,6 +74,30 @@ services:
     networks:
       - proyecto_semilla_network
 
+  # MCP Server
+  mcp_server:
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile # Use backend's Dockerfile as it has mcp installed
+    container_name: proyecto_semilla_mcp_server
+    restart: unless-stopped
+    command: python run_mcp_server.py # Command to run the MCP server script
+    volumes:
+      - ./backend:/app # Mount backend code to access run_mcp_server.py
+    ports:
+      - "8001:8001"
+    networks:
+      - proyecto_semilla_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      backend:
+        condition: service_healthy # MCP server depends on backend being healthy
+
   # Frontend Next.js
   frontend:
     build:

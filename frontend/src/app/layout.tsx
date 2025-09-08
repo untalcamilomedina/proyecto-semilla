@@ -6,8 +6,8 @@ import { Providers } from '../components/providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Proyecto Semilla - CMS',
-  description: 'Multi-tenant SaaS platform built with FastAPI and Next.js',
+  title: 'Proyecto Semilla 🌱 - Plataforma Vibecoding-native',
+  description: 'Primera plataforma SaaS Vibecoding-native para desarrollo empresarial',
 };
 
 export default function RootLayout({

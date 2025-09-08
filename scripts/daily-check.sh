@@ -10,6 +10,7 @@ echo "=================================="
 DOCKER_STATUS=0
 BACKEND_STATUS=0
 FRONTEND_STATUS=0
+MCP_STATUS=0
 OVERALL_STATUS=0
 
 # 1. VERIFICAR DOCKER SERVICES
@@ -37,7 +38,20 @@ else
     OVERALL_STATUS=1
 fi
 
-# 3. VERIFICAR FRONTEND BUILD
+# 3. VERIFICAR MCP SERVER HEALTH
+echo "🧠 Checking MCP Server health..."
+sleep 5 # Give MCP server time to start
+curl -s -f http://localhost:8001/docs > /dev/null 2>&1
+MCP_STATUS=$?
+
+if [ $MCP_STATUS -eq 0 ]; then
+    echo "✅ MCP Server health: HEALTHY"
+else
+    echo "❌ MCP Server health: UNHEALTHY (http://localhost:8001/docs failed)"
+    OVERALL_STATUS=1
+fi
+
+# 4. VERIFICAR FRONTEND BUILD
 echo "🎨 Checking Frontend compilation..."
 if [ -d "frontend" ]; then
     cd frontend
@@ -55,7 +69,7 @@ else
     echo "⚠️  Frontend directory not found"
 fi
 
-# 4. CALCULAR MÉTRICAS REALES
+# 5. CALCULAR MÉTRICAS REALES
 echo "📊 Calculating real metrics..."
 
 # Contar líneas de código reales
@@ -73,7 +87,7 @@ LAST_COMMIT=$(git log -1 --pretty=format:"%h - %s (%cr)" 2>/dev/null || echo "No
 DOCKER_SERVICES=$(docker-compose ps --services 2>/dev/null | wc -l || echo "0")
 DOCKER_RUNNING=$(docker-compose ps --services --filter status=running 2>/dev/null | wc -l || echo "0")
 
-# 5. GENERAR CURRENT_STATUS.md
+# 6. GENERAR CURRENT_STATUS.md
 echo "📝 Updating CURRENT_STATUS.md..."
 
 mkdir -p docs
@@ -90,6 +104,7 @@ cat > docs/CURRENT_STATUS.md << EOF
 |---------|--------|---------|
 | Docker | $([ $DOCKER_STATUS -eq 0 ] && echo "✅ UP" || echo "❌ DOWN") | $DOCKER_RUNNING/$DOCKER_SERVICES services running |
 | Backend | $([ $BACKEND_STATUS -eq 0 ] && echo "✅ HEALTHY" || echo "❌ UNHEALTHY") | http://localhost:7777/health |
+| MCP Server | $([ $MCP_STATUS -eq 0 ] && echo "✅ HEALTHY" || echo "❌ UNHEALTHY") | http://localhost:8001/docs |
 | Frontend | $([ $FRONTEND_STATUS -eq 0 ] && echo "✅ BUILDS OK" || echo "❌ BUILD ERRORS") | npm run build status |
 
 ---
@@ -128,6 +143,7 @@ $(git status --porcelain 2>/dev/null || echo "Git not available")
 $([ $OVERALL_STATUS -ne 0 ] && echo "- **CRITICAL**: Fix failing services before new development" || echo "- No critical issues detected")
 $([ $DOCKER_STATUS -ne 0 ] && echo "- **HIGH**: Docker services not starting properly")
 $([ $BACKEND_STATUS -ne 0 ] && echo "- **HIGH**: Backend health check failing")
+$([ $MCP_STATUS -ne 0 ] && echo "- **HIGH**: MCP Server health check failing")
 $([ $FRONTEND_STATUS -ne 0 ] && echo "- **MEDIUM**: Frontend compilation errors")
 
 ### 📋 Next Actions (Based on current state)
@@ -152,7 +168,7 @@ $([ $TOTAL_LINES -lt 1000 ] && echo "📊 **INFO**: Project is in early developm
 
 EOF
 
-# 6. RESULTADO FINAL
+# 7. RESULTADO FINAL
 echo "=================================="
 
 if [ $OVERALL_STATUS -eq 0 ]; then
@@ -165,6 +181,7 @@ else
     echo "🔧 TROUBLESHOOTING:"
     [ $DOCKER_STATUS -ne 0 ] && echo "   - Run: docker-compose down && docker-compose up -d"
     [ $BACKEND_STATUS -ne 0 ] && echo "   - Check: docker-compose logs backend"
+    [ $MCP_STATUS -ne 0 ] && echo "   - Check: docker-compose logs mcp_server"
     [ $FRONTEND_STATUS -ne 0 ] && echo "   - Check: cd frontend && npm install && npm run build"
 fi
 
