@@ -14,6 +14,7 @@ from jose import jwt, JWTError
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.logging import get_logger
+from app.core.cookies import get_cookie_manager
 from app.models.user import User
 
 logger = get_logger(__name__)
@@ -49,19 +50,26 @@ async def tenant_context_middleware(request: Request, call_next):
     response = Response("Internal server error", status_code=500)
 
     try:
-        # Extract token from Authorization header
+        # Extract token from Authorization header first
+        token = None
         authorization = request.headers.get("Authorization")
-        if not authorization or not authorization.startswith("Bearer "):
+
+        if authorization and authorization.startswith("Bearer "):
+            token = authorization.split(" ")[1]
+        else:
+            # Fallback to cookie-based authentication
+            cookie_manager = get_cookie_manager()
+            token = cookie_manager.get_access_token_from_cookie(request)
+
+        if not token:
             # For endpoints that require auth but no token provided
             if request.url.path.startswith("/api/v1/") and not request.url.path.startswith("/api/v1/auth/login"):
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Authorization header missing",
+                    detail="Authentication required",
                     headers={"WWW-Authenticate": "Bearer"},
                 )
             return await call_next(request)
-
-        token = authorization.split(" ")[1]
 
         try:
             # Decode JWT token

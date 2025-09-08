@@ -50,8 +50,9 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://admin:${DB_PASSWORD:-changeme123}@db:5432/proyecto_semilla
+      DB_PASSWORD: ${DB_PASSWORD:-changeme123}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_key_here}
+      JWT_SECRET: ${JWT_SECRET:-xO5kjaG4nj0WOaDYezPI/ArMQTFYIlS7Chz3WRnAmvo=}
       CORS_ORIGINS: http://localhost:3000,http://frontend:3000
     volumes:
       - ./backend:/app

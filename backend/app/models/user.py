@@ -62,6 +62,6 @@ class User(Base):
     def has_permission(self, permission: str) -> bool:
         """Check if user has a specific permission"""
         for role in self.roles:
-            if permission in role.permissions:
+            if role.has_permission(permission):
                 return True
         return False

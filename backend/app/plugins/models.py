@@ -234,7 +234,7 @@ class PluginAnalyticsModel(Base):
     metric_name = Column(String(100), nullable=False)
     value = Column(Float, nullable=False)
     timestamp = Column(DateTime, nullable=False, index=True)
-    metadata = Column(JSON)
+    plugin_metadata = Column(JSON)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 

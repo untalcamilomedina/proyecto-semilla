@@ -6,6 +6,7 @@ Creates initial data for development and testing
 
 import asyncio
 import sys
+import os
 from pathlib import Path
 
 # Add backend to path
@@ -41,16 +42,116 @@ async def create_initial_tenant(db: AsyncSession) -> Tenant:
     return tenant
 
 
+async def create_super_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
+    """Create super admin role"""
+    print("👑 Creating super admin role...")
+
+    permissions = [
+        "users:read", "users:write", "users:delete",
+        "tenants:read", "tenants:write", "tenants:delete",
+        "articles:read", "articles:write", "articles:delete", "articles:publish",
+        "roles:read", "roles:write", "roles:delete",
+        "categories:read", "categories:write", "categories:delete",
+        "comments:read", "comments:write", "comments:delete",
+        "system:admin", "system:config"
+    ]
+
+    role = Role(
+        tenant_id=tenant.id,
+        name="Super Admin",
+        description="Control total del sistema",
+        permissions=str(permissions).replace("'", '"'),
+        hierarchy_level=1000,
+        color="#FF0000",
+        is_default=False
+    )
+
+    db.add(role)
+    await db.commit()
+    await db.refresh(role)
+
+    print(f"✅ Created role: {role.name} (ID: {role.id})")
+    return role
+
+
 async def create_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
     """Create admin role"""
     print("👑 Creating admin role...")
 
+    permissions = [
+        "users:read", "users:write", "users:delete",
+        "tenants:read", "tenants:write",
+        "articles:read", "articles:write", "articles:delete", "articles:publish",
+        "roles:read", "roles:write", "roles:delete",
+        "categories:read", "categories:write", "categories:delete",
+        "comments:read", "comments:write", "comments:delete",
+        "system:config"
+    ]
+
     role = Role(
         tenant_id=tenant.id,
-        name="admin",
-        description="Administrator with full access",
-        permissions='["users:read", "users:write", "tenants:read", "tenants:write", "roles:read", "roles:write"]',
-        hierarchy_level=100,
+        name="Admin",
+        description="Administración de tenant",
+        permissions=str(permissions).replace("'", '"'),
+        hierarchy_level=500,
+        color="#FF6B35",
+        is_default=False
+    )
+
+    db.add(role)
+    await db.commit()
+    await db.refresh(role)
+
+    print(f"✅ Created role: {role.name} (ID: {role.id})")
+    return role
+
+
+async def create_manager_role(db: AsyncSession, tenant: Tenant) -> Role:
+    """Create manager role"""
+    print("👔 Creating manager role...")
+
+    permissions = [
+        "users:read", "users:write",
+        "articles:read", "articles:write", "articles:delete", "articles:publish",
+        "categories:read", "categories:write", "categories:delete",
+        "comments:read", "comments:write", "comments:delete"
+    ]
+
+    role = Role(
+        tenant_id=tenant.id,
+        name="Manager",
+        description="Gestión de contenido y usuarios",
+        permissions=str(permissions).replace("'", '"'),
+        hierarchy_level=300,
+        color="#4ECDC4",
+        is_default=False
+    )
+
+    db.add(role)
+    await db.commit()
+    await db.refresh(role)
+
+    print(f"✅ Created role: {role.name} (ID: {role.id})")
+    return role
+
+
+async def create_editor_role(db: AsyncSession, tenant: Tenant) -> Role:
+    """Create editor role"""
+    print("✏️ Creating editor role...")
+
+    permissions = [
+        "articles:read", "articles:write", "articles:publish",
+        "categories:read",
+        "comments:read", "comments:write"
+    ]
+
+    role = Role(
+        tenant_id=tenant.id,
+        name="Editor",
+        description="Creación y edición de contenido",
+        permissions=str(permissions).replace("'", '"'),
+        hierarchy_level=200,
+        color="#45B7D1",
         is_default=False
     )
 
@@ -66,12 +167,20 @@ async def create_user_role(db: AsyncSession, tenant: Tenant) -> Role:
     """Create user role"""
     print("👤 Creating user role...")
 
+    permissions = [
+        "users:read",
+        "articles:read",
+        "categories:read",
+        "comments:read", "comments:write"
+    ]
+
     role = Role(
         tenant_id=tenant.id,
-        name="user",
-        description="Standard user role",
-        permissions='["users:read", "tenants:read"]',
-        hierarchy_level=10,
+        name="User",
+        description="Usuario básico con permisos limitados",
+        permissions=str(permissions).replace("'", '"'),
+        hierarchy_level=100,
+        color="#96CEB4",
         is_default=True
     )
 
@@ -87,8 +196,13 @@ async def create_super_admin(db: AsyncSession, tenant: Tenant, admin_role: Role)
     """Create super admin user"""
     print("🦸 Creating super admin user...")
 
+    # Get password from environment or use secure default
+    admin_password = os.getenv("SEED_ADMIN_PASSWORD", "ChangeMeSecure123!")
+    if admin_password == "ChangeMeSecure123!":
+        print("⚠️  Using default admin password. Set SEED_ADMIN_PASSWORD environment variable for security.")
+
     # Hash password
-    hashed_password = get_password_hash("admin123")
+    hashed_password = get_password_hash(admin_password)
 
     user = User(
         tenant_id=tenant.id,
@@ -116,7 +230,7 @@ async def create_super_admin(db: AsyncSession, tenant: Tenant, admin_role: Role)
     await db.commit()
 
     print(f"✅ Created super admin: {user.email} (ID: {user.id})")
-    print("🔐 Password: admin123 (CHANGE THIS IN PRODUCTION!)")
+    print(f"🔐 Password: {admin_password} (Set SEED_ADMIN_PASSWORD environment variable for security)")
     return user
 
 
@@ -143,8 +257,13 @@ async def create_demo_user(db: AsyncSession, tenant: Tenant, user_role: Role) ->
     """Create demo user"""
     print("🎭 Creating demo user...")
 
+    # Get password from environment or use secure default
+    demo_password = os.getenv("SEED_DEMO_PASSWORD", "DemoSecure456!")
+    if demo_password == "DemoSecure456!":
+        print("⚠️  Using default demo password. Set SEED_DEMO_PASSWORD environment variable for security.")
+
     # Hash password
-    hashed_password = get_password_hash("demo123")
+    hashed_password = get_password_hash(demo_password)
 
     user = User(
         tenant_id=tenant.id,
@@ -172,7 +291,7 @@ async def create_demo_user(db: AsyncSession, tenant: Tenant, user_role: Role) ->
     await db.commit()
 
     print(f"✅ Created demo user: {user.email} (ID: {user.id})")
-    print("🔐 Password: demo123")
+    print(f"🔐 Password: {demo_password} (Set SEED_DEMO_PASSWORD environment variable for security)")
     return user
 
 
@@ -188,11 +307,14 @@ async def seed_database():
         tenant = await create_initial_tenant(db)
 
         # Create roles
+        super_admin_role = await create_super_admin_role(db, tenant)
         admin_role = await create_admin_role(db, tenant)
+        manager_role = await create_manager_role(db, tenant)
+        editor_role = await create_editor_role(db, tenant)
         user_role = await create_user_role(db, tenant)
 
         # Create super admin
-        await create_super_admin(db, tenant, admin_role)
+        await create_super_admin(db, tenant, super_admin_role)
 
         # Create demo data
         print("\n" + "=" * 30)
@@ -207,10 +329,11 @@ async def seed_database():
         print("=" * 50)
         print("\n📋 Summary:")
         print("- Main tenant: Proyecto Semilla")
-        print("- Super admin: admin@proyectosemilla.dev / admin123")
+        print(f"- Super admin: admin@proyectosemilla.dev / {admin_password}")
+        print("- Roles created: Super Admin, Admin, Manager, Editor, User")
         print("- Demo tenant: Demo Company")
-        print("- Demo user: demo@demo-company.com / demo123")
-        print("\n⚠️  Remember to change default passwords in production!")
+        print(f"- Demo user: demo@demo-company.com / {demo_password}")
+        print("\n⚠️  Set SEED_ADMIN_PASSWORD and SEED_DEMO_PASSWORD environment variables for production security!")
 
     except Exception as e:
         print(f"❌ Error during seeding: {e}")

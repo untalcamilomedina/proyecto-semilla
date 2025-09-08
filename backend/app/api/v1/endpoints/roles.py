@@ -112,6 +112,7 @@ async def create_role(
         )
 
     # Create role
+    import json
     role_id = UUID()
     await db.execute(
         text("""
@@ -123,7 +124,7 @@ async def create_role(
             "tenant_id": tenant_id,
             "name": role_in.name,
             "description": role_in.description,
-            "permissions": role_in.permissions,
+            "permissions": json.dumps(role_in.permissions),
             "color": role_in.color,
             "hierarchy_level": role_in.hierarchy_level,
             "is_default": role_in.is_default,
@@ -182,12 +183,19 @@ async def read_role(
             detail="Role not found"
         )
 
+    # Parse permissions JSON string to list
+    import json
+    try:
+        permissions = json.loads(role_data[4]) if role_data[4] else []
+    except (json.JSONDecodeError, TypeError):
+        permissions = []
+
     return {
         "id": str(role_data[0]),
         "tenant_id": str(role_data[1]),
         "name": role_data[2],
         "description": role_data[3],
-        "permissions": role_data[4] or [],
+        "permissions": permissions,
         "color": role_data[5],
         "hierarchy_level": role_data[6],
         "is_default": role_data[7],
@@ -258,8 +266,9 @@ async def update_role(
         param_count += 1
 
     if role_in.permissions is not None:
+        import json
         update_fields.append(f"permissions = ${param_count}")
-        values.append(role_in.permissions)
+        values.append(json.dumps(role_in.permissions))
         param_count += 1
 
     if role_in.color is not None:

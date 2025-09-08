@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import security
 from app.core.database import get_db
+from app.core.cookies import get_cookie_manager
 from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, RefreshTokenRequest
 from app.models.user import User
 from app.models.tenant import Tenant
@@ -64,11 +65,37 @@ async def login(
         ip_address=None   # Could be extracted from request
     )
 
-    return {
+    # Get tenant name for cookie
+    tenant_result = await db.execute(
+        "SELECT name FROM tenants WHERE id = :tenant_id",
+        {"tenant_id": user_obj.tenant_id}
+    )
+    tenant_name = tenant_result.fetchone()
+    tenant_name = tenant_name[0] if tenant_name else "Unknown"
+
+    # Create response with secure cookies
+    cookie_manager = get_cookie_manager()
+    response = cookie_manager.create_login_response(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        tenant_id=str(user_obj.tenant_id),
+        tenant_name=tenant_name
+    )
+
+    # Also include tokens in JSON response for backward compatibility
+    response_data = {
         "access_token": access_token,
         "refresh_token": refresh_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "tenant_id": str(user_obj.tenant_id),
+        "tenant_name": tenant_name
     }
+
+    # Update the response body
+    response.body = response.render(response_data)
+    response.headers["Content-Type"] = "application/json"
+
+    return response
 
 
 @router.post("/register", response_model=UserResponse)
@@ -203,12 +230,14 @@ async def logout(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Logout by revoking refresh token
+    Logout by revoking refresh token and clearing cookies
     """
     # Revoke the refresh token
     await security.revoke_refresh_token(db, refresh_request.refresh_token)
 
-    return {"message": "Successfully logged out"}
+    # Create logout response with cleared cookies
+    cookie_manager = get_cookie_manager()
+    return cookie_manager.create_logout_response()
 
 
 @router.post("/logout-all")
@@ -221,7 +250,9 @@ async def logout_all_devices(
     """
     await security.revoke_all_user_refresh_tokens(db, str(current_user.id))
 
-    return {"message": "Successfully logged out from all devices"}
+    # Create logout response with cleared cookies
+    cookie_manager = get_cookie_manager()
+    return cookie_manager.create_logout_response()
 
 
 @router.get("/me", response_model=UserResponse)

@@ -5,13 +5,15 @@ Multi-tenant management with proper authorization
 
 from typing import Any, List
 from uuid import UUID, uuid4
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, create_access_token
+from app.core.cookies import get_cookie_manager
 from app.models.user import User
 from app.models.tenant import Tenant
 from app.schemas.tenant import (
@@ -20,6 +22,7 @@ from app.schemas.tenant import (
     TenantUpdate,
     TenantWithUsers
 )
+from app.schemas.auth import TokenResponse
 
 router = APIRouter()
 
@@ -289,3 +292,101 @@ async def delete_tenant(
     await db.commit()
 
     return {"message": "Tenant deleted successfully"}
+
+
+@router.post("/switch/{tenant_id}", response_model=TokenResponse)
+async def switch_tenant(
+    tenant_id: UUID,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Switch user to a different tenant
+    Creates new access token with updated tenant context
+    """
+    # Verify tenant exists and is active
+    tenant_result = await db.execute(
+        text("SELECT id, name, is_active FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
+    )
+    tenant_data = tenant_result.fetchone()
+
+    if not tenant_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tenant not found"
+        )
+
+    if not tenant_data[2]:  # is_active
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tenant is not active"
+        )
+
+    # Verify user has access to this tenant
+    # For now, allow access to all tenants (this can be restricted based on user permissions)
+    # In production, you might want to check user_tenant_permissions table
+
+    # Create new access token with updated tenant_id
+    access_token = create_access_token(
+        subject=current_user.id,
+        tenant_id=str(tenant_id)
+    )
+
+    # Create response with updated cookies
+    cookie_manager = get_cookie_manager()
+    response = cookie_manager.create_login_response(
+        access_token=access_token,
+        refresh_token="",  # Keep existing refresh token
+        tenant_id=str(tenant_id),
+        tenant_name=tenant_data[1]
+    )
+
+    # Update response body
+    response_data = {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": 60 * 24 * 8,  # 8 days in seconds
+        "tenant_id": str(tenant_id),
+        "tenant_name": tenant_data[1]
+    }
+
+    response.body = response.render(response_data)
+    response.headers["Content-Type"] = "application/json"
+
+    return response
+
+
+@router.get("/user-tenants", response_model=List[TenantResponse])
+async def get_user_tenants(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Get all tenants available to the current user
+    """
+    # For now, return all active tenants
+    # In production, filter based on user permissions
+    result = await db.execute(
+        text("SELECT * FROM tenants WHERE is_active = true ORDER BY name")
+    )
+    tenants = result.fetchall()
+
+    # Convert to response format
+    tenant_list = []
+    for row in tenants:
+        tenant_list.append({
+            "id": str(row[0]),
+            "name": row[1],
+            "slug": row[2],
+            "description": row[3],
+            "parent_tenant_id": str(row[4]) if row[4] else None,
+            "settings": row[5] or "{}",
+            "is_active": row[6],
+            "created_at": row[7].isoformat() if row[7] else None,
+            "updated_at": row[8].isoformat() if row[8] else None
+        })
+
+    return tenant_list

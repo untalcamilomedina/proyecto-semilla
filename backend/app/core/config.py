@@ -34,6 +34,9 @@ class Settings(BaseSettings):
         "http://localhost:8000",  # FastAPI server
     ]
 
+    # Additional CORS origins from environment
+    CORS_ORIGINS: str = ""
+
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
@@ -49,19 +52,40 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1"]
 
     # Database Configuration
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://admin:changeme123@localhost:5432/proyecto_semilla")
+    DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    DB_PORT: int = int(os.getenv("DB_PORT", "5432"))
+    DB_NAME: str = os.getenv("DB_NAME", "proyecto_semilla")
+    DB_USER: str = os.getenv("DB_USER", "admin")
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
+
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construct database URL from environment variables"""
+        if not self.DB_PASSWORD:
+            raise ValueError("DB_PASSWORD environment variable is required")
+        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # Redis Configuration
-    REDIS_URL: str = "redis://localhost:6379"
-    
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+
     # Rate Limiting Configuration
-    RATE_LIMIT_REQUESTS: int = 100  # requests per window
-    RATE_LIMIT_WINDOW: int = 60  # seconds
+    RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))
+    RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "60"))
 
     # JWT Configuration
-    JWT_SECRET: str = "your_jwt_secret_key_here_change_this_in_production"
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "")
     JWT_ALGORITHM: str = "HS256"
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
+
+    @field_validator("JWT_SECRET", mode="after")
+    @classmethod
+    def validate_jwt_secret(cls, v: str) -> str:
+        """Validate JWT secret is properly configured"""
+        if not v or v == "your_jwt_secret_key_here_change_this_in_production":
+            raise ValueError("JWT_SECRET must be set to a secure value in environment variables")
+        if len(v) < 32:
+            raise ValueError("JWT_SECRET must be at least 32 characters long")
+        return v
 
     # Email Configuration (future)
     SMTP_TLS: bool = True
@@ -75,6 +99,14 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "json"  # json or text
+
+    # Frontend Configuration
+    NEXT_PUBLIC_API_URL: str = "http://localhost:7777"
+
+    # Cookie Configuration
+    COOKIE_SECURE: bool = False
+    COOKIE_DOMAIN: str = ""
+    COOKIE_SAME_SITE: str = "lax"
 
     class Config:
         env_file = ".env"

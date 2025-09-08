@@ -6,7 +6,7 @@ Complete marketplace system with plugin discovery, reviews, and installation
 import json
 import asyncio
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, AsyncGenerator
+from typing import Dict, List, Any, Optional, AsyncGenerator, Tuple
 from dataclasses import dataclass, asdict
 import uuid
 import re

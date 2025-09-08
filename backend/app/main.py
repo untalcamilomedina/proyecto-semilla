@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import settings
-from app.core.database import create_tables
+from app.core.database import create_tables, get_db
 from app.core.logging import setup_logging
 from app.core.middleware import tenant_context_middleware, rate_limiting_middleware, logging_middleware
 from app.core.rate_limiting import RateLimitMiddleware, configure_default_limits
@@ -19,6 +19,7 @@ from app.core.audit_logging import init_audit_logging, shutdown_audit_logging, l
 from app.middleware.compression import AdvancedCompressionMiddleware, HTTP2ServerPushMiddleware
 from app.api.v1.router import api_router
 from app.websocket.collaboration import collaboration_manager
+from app.plugins import initialize_plugin_system, get_plugin_system_status
 
 # Setup logger
 logger = logging.getLogger(__name__)
@@ -40,6 +41,17 @@ async def lifespan(app: FastAPI):
 
     # Initialize audit logging
     await init_audit_logging()
+
+    # Initialize plugin system
+    print("🔌 Initializing Plugin System...")
+    db_session = await get_db().__aenter__()
+    try:
+        integration_results = await initialize_plugin_system(app, db_session)
+        print(f"✅ Plugin system initialized with {len(integration_results)} modules")
+    except Exception as e:
+        print(f"⚠️  Plugin system initialization failed: {e}")
+    finally:
+        await db_session.__aexit__(None, None, None)
 
     print("✅ Backend started successfully!")
 
@@ -106,6 +118,142 @@ async def health_check():
     Health check endpoint
     """
     return {"status": "healthy", "version": "0.1.0"}
+
+
+# Plugin Management Endpoints
+from fastapi import Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+@app.get("/api/v1/plugins/status")
+async def get_plugins_status():
+    """
+    Get plugin system status
+    """
+    try:
+        status = await get_plugin_system_status()
+        return status
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get plugin status: {e}")
+
+
+@app.get("/api/v1/plugins/")
+async def list_plugins():
+    """
+    List all available plugins
+    """
+    try:
+        from app.plugins import get_plugin_manager
+        manager = await get_plugin_manager()
+        plugins = manager.list_modules()
+        return {"plugins": plugins}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list plugins: {e}")
+
+
+@app.post("/api/v1/plugins/{module_name}/install")
+async def install_plugin(module_name: str):
+    """
+    Install and integrate a specific plugin
+    """
+    try:
+        from app.plugins import get_plugin_manager, get_module_registry
+        manager = await get_plugin_manager()
+        registry = await get_module_registry()
+
+        # Load and integrate module
+        loaded = await manager.load_module(module_name)
+        if not loaded:
+            raise HTTPException(status_code=400, detail=f"Failed to load module {module_name}")
+
+        # Get module metadata
+        metadata = manager.modules.get(module_name)
+        if not metadata:
+            raise HTTPException(status_code=404, detail=f"Module metadata not found for {module_name}")
+
+        # Integrate module
+        result = await manager.integrate_module(module_name, app)
+        if not result.success:
+            raise HTTPException(status_code=400, detail=f"Failed to integrate module {module_name}: {result.errors}")
+
+        # Register in registry
+        module_record = await registry.get_module(module_name)
+        if not module_record:
+            # Create module record if it doesn't exist
+            from pathlib import Path
+            module_path = Path(f"modules/{module_name}")
+            module_record = await registry.register_module(module_path)
+
+        await registry.install_module(module_name)
+
+        return {
+            "message": f"Module {module_name} installed successfully",
+            "integration_result": {
+                "routes_registered": result.routes_registered,
+                "models_registered": result.models_registered,
+                "services_registered": result.services_registered,
+                "migrations_applied": result.migrations_applied
+            }
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to install plugin {module_name}: {e}")
+
+
+@app.post("/api/v1/plugins/{module_name}/test")
+async def test_plugin(module_name: str):
+    """
+    Run integration tests for a specific plugin
+    """
+    try:
+        from app.plugins import get_plugin_manager, run_module_integration_tests
+        from fastapi.testclient import TestClient
+
+        manager = await get_plugin_manager()
+        metadata = manager.modules.get(module_name)
+
+        if not metadata:
+            raise HTTPException(status_code=404, detail=f"Module {module_name} not found")
+
+        # Create test client
+        client = TestClient(app)
+
+        # Get module record
+        from app.plugins import get_module_registry
+        registry = await get_module_registry()
+        module_record = await registry.get_module(module_name)
+
+        if not module_record:
+            raise HTTPException(status_code=404, detail=f"Module record not found for {module_name}")
+
+        # Run integration tests
+        test_suite = await run_module_integration_tests(module_record, metadata)
+
+        return {
+            "module_name": module_name,
+            "tests_run": test_suite.total_tests,
+            "tests_passed": test_suite.passed_tests,
+            "tests_failed": test_suite.failed_tests,
+            "success_rate": (test_suite.passed_tests / test_suite.total_tests * 100) if test_suite.total_tests > 0 else 0,
+            "total_duration": test_suite.total_duration,
+            "test_results": [
+                {
+                    "test_name": test.test_name,
+                    "description": test.description,
+                    "success": test.success,
+                    "duration": test.duration,
+                    "error_message": test.error_message,
+                    "details": test.details
+                }
+                for test in test_suite.tests
+            ]
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to test plugin {module_name}: {e}")
 
 
 @app.get("/")

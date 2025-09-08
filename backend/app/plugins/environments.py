@@ -216,13 +216,17 @@ class EnvironmentManager:
             pass  # Network might already exist
 
         # Create PostgreSQL container
+        test_db_password = os.getenv("TEST_DB_PASSWORD", "SecureTestPass789!")
+        if test_db_password == "SecureTestPass789!":
+            print("⚠️  Using default test database password. Set TEST_DB_PASSWORD environment variable for security.")
+
         db_container = self.docker_client.containers.run(
             "postgres:15-alpine",
             name=f"plugin_db_{env.id}",
             environment={
                 "POSTGRES_DB": f"test_{env.plugin_id}",
                 "POSTGRES_USER": f"test_{env.tenant_id}",
-                "POSTGRES_PASSWORD": "test_password"
+                "POSTGRES_PASSWORD": test_db_password
             },
             networks=[network_name],
             detach=True,
