@@ -131,6 +131,14 @@ export interface UserCreate {
   role_id: string;
 }
 
+export interface UserRegister {
+  email: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  tenant_id: string;
+}
+
 export interface UserUpdate {
   email?: string;
   first_name?: string;

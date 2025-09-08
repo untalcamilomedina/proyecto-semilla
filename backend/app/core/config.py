@@ -27,10 +27,10 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # CORS Configuration
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:3000",  # Next.js dev server
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",  # Next.js dev server (Docker)
         "http://localhost:3001",  # Next.js dev server (alternative port)
-        "http://localhost:3002",  # Next.js dev server (alternative port)
+        "http://localhost:3002",  # Next.js dev server (development)
         "http://localhost:8000",  # FastAPI server
     ]
 
