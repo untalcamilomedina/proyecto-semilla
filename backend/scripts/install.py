@@ -119,8 +119,32 @@ class Installer:
                 else:
                     version = "Unknown"
 
-                if min_version and version != "Unknown" and version.startswith(min_version):
-                    self.print_success(f"{name} {version} - OK")
+                if min_version and version != "Unknown":
+                    try:
+                        # Parse version numbers for comparison
+                        if name == "Node.js":
+                            # Node.js version format: v16.14.0 or 16.14.0
+                            version_clean = version.lstrip('v')
+                            current_major = int(version_clean.split('.')[0])
+                            min_major = int(min_version)
+                            if current_major >= min_major:
+                                self.print_success(f"{name} {version} - OK")
+                            else:
+                                self.print_warning(f"{name} {version} - Versión mínima requerida: {min_version}")
+                                all_good = False
+                        elif name == "Python":
+                            current_minor = int(version.split('.')[1])
+                            min_minor = int(min_version.split('.')[1])
+                            if current_minor >= min_minor:
+                                self.print_success(f"{name} {version} - OK")
+                            else:
+                                self.print_warning(f"{name} {version} - Versión mínima requerida: {min_version}")
+                                all_good = False
+                        else:
+                            self.print_success(f"{name} {version} - OK")
+                    except (ValueError, IndexError) as e:
+                        self.print_warning(f"{name} {version} - No se pudo validar versión: {e}")
+                        all_good = False
                 elif not min_version:
                     self.print_success(f"{name} - OK")
                 else:
@@ -183,7 +207,7 @@ class Installer:
         db_host = self.get_user_input("Host de PostgreSQL", "localhost")
         db_port = self.get_user_input("Puerto de PostgreSQL", "5432")
         db_name = self.get_user_input("Nombre de la base de datos", "proyecto_semilla")
-        db_user = self.get_user_input("Usuario de PostgreSQL", "postgres")
+        db_user = self.get_user_input("Usuario de PostgreSQL", "admin")
         db_password = self.get_user_input("Contraseña de PostgreSQL", password=True)
 
         self.config.update({

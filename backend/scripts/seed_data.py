@@ -301,7 +301,6 @@ async def seed_database():
     print("=" * 50)
 
     db = await get_db().__anext__()
-
     try:
         # Create initial tenant
         tenant = await create_initial_tenant(db)

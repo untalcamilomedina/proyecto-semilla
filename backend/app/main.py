@@ -32,6 +32,7 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     print("🚀 Starting Proyecto Semilla Backend...")
+    print(f"DATABASE_URL: {settings.DATABASE_URL}")
 
     # Setup structured logging
     setup_logging()
@@ -44,14 +45,14 @@ async def lifespan(app: FastAPI):
 
     # Initialize plugin system
     print("🔌 Initializing Plugin System...")
-    db_session = await get_db().__aenter__()
+    db_session = await get_db().__anext__()
     try:
         integration_results = await initialize_plugin_system(app, db_session)
         print(f"✅ Plugin system initialized with {len(integration_results)} modules")
     except Exception as e:
         print(f"⚠️  Plugin system initialization failed: {e}")
     finally:
-        await db_session.__aexit__(None, None, None)
+        await db_session.close()
 
     print("✅ Backend started successfully!")
 

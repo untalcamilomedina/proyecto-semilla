@@ -44,7 +44,7 @@ async def tenant_context_middleware(request: Request, call_next):
         return await call_next(request)
 
     # Skip for auth endpoints that don't require tenant context
-    if request.url.path.startswith("/api/v1/auth/login"):
+    if request.url.path.startswith("/api/v1/auth/login") or request.url.path.startswith("/api/v1/auth/register"):
         return await call_next(request)
 
     response = Response("Internal server error", status_code=500)
@@ -105,8 +105,23 @@ async def tenant_context_middleware(request: Request, call_next):
         response = await call_next(request)
 
     except HTTPException as e:
-        # Re-raise HTTP exceptions
-        raise e
+        # Handle HTTP exceptions properly with CORS headers
+        from app.core.config import settings
+        cors_headers = {}
+        if settings.BACKEND_CORS_ORIGINS:
+            cors_headers.update({
+                "Access-Control-Allow-Origin": "http://localhost:3002",  # Allow the requesting origin
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Vary": "Origin"
+            })
+
+        response = JSONResponse(
+            status_code=e.status_code,
+            content={"detail": e.detail},
+            headers={**e.headers, **cors_headers} if e.headers else cors_headers
+        )
     except Exception as e:
         logger.error(
             "Middleware error",
