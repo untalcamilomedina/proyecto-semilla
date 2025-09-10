@@ -34,17 +34,81 @@ def get_redis_client():
     return redis_client
 
 
+async def cors_middleware(request: Request, call_next):
+    """
+    CORS middleware to handle preflight requests and add CORS headers to all responses
+    """
+    # Handle preflight OPTIONS requests
+    if request.method == "OPTIONS":
+        from app.core.config import settings
+        cors_headers = {}
+
+        if settings.BACKEND_CORS_ORIGINS:
+            request_origin = request.headers.get("origin")
+            allowed_origins = [str(origin) for origin in settings.BACKEND_CORS_ORIGINS]
+
+            if request_origin and request_origin in allowed_origins:
+                cors_origin = request_origin
+            elif allowed_origins:
+                cors_origin = allowed_origins[0]
+            else:
+                cors_origin = None
+
+            if cors_origin:
+                cors_headers.update({
+                    "Access-Control-Allow-Origin": cors_origin,
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+                    "Access-Control-Max-Age": "86400",  # 24 hours
+                    "Vary": "Origin"
+                })
+
+        return Response(status_code=200, headers=cors_headers)
+
+    # Continue with request
+    response = await call_next(request)
+
+    # Add CORS headers to all responses
+    from app.core.config import settings
+    if settings.BACKEND_CORS_ORIGINS:
+        request_origin = request.headers.get("origin")
+        allowed_origins = [str(origin) for origin in settings.BACKEND_CORS_ORIGINS]
+
+        if request_origin and request_origin in allowed_origins:
+            cors_origin = request_origin
+        elif allowed_origins:
+            cors_origin = allowed_origins[0]
+        else:
+            cors_origin = None
+
+        if cors_origin:
+            response.headers.update({
+                "Access-Control-Allow-Origin": cors_origin,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Requested-With",
+                "Vary": "Origin"
+            })
+
+    return response
+
+
 async def tenant_context_middleware(request: Request, call_next):
     """
     Middleware to set tenant context for RLS
     Extracts tenant_id from JWT and sets it in database session
     """
-    # Skip middleware for health checks and docs
-    if request.url.path in ["/api/v1/health", "/api/v1/health/detailed", "/docs", "/redoc", "/openapi.json", "/api/v1/openapi.json", "/", "/health"]:
+    # Skip middleware for health checks, docs, and OPTIONS requests
+    if request.method == "OPTIONS" or request.url.path in ["/api/v1/health", "/api/v1/health/detailed", "/docs", "/redoc", "/openapi.json", "/api/v1/openapi.json", "/", "/health"]:
         return await call_next(request)
 
     # Skip for auth endpoints that don't require tenant context
-    if request.url.path.startswith("/api/v1/auth/login") or request.url.path.startswith("/api/v1/auth/register"):
+    if (request.url.path.startswith("/api/v1/auth/login") or
+        request.url.path.startswith("/api/v1/auth/register") or
+        request.url.path.startswith("/api/v1/auth/refresh") or
+        request.url.path.startswith("/api/v1/auth/logout") or
+        request.url.path.startswith("/api/v1/auth/logout-all")):
         return await call_next(request)
 
     response = Response("Internal server error", status_code=500)
@@ -105,22 +169,11 @@ async def tenant_context_middleware(request: Request, call_next):
         response = await call_next(request)
 
     except HTTPException as e:
-        # Handle HTTP exceptions properly with CORS headers
-        from app.core.config import settings
-        cors_headers = {}
-        if settings.BACKEND_CORS_ORIGINS:
-            cors_headers.update({
-                "Access-Control-Allow-Origin": "http://localhost:3002",  # Allow the requesting origin
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
-                "Vary": "Origin"
-            })
-
+        # Handle HTTP exceptions properly
         response = JSONResponse(
             status_code=e.status_code,
             content={"detail": e.detail},
-            headers={**e.headers, **cors_headers} if e.headers else cors_headers
+            headers=e.headers
         )
     except Exception as e:
         logger.error(

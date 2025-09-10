@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Base de datos PostgreSQL con RLS
   db:
@@ -53,7 +51,14 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-changeme123}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-xO5kjaG4nj0WOaDYezPI/ArMQTFYIlS7Chz3WRnAmvo=}
-      CORS_ORIGINS: http://localhost:3000,http://localhost:3002,http://frontend:3000
+      CORS_ORIGINS: http://localhost:3000,http://frontend:3000
+      DEBUG: ${DEBUG:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
+      COOKIE_SAME_SITE: ${COOKIE_SAME_SITE:-lax}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123}
+      SEED_DEMO_PASSWORD: ${SEED_DEMO_PASSWORD:-demo123}
     volumes:
       - ./backend:/app
       - ./tests:/app/tests
@@ -107,7 +112,7 @@ services:
     container_name: proyecto_semilla_frontend
     restart: unless-stopped
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:7777
+      NEXT_PUBLIC_API_URL: http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules

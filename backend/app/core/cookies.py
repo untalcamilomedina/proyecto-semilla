@@ -5,7 +5,7 @@ Handles JWT tokens in HTTP-only cookies for enhanced security
 
 import os
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import Response, Request
 from fastapi.responses import JSONResponse
@@ -35,7 +35,7 @@ class SecureCookieManager:
         if expires_in is None:
             expires_in = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60  # Convert to seconds
 
-        expires = datetime.utcnow() + timedelta(seconds=expires_in)
+        expires = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
 
         response.set_cookie(
             key=self.access_token_cookie_name,
@@ -51,7 +51,7 @@ class SecureCookieManager:
     def set_refresh_token_cookie(self, response: Response, token: str):
         """Set refresh token in secure cookie"""
         # Refresh tokens expire in 30 days
-        expires = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expires = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
         response.set_cookie(
             key=self.refresh_token_cookie_name,
@@ -67,7 +67,7 @@ class SecureCookieManager:
     def set_tenant_cookie(self, response: Response, tenant_id: str, tenant_name: str):
         """Set current tenant information in cookie"""
         # Tenant cookie expires in 30 days
-        expires = datetime.utcnow() + timedelta(days=30)
+        expires = datetime.now(timezone.utc) + timedelta(days=30)
 
         response.set_cookie(
             key=self.tenant_cookie_name,

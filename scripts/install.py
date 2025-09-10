@@ -141,7 +141,7 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:8000
 DEBUG={config["DEBUG"]}
 
 # Frontend
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 
 # Configuración adicional
 LOG_LEVEL=INFO
@@ -244,10 +244,10 @@ LOG_LEVEL=INFO
         print("1. Levantar todos los servicios:")
         print("   docker-compose up -d")
         print("\n2. Verificar que todo funciona:")
-        print("   - Backend API: http://localhost:7777")
-        print("   - Documentación: http://localhost:7777/docs")
-        print("   - Health check: http://localhost:7777/api/v1/health")
-        print("   - Login: POST http://localhost:7777/api/v1/auth/login")
+        print("   - Backend API: http://localhost:8000")
+        print("   - Documentación: http://localhost:8000/docs")
+        print("   - Health check: http://localhost:8000/api/v1/health")
+        print("   - Login: POST http://localhost:8000/api/v1/auth/login")
         print("\n3. Credenciales de acceso:")
         print("   - Super Admin: admin@proyectosemilla.dev / admin123")
         print("   - Demo User: demo@demo-company.com / demo123")

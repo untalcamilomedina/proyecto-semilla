@@ -33,10 +33,10 @@ export default function ArticlesPage() {
   };
 
   // Fetch data using React Query hooks
-  const { data: articles, isLoading: articlesLoading } = useArticles(queryParams);
+  const { data: articlesData, isLoading: articlesLoading } = useArticles(queryParams);
   const deleteArticleMutation = useDeleteArticle();
 
-  const filteredArticles = articles?.filter(article =>
+  const filteredArticles = articlesData?.filter((article: any) =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];

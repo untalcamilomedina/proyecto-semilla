@@ -1,28 +1,62 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Permission, PERMISSIONS } from '@/types/api';
+import { Permission, PERMISSIONS } from '../types/api';
+import { apiClient } from '../lib/api-client';
 
+/**
+ * Hook personalizado para gestionar permisos de usuario
+ *
+ * Proporciona funcionalidades para:
+ * - Obtener permisos del usuario desde la API
+ * - Verificar permisos individuales
+ * - Verificar múltiples permisos (AND/OR)
+ * - Control de acceso basado en permisos
+ * - Cache y refresh automático de permisos
+ *
+ * @returns Objeto con estado de permisos y funciones de verificación
+ */
 interface UsePermissionsReturn {
+  /** Lista de permisos del usuario actual */
   userPermissions: string[];
+  /** Verifica si el usuario tiene un permiso específico */
   hasPermission: (permission: Permission) => boolean;
+  /** Verifica si el usuario tiene al menos uno de los permisos especificados */
   hasAnyPermission: (permissions: Permission[]) => boolean;
+  /** Verifica si el usuario tiene todos los permisos especificados */
   hasAllPermissions: (permissions: Permission[]) => boolean;
+  /** Verifica acceso basado en permisos con opción AND/OR */
   canAccess: (requiredPermissions: Permission | Permission[], requireAll?: boolean) => boolean;
+  /** Indica si se están cargando los permisos */
   isLoading: boolean;
+  /** Error ocurrido al cargar permisos */
   error: string | null;
+  /** Función para refrescar permisos desde la API */
   refreshPermissions: () => Promise<void>;
 }
 
-// Mock user permissions for development - replace with actual user data
-const MOCK_USER_PERMISSIONS = [
-  PERMISSIONS.USERS_READ,
-  PERMISSIONS.ARTICLES_READ,
-  PERMISSIONS.ARTICLES_WRITE,
-  PERMISSIONS.CATEGORIES_READ,
-  PERMISSIONS.COMMENTS_READ,
-  PERMISSIONS.COMMENTS_WRITE,
-  PERMISSIONS.ROLES_READ
-];
+// Default permissions when API is not available
+const DEFAULT_PERMISSIONS: string[] = [];
 
+/**
+ * Hook principal para gestión de permisos de usuario
+ *
+ * Carga automáticamente los permisos del usuario al montar el componente
+ * y proporciona funciones para verificar permisos de manera eficiente.
+ *
+ * @returns {UsePermissionsReturn} Objeto con estado y funciones de permisos
+ *
+ * @example
+ * ```typescript
+ * const { hasPermission, canAccess, isLoading } = usePermissions();
+ *
+ * if (isLoading) return <LoadingSpinner />;
+ *
+ * if (!hasPermission(PERMISSIONS.ARTICLES_WRITE)) {
+ *   return <AccessDenied />;
+ * }
+ *
+ * return <EditArticleForm />;
+ * ```
+ */
 export function usePermissions(): UsePermissionsReturn {
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,13 +67,15 @@ export function usePermissions(): UsePermissionsReturn {
       setIsLoading(true);
       setError(null);
 
-      // TODO: Replace with actual API call to get user permissions
-      // For now, using mock data
-      setUserPermissions(MOCK_USER_PERMISSIONS);
+      // Get user permissions from API
+      const response = await apiClient.getUserPermissions();
+      setUserPermissions(response.permissions || DEFAULT_PERMISSIONS);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load permissions');
       console.error('Error loading permissions:', err);
+      // Set default permissions on error
+      setUserPermissions(DEFAULT_PERMISSIONS);
     } finally {
       setIsLoading(false);
     }

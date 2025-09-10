@@ -3,11 +3,15 @@
 import { useArticles, useArticleStats } from '../hooks/useArticles';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../lib/api-client';
+import { inputValidation } from '../lib/utils';
 
 export default function Home() {
   const [statusFilter, setStatusFilter] = useState<'draft' | 'published' | 'review'>('published');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: 'demo@demo-company.com', password: 'demo123' });
+  const [loginForm, setLoginForm] = useState({
+    email: process.env.NEXT_PUBLIC_DEMO_EMAIL || 'demo@demo-company.com',
+    password: process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'demo123'
+  });
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [showRegister, setShowRegister] = useState(false);
@@ -16,7 +20,7 @@ export default function Home() {
     password: '',
     first_name: '',
     last_name: '',
-    tenant_id: '8aa99184-4011-4cfc-b2cb-82b64f10d72b' // Demo company tenant
+    tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || ''
   });
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerError, setRegisterError] = useState('');
@@ -27,10 +31,20 @@ export default function Home() {
   const { data: stats } = useArticleStats();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-    if (token) {
-      setIsAuthenticated(true);
+    // Check if user is already authenticated by checking cookies
+    const checkAuth = async () => {
+      try {
+        // Try to get current user info - if successful, user is authenticated
+        await apiClient.getCurrentUser();
+        setIsAuthenticated(true);
+      } catch (error) {
+        // User is not authenticated
+        setIsAuthenticated(false);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      checkAuth();
     }
   }, []);
 
@@ -39,14 +53,29 @@ export default function Home() {
     setIsLoggingIn(true);
     setLoginError('');
 
+    // Validar email antes de enviar
+    const emailValidation = inputValidation.validateEmail(loginForm.email);
+    if (!emailValidation.isValid) {
+      setLoginError(emailValidation.error || 'Email inválido');
+      setIsLoggingIn(false);
+      return;
+    }
+
+    // Validar que la contraseña no esté vacía
+    if (!loginForm.password.trim()) {
+      setLoginError('Contraseña es requerida');
+      setIsLoggingIn(false);
+      return;
+    }
+
     try {
       await apiClient.login({
-        email: loginForm.email,
+        email: emailValidation.sanitized,
         password: loginForm.password
       });
       setIsAuthenticated(true);
     } catch (error: any) {
-      setLoginError(error.detail || 'Login failed');
+      setLoginError(error.detail || 'Error de inicio de sesión');
     } finally {
       setIsLoggingIn(false);
     }
@@ -57,30 +86,79 @@ export default function Home() {
     setIsRegistering(true);
     setRegisterError('');
 
+    // Validaciones de entrada
+    const emailValidation = inputValidation.validateEmail(registerForm.email);
+    if (!emailValidation.isValid) {
+      setRegisterError(emailValidation.error || 'Email inválido');
+      setIsRegistering(false);
+      return;
+    }
+
+    const firstNameValidation = inputValidation.validateUsername(registerForm.first_name);
+    if (!firstNameValidation.isValid) {
+      setRegisterError(firstNameValidation.error || 'Nombre inválido');
+      setIsRegistering(false);
+      return;
+    }
+
+    const lastNameValidation = inputValidation.validateUsername(registerForm.last_name);
+    if (!lastNameValidation.isValid) {
+      setRegisterError(lastNameValidation.error || 'Apellido inválido');
+      setIsRegistering(false);
+      return;
+    }
+
+    const passwordValidation = inputValidation.validatePassword(registerForm.password);
+    if (!passwordValidation.isValid) {
+      setRegisterError(passwordValidation.errors.join('. '));
+      setIsRegistering(false);
+      return;
+    }
+
     try {
-      // First register the user
-      await apiClient.register(registerForm);
-      
-      // Then automatically log them in
+      // Registrar al usuario con datos sanitizados
+      const sanitizedData: any = {
+        email: emailValidation.sanitized,
+        first_name: firstNameValidation.sanitized,
+        last_name: lastNameValidation.sanitized,
+        password: registerForm.password
+      };
+
+      // Solo incluir tenant_id si tiene un valor
+      if (registerForm.tenant_id.trim()) {
+        sanitizedData.tenant_id = registerForm.tenant_id;
+      }
+
+      await apiClient.register(sanitizedData);
+
+      // Iniciar sesión automáticamente
       await apiClient.login({
-        email: registerForm.email,
+        email: emailValidation.sanitized,
         password: registerForm.password
       });
-      
+
       setIsAuthenticated(true);
       setShowRegister(false);
     } catch (error: any) {
-      setRegisterError(error.detail || 'Registration failed');
+      setRegisterError(error.detail || 'Error en el registro');
     } finally {
       setIsRegistering(false);
     }
   };
 
-  const handleLogout = () => {
-    apiClient.logout();
-    setIsAuthenticated(false);
-    setLoginForm({ email: 'demo@demo-company.com', password: 'demo123' });
-    setShowRegister(false);
+  const handleLogout = async () => {
+    try {
+      await apiClient.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsAuthenticated(false);
+      setLoginForm({
+        email: process.env.NEXT_PUBLIC_DEMO_EMAIL || 'demo@demo-company.com',
+        password: process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'demo123'
+      });
+      setShowRegister(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -151,8 +229,8 @@ export default function Home() {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Credenciales de demo:<br />
-                <strong>Email:</strong> demo@demo-company.com<br />
-                <strong>Contraseña:</strong> demo123
+                <strong>Email:</strong> {process.env.NEXT_PUBLIC_DEMO_EMAIL || 'demo@demo-company.com'}<br />
+                <strong>Contraseña:</strong> {process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'demo123'}
               </p>
               <div className="mt-4">
                 <button

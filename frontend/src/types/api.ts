@@ -228,11 +228,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
+  message: string;
   token_type: string;
   expires_in: number;
-  user: User;
+  tenant_id: string;
+  tenant_name: string;
 }
 
 export interface RefreshTokenRequest {

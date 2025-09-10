@@ -22,6 +22,7 @@ import {
   useDeleteTenant,
   useUsers
 } from '@/hooks/use-api';
+import { User } from '@/types/api';
 
 export default function TenantsPage() {
   const [searchQuery, setSearchQuery] = useState('');

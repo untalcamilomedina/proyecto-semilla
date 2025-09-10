@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -17,32 +17,21 @@ import {
 import { apiClient } from '@/lib/api-client';
 import { User } from '@/types/api';
 import { usePermissionCheck } from '@/hooks/usePermissions';
+import { useUsers, useUpdateUser, useDeleteUser } from '@/hooks/use-api';
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Permission checks
   const { canReadUsers, canWriteUsers, canDeleteUsers, canManageUsers } = usePermissionCheck();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const usersData = await apiClient.getUsers();
-        setUsers(usersData);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch users using React Query hook
+  const { data: users, isLoading } = useUsers();
+  const updateUserMutation = useUpdateUser();
+  const deleteUserMutation = useDeleteUser();
 
-    fetchUsers();
-  }, []);
-
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = (users || []).filter(user =>
     user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -50,10 +39,10 @@ export default function UsersPage() {
 
   const handleToggleUserStatus = async (userId: string, currentStatus: boolean) => {
     try {
-      await apiClient.updateUser(userId, { is_active: !currentStatus });
-      setUsers(users.map(user =>
-        user.id === userId ? { ...user, is_active: !currentStatus } : user
-      ));
+      await updateUserMutation.mutateAsync({
+        id: userId,
+        user: { is_active: !currentStatus }
+      });
     } catch (error) {
       console.error('Error updating user status:', error);
     }
@@ -63,8 +52,7 @@ export default function UsersPage() {
     if (!confirm('¿Estás seguro de que quieres eliminar este usuario?')) return;
 
     try {
-      await apiClient.deleteUser(userId);
-      setUsers(users.filter(user => user.id !== userId));
+      await deleteUserMutation.mutateAsync(userId);
     } catch (error) {
       console.error('Error deleting user:', error);
     }

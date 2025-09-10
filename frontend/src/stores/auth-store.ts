@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { User, LoginRequest, UserRegister } from '../types/api';
 import { apiClient } from '../lib/api-client';
 
@@ -18,11 +17,11 @@ interface AuthState {
   refreshUser: () => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  initialize: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       // Initial state
       user: null,
       isAuthenticated: false,
@@ -33,15 +32,9 @@ export const useAuthStore = create<AuthState>()(
       login: async (credentials: LoginRequest) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await apiClient.login(credentials);
-          const user = response.user;
-
-          set({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          });
+          await apiClient.login(credentials);
+          // After successful login, fetch user info using cookies
+          await get().refreshUser();
         } catch (error: any) {
           set({
             isLoading: false,
@@ -136,13 +129,25 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
-    }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
-    }
-  )
+
+      initialize: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const user = await apiClient.getCurrentUser();
+          set({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null
+          });
+        } catch (error: any) {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null // Don't show error on initialization
+          });
+        }
+      },
+    })
 );

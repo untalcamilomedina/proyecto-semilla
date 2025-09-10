@@ -135,6 +135,72 @@ def authenticate_user(db: AsyncSession, email: str, password: str) -> Optional[U
     return None
 
 
+async def get_current_user_from_cookie(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+) -> User:
+    """
+    Get current authenticated user from JWT token in cookie
+    """
+    from app.core.cookies import get_cookie_manager
+
+    cookie_manager = get_cookie_manager()
+    token = cookie_manager.get_access_token_from_cookie(request)
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Get user from database
+    user = await db.get(User, user_uuid)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
+
+    return user
+
+
 async def get_current_user_with_tenant(
     request: Request,
     db: AsyncSession = Depends(get_db)
@@ -187,47 +253,6 @@ async def get_current_user_with_tenant(
     return user
 
 
-def create_refresh_token(user: User) -> str:
-    """
-    Create a refresh token for a user
-    """
-    expires_delta = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    token_data = {
-        "sub": str(user.id),
-        "tenant_id": str(user.tenant_id),
-        "type": "refresh",
-        "exp": datetime.utcnow() + expires_delta
-    }
-    return jwt.encode(token_data, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
-
-
-async def store_refresh_token(
-    db: AsyncSession,
-    user: User,
-    token: str,
-    user_agent: Optional[str] = None,
-    ip_address: Optional[str] = None
-) -> None:
-    """
-    Store a refresh token in the database
-    """
-    from app.models.refresh_token import RefreshToken
-    from uuid import uuid4
-
-    expires_at = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-
-    refresh_token_obj = RefreshToken(
-        id=uuid4(),
-        user_id=user.id,
-        tenant_id=user.tenant_id,
-        token=token,
-        expires_at=expires_at,
-        user_agent=user_agent,
-        ip_address=ip_address
-    )
-
-    db.add(refresh_token_obj)
-    await db.commit()
 
 
 async def verify_refresh_token(db: AsyncSession, token: str) -> Optional["RefreshToken"]:
@@ -303,9 +328,20 @@ def create_refresh_token(user: User) -> str:
 
 async def store_refresh_token(db: AsyncSession, user: User, token: str, user_agent: str = None, ip_address: str = None):
     """
-    Store refresh token in database
+    Store refresh token in database with uniqueness check
     """
     from datetime import timedelta
+    from sqlalchemy import select
+
+    # Check if token already exists
+    stmt = select(RefreshToken).where(RefreshToken.token == token)
+    result = await db.execute(stmt)
+    existing_token = result.scalar_one_or_none()
+
+    if existing_token:
+        # Token already exists, return it
+        return existing_token
+
     expires_at = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
     refresh_token = RefreshToken(

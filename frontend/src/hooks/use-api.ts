@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
+import { useAuth } from '../components/providers';
 import {
   Article,
   ArticleCreate,
@@ -48,24 +49,32 @@ export const queryKeys = {
 
 // Articles Hooks
 export function useArticles(params?: ArticleQueryParams) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: [...queryKeys.articles, params],
     queryFn: () => apiClient.getArticles(params),
+    enabled: isAuthenticated,
   });
 }
 
 export function useArticle(id: string) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.article(id),
     queryFn: () => apiClient.getArticle(id),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 
 export function useArticleStats() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.articleStats,
     queryFn: () => apiClient.getArticleStats(),
+    enabled: isAuthenticated,
   });
 }
 
@@ -145,24 +154,32 @@ export function useDeleteArticle() {
 
 // Categories Hooks
 export function useCategories() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.categories,
     queryFn: () => apiClient.getCategories(),
+    enabled: isAuthenticated,
   });
 }
 
 export function useCategory(id: string) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.category(id),
     queryFn: () => apiClient.getCategory(id),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 
 export function useCategoryStats() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.categoryStats,
     queryFn: () => apiClient.getCategoryStats(),
+    enabled: isAuthenticated,
   });
 }
 
@@ -242,17 +259,22 @@ export function useDeleteCategory() {
 
 // Users Hooks
 export function useUsers() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.users,
     queryFn: () => apiClient.getUsers(),
+    enabled: isAuthenticated,
   });
 }
 
 export function useUser(id: string) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.user(id),
     queryFn: () => apiClient.getUser(id),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 
@@ -332,24 +354,32 @@ export function useDeleteUser() {
 
 // Tenants Hooks
 export function useTenants() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.tenants,
     queryFn: () => apiClient.getTenants(),
+    enabled: isAuthenticated,
   });
 }
 
 export function useTenant(id: string) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.tenant(id),
     queryFn: () => apiClient.getTenant(id),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 
 export function useUserTenants() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.userTenants,
     queryFn: () => apiClient.getUserTenants(),
+    enabled: isAuthenticated,
   });
 }
 
@@ -454,17 +484,22 @@ export function useSwitchTenant() {
 
 // Roles Hooks
 export function useRoles() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.roles,
     queryFn: () => apiClient.getRoles(),
+    enabled: isAuthenticated,
   });
 }
 
 export function useRole(id: string) {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: queryKeys.role(id),
     queryFn: () => apiClient.getRole(id),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 

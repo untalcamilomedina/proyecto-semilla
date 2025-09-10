@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
+import { useAuth } from '../components/providers';
 import {
   Article,
   ArticleCreate,
@@ -21,9 +22,12 @@ export const articleKeys = {
 
 // Get articles hook
 export const useArticles = (params?: ArticleQueryParams) => {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: articleKeys.list(params || {}),
     queryFn: () => apiClient.getArticles(params),
+    enabled: isAuthenticated, // Only fetch when authenticated
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -42,9 +46,12 @@ export const useArticle = (id: string) => {
 
 // Get article stats hook
 export const useArticleStats = () => {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: articleKeys.stats(),
     queryFn: () => apiClient.getArticleStats(),
+    enabled: isAuthenticated, // Only fetch when authenticated
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes
   });

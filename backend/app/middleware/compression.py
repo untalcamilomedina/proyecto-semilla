@@ -39,9 +39,11 @@ class AdvancedCompressionMiddleware(BaseHTTPMiddleware):
         try:
             response_size = len(response.body) if hasattr(response, 'body') else self.minimum_size + 1
             if response_size < self.minimum_size:
+                response.headers["x-compression"] = "skipped-small"
                 return response
         except (AttributeError, TypeError):
             # For streaming responses or other types, skip compression
+            response.headers["x-compression"] = "skipped-streaming"
             return response
 
         # Skip compression for already compressed content
@@ -49,6 +51,7 @@ class AdvancedCompressionMiddleware(BaseHTTPMiddleware):
         if any(compressed_type in content_type for compressed_type in [
             "image/", "video/", "audio/", "application/octet-stream"
         ]):
+            response.headers["x-compression"] = "skipped-already-compressed"
             return response
 
         # Get client accepted encodings
@@ -66,7 +69,7 @@ class AdvancedCompressionMiddleware(BaseHTTPMiddleware):
                 if len(compressed_body) < len(response.body) * 0.9:
                     response.body = compressed_body
                     response.headers["content-encoding"] = "br"
-                    response.headers["content-length"] = str(len(compressed_body))
+                    # Don't set content-length for compressed responses to avoid conflicts
                     response.headers["x-compression"] = "brotli"
                     return response
 
@@ -86,7 +89,7 @@ class AdvancedCompressionMiddleware(BaseHTTPMiddleware):
                 if len(compressed_body) < len(response.body) * 0.95:
                     response.body = compressed_body
                     response.headers["content-encoding"] = "gzip"
-                    response.headers["content-length"] = str(len(compressed_body))
+                    # Don't set content-length for compressed responses to avoid conflicts
                     response.headers["x-compression"] = "gzip"
                     return response
 

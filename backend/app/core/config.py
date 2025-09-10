@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     # API Configuration
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1 hour for better security
 
     # Server Configuration
     SERVER_NAME: str = "Proyecto Semilla"
@@ -29,8 +29,6 @@ class Settings(BaseSettings):
     # CORS Configuration
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",  # Next.js dev server (Docker)
-        "http://localhost:3001",  # Next.js dev server (alternative port)
-        "http://localhost:3002",  # Next.js dev server (development)
         "http://localhost:8000",  # FastAPI server
     ]
 
@@ -40,16 +38,41 @@ class Settings(BaseSettings):
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(
-        cls, v: Union[str, List[str]]
+        cls, v: Union[str, List[str]], info: ValidationInfo
     ) -> Union[List[str], str]:
+        # Get CORS_ORIGINS from environment/context
+        cors_origins_str = info.data.get("CORS_ORIGINS", "")
+
+        # Start with default origins
+        origins = [
+            "http://localhost:3000",  # Next.js dev server (Docker)
+            "http://localhost:8000",  # FastAPI server
+        ]
+
+        # Add additional origins from CORS_ORIGINS environment variable
+        if cors_origins_str:
+            additional_origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+            origins.extend(additional_origins)
+
+        # Process the field value if it's a string
         if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+            field_origins = [i.strip() for i in v.split(",")]
+            origins.extend(field_origins)
+        elif isinstance(v, list):
+            origins.extend(v)
+
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_origins = []
+        for origin in origins:
+            if origin not in seen:
+                seen.add(origin)
+                unique_origins.append(origin)
+
+        return unique_origins
 
     # Trusted Hosts
-    ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1"]
+    ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "proyecto-semilla.local", "api.proyecto-semilla.local"]
 
     # Database Configuration
     DB_HOST: str = os.getenv("DB_HOST", "db")
@@ -104,8 +127,8 @@ class Settings(BaseSettings):
     NEXT_PUBLIC_API_URL: str = "http://localhost:7777"
 
     # Cookie Configuration
-    COOKIE_SECURE: bool = False
-    COOKIE_DOMAIN: str = ""
+    COOKIE_SECURE: bool = False  # Set to True in production with HTTPS
+    COOKIE_DOMAIN: str = ""  # Empty for localhost, set to domain in production
     COOKIE_SAME_SITE: str = "lax"
 
     class Config:

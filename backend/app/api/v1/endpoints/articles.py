@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, desc
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user_from_cookie
 from app.models.user import User
 from app.models.article import Article, Category
 from app.schemas.article import (
@@ -35,7 +35,7 @@ async def read_articles(
     limit: int = Query(100, ge=1, le=1000),
     status_filter: str = Query(None, regex="^(draft|published|review)$"),
     category_id: UUID = None,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Retrieve articles with optional filtering
@@ -105,7 +105,7 @@ async def read_articles(
 async def create_article(
     article_in: ArticleCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Create new article
@@ -165,7 +165,7 @@ async def create_article(
 async def read_article(
     article_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Get article by ID with full content
@@ -221,7 +221,7 @@ async def update_article(
     article_id: UUID,
     article_in: ArticleUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Update article
@@ -341,7 +341,7 @@ async def update_article(
 async def delete_article(
     article_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Delete article (soft delete - mark as inactive)
@@ -372,7 +372,7 @@ async def delete_article(
 @router.get("/stats/overview", response_model=ArticleStats)
 async def get_article_stats(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user_from_cookie)
 ) -> Any:
     """
     Get article statistics for the tenant
@@ -382,42 +382,48 @@ async def get_article_stats(
         text("SELECT COUNT(*) FROM articles WHERE tenant_id = $1"),
         [str(current_user.tenant_id)]
     )
-    total_articles = total_result.fetchone()[0]
+    total_row = total_result.fetchone()
+    total_articles = total_row[0] if total_row else 0
 
     # Get published articles
     published_result = await db.execute(
         text("SELECT COUNT(*) FROM articles WHERE tenant_id = $1 AND status = 'published'"),
         [str(current_user.tenant_id)]
     )
-    published_articles = published_result.fetchone()[0]
+    published_row = published_result.fetchone()
+    published_articles = published_row[0] if published_row else 0
 
     # Get draft articles
     draft_result = await db.execute(
         text("SELECT COUNT(*) FROM articles WHERE tenant_id = $1 AND status = 'draft'"),
         [str(current_user.tenant_id)]
     )
-    draft_articles = draft_result.fetchone()[0]
+    draft_row = draft_result.fetchone()
+    draft_articles = draft_row[0] if draft_row else 0
 
     # Get total views
     views_result = await db.execute(
         text("SELECT COALESCE(SUM(view_count), 0) FROM articles WHERE tenant_id = $1"),
         [str(current_user.tenant_id)]
     )
-    total_views = views_result.fetchone()[0]
+    views_row = views_result.fetchone()
+    total_views = views_row[0] if views_row else 0
 
     # Get total comments
     comments_result = await db.execute(
         text("SELECT COALESCE(SUM(comment_count), 0) FROM articles WHERE tenant_id = $1"),
         [str(current_user.tenant_id)]
     )
-    total_comments = comments_result.fetchone()[0]
+    comments_row = comments_result.fetchone()
+    total_comments = comments_row[0] if comments_row else 0
 
     # Get total likes
     likes_result = await db.execute(
         text("SELECT COALESCE(SUM(like_count), 0) FROM articles WHERE tenant_id = $1"),
         [str(current_user.tenant_id)]
     )
-    total_likes = likes_result.fetchone()[0]
+    likes_row = likes_result.fetchone()
+    total_likes = likes_row[0] if likes_row else 0
 
     return {
         "total_articles": total_articles,

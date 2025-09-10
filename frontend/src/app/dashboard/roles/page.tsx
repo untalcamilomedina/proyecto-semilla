@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,32 +18,20 @@ import {
 import { apiClient } from '@/lib/api-client';
 import { Role } from '@/types/api';
 import { usePermissionCheck } from '@/hooks/usePermissions';
+import { useRoles, useDeleteRole } from '@/hooks/use-api';
 
 export default function RolesPage() {
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Permission checks
   const { canWriteRoles, canDeleteRoles } = usePermissionCheck();
 
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const rolesData = await apiClient.getRoles();
-        setRoles(rolesData);
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch roles using React Query hook
+  const { data: roles, isLoading } = useRoles();
+  const deleteRoleMutation = useDeleteRole();
 
-    fetchRoles();
-  }, []);
-
-  const filteredRoles = roles.filter(role =>
+  const filteredRoles = (roles || []).filter(role =>
     role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     role.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -52,8 +40,7 @@ export default function RolesPage() {
     if (!confirm('¿Estás seguro de que quieres eliminar este rol?')) return;
 
     try {
-      await apiClient.deleteRole(roleId);
-      setRoles(roles.filter(role => role.id !== roleId));
+      await deleteRoleMutation.mutateAsync(roleId);
     } catch (error) {
       console.error('Error deleting role:', error);
     }
@@ -135,7 +122,7 @@ export default function RolesPage() {
                     Permisos ({role.permissions.length})
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {role.permissions.slice(0, 3).map((permission, index) => (
+                    {role.permissions.slice(0, 3).map((permission: string, index: number) => (
                       <Badge key={index} variant="outline" className="text-xs">
                         {permission}
                       </Badge>

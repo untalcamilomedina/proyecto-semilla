@@ -7,7 +7,9 @@ from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import security
@@ -16,6 +18,7 @@ from app.core.cookies import get_cookie_manager
 from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, RefreshTokenRequest
 from app.models.user import User
 from app.models.tenant import Tenant
+from app.services.permission_service import PermissionService
 
 router = APIRouter()
 
@@ -67,7 +70,7 @@ async def login(
 
     # Get tenant name for cookie
     tenant_result = await db.execute(
-        "SELECT name FROM tenants WHERE id = :tenant_id",
+        text("SELECT name FROM tenants WHERE id = :tenant_id"),
         {"tenant_id": user_obj.tenant_id}
     )
     tenant_name = tenant_result.fetchone()
@@ -75,27 +78,12 @@ async def login(
 
     # Create response with secure cookies
     cookie_manager = get_cookie_manager()
-    response = cookie_manager.create_login_response(
+    return cookie_manager.create_login_response(
         access_token=access_token,
         refresh_token=refresh_token,
         tenant_id=str(user_obj.tenant_id),
         tenant_name=tenant_name
     )
-
-    # Also include tokens in JSON response for backward compatibility
-    response_data = {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer",
-        "tenant_id": str(user_obj.tenant_id),
-        "tenant_name": tenant_name
-    }
-
-    # Update the response body
-    response.body = response.render(response_data)
-    response.headers["Content-Type"] = "application/json"
-
-    return response
 
 
 @router.post("/register", response_model=UserResponse)
@@ -117,20 +105,41 @@ async def register(
             detail="User with this email already exists"
         )
 
-    # For now, require tenant_id (will be improved later)
+    # For testing purposes, allow registration without tenant_id
+    # Create a default tenant if none provided
     if not user_in.tenant_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Tenant ID is required for registration"
+        # Check if default tenant exists
+        default_tenant = await db.execute(
+            text("SELECT id FROM tenants WHERE slug = 'default' LIMIT 1")
         )
+        tenant_row = default_tenant.fetchone()
 
-    # Verify tenant exists
-    tenant = await db.get(Tenant, user_in.tenant_id)
-    if not tenant:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid tenant ID"
-        )
+        if tenant_row:
+            user_in.tenant_id = str(tenant_row[0])
+        else:
+            # Create default tenant
+            from uuid import uuid4
+            default_tenant_id = uuid4()
+            await db.execute(
+                text("INSERT INTO tenants (id, name, slug, description, is_active, created_at, updated_at) VALUES (:id, :name, :slug, :description, :is_active, NOW(), NOW())"),
+                {
+                    "id": default_tenant_id,
+                    "name": "Default Tenant",
+                    "slug": "default",
+                    "description": "Default tenant for testing",
+                    "is_active": True
+                }
+            )
+            await db.commit()
+            user_in.tenant_id = str(default_tenant_id)
+    else:
+        # Verify tenant exists if provided
+        tenant = await db.get(Tenant, user_in.tenant_id)
+        if not tenant:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid tenant ID"
+            )
 
     # Hash password
     hashed_password = security.get_password_hash(user_in.password)
@@ -257,13 +266,15 @@ async def logout_all_devices(
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(
-    current_user: User = Depends(security.get_current_user),
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
     Get current user information
     """
-    # User is already authenticated via get_current_user dependency
+    # Get user from cookie-based authentication
+    current_user = await security.get_current_user_from_cookie(request, db)
+
     return {
         "id": str(current_user.id),
         "email": current_user.email,
@@ -276,4 +287,27 @@ async def read_users_me(
         "role_ids": [],  # TODO: Implement roles
         "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
         "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None
+    }
+
+
+@router.get("/permissions")
+async def get_user_permissions(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Get current user's permissions
+    """
+    # Get user from cookie-based authentication
+    current_user = await security.get_current_user_from_cookie(request, db)
+
+    # Get user permissions
+    permissions = await PermissionService.get_user_permissions(
+        current_user.id, current_user.tenant_id, db
+    )
+
+    return {
+        "permissions": permissions,
+        "user_id": str(current_user.id),
+        "tenant_id": str(current_user.tenant_id)
     }
