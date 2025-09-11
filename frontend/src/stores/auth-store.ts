@@ -1,11 +1,13 @@
 import { create } from 'zustand';
-import { User, LoginRequest, UserRegister } from '../types/api';
+import { User, LoginRequest, UserRegister, Tenant } from '../types/api';
 import { apiClient } from '../lib/api-client';
 
 interface AuthState {
   // State
   user: User | null;
   token: string | null;
+  activeTenant: Tenant | null;
+  tenants: Tenant[];
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -16,6 +18,7 @@ interface AuthState {
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  switchTenant: (tenantId: string) => Promise<void>;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   initialize: () => Promise<void>;
@@ -28,8 +31,10 @@ export const useAuthStore = create<AuthState>()(
       // Initial state
       user: null,
       token: null,
+      activeTenant: null,
+      tenants: [],
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true,
       error: null,
 
       // Actions
@@ -119,8 +124,15 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const user = await apiClient.getCurrentUser();
+          const tenants = await apiClient.getTenants();
+          const activeTenant = user.tenant_id
+            ? tenants.find((t: Tenant) => t.id === user.tenant_id) || null
+            : tenants.length > 0 ? tenants[0] : null;
+          
           set({
             user,
+            tenants,
+            activeTenant,
             isAuthenticated: true,
             isLoading: false,
             error: null
@@ -128,9 +140,28 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             user: null,
+            tenants: [],
+            activeTenant: null,
             isAuthenticated: false,
             isLoading: false,
             error: error.detail || 'Error al obtener información del usuario'
+          });
+          throw error;
+        }
+      },
+
+      switchTenant: async (tenantId: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await apiClient.switchTenant(tenantId);
+          // The response should contain the new token
+          // but we rely on cookies, so we just need to refresh the user data
+          await get().refreshUser();
+          window.location.reload(); // Recargar para asegurar que todo el estado se actualice
+        } catch (error: any) {
+          set({
+            isLoading: false,
+            error: error.detail || 'Error al cambiar de inquilino'
           });
           throw error;
         }
@@ -144,8 +175,15 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const user = await apiClient.getCurrentUser();
+          const tenants = await apiClient.getTenants();
+          const activeTenant = user.tenant_id
+            ? tenants.find((t: Tenant) => t.id === user.tenant_id) || null
+            : tenants.length > 0 ? tenants[0] : null;
+
           set({
             user,
+            tenants,
+            activeTenant,
             isAuthenticated: true,
             isLoading: false,
             error: null
@@ -153,6 +191,8 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             user: null,
+            tenants: [],
+            activeTenant: null,
             isAuthenticated: false,
             isLoading: false,
             error: null // Don't show error on initialization

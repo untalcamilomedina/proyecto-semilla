@@ -49,10 +49,7 @@ async def create_super_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
     permissions = [
         "users:read", "users:write", "users:delete",
         "tenants:read", "tenants:write", "tenants:delete",
-        "articles:read", "articles:write", "articles:delete", "articles:publish",
         "roles:read", "roles:write", "roles:delete",
-        "categories:read", "categories:write", "categories:delete",
-        "comments:read", "comments:write", "comments:delete",
         "system:admin", "system:config"
     ]
 
@@ -81,10 +78,7 @@ async def create_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
     permissions = [
         "users:read", "users:write", "users:delete",
         "tenants:read", "tenants:write",
-        "articles:read", "articles:write", "articles:delete", "articles:publish",
         "roles:read", "roles:write", "roles:delete",
-        "categories:read", "categories:write", "categories:delete",
-        "comments:read", "comments:write", "comments:delete",
         "system:config"
     ]
 
@@ -112,9 +106,6 @@ async def create_manager_role(db: AsyncSession, tenant: Tenant) -> Role:
 
     permissions = [
         "users:read", "users:write",
-        "articles:read", "articles:write", "articles:delete", "articles:publish",
-        "categories:read", "categories:write", "categories:delete",
-        "comments:read", "comments:write", "comments:delete"
     ]
 
     role = Role(
@@ -140,9 +131,6 @@ async def create_editor_role(db: AsyncSession, tenant: Tenant) -> Role:
     print("✏️ Creating editor role...")
 
     permissions = [
-        "articles:read", "articles:write", "articles:publish",
-        "categories:read",
-        "comments:read", "comments:write"
     ]
 
     role = Role(
@@ -169,9 +157,6 @@ async def create_user_role(db: AsyncSession, tenant: Tenant) -> Role:
 
     permissions = [
         "users:read",
-        "articles:read",
-        "categories:read",
-        "comments:read", "comments:write"
     ]
 
     role = Role(

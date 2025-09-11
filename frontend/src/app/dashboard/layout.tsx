@@ -35,24 +35,13 @@ export default function DashboardLayout({
     return null;
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Validando autenticación...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
         <Sidebar />
         <div className="flex-1 flex flex-col">
-          <Header user={user} tenant={undefined} />
+          <Header user={user} />
           <main className="flex-1 p-6">
             {children}
           </main>

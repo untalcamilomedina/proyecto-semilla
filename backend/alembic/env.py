@@ -20,6 +20,15 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 # add your model's MetaData object here
 # for 'autogenerate' support
 from app.core.database import Base
+# Import all models here so Alembic can see them
+from app.models.tenant import Tenant
+from app.models.user import User
+from app.models.role import Role
+from app.models.user_role import UserRole
+from app.models.refresh_token import RefreshToken
+# Collaboration models (if they exist and need to be preserved)
+# from app.models.collaboration import ...
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

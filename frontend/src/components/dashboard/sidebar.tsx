@@ -36,12 +36,6 @@ const navigation = [
     permissions: [PERMISSIONS.TENANTS_READ]
   },
   {
-    name: 'Artículos',
-    href: '/dashboard/articles',
-    icon: FileText,
-    permissions: [PERMISSIONS.ARTICLES_READ]
-  },
-  {
     name: 'Roles',
     href: '/dashboard/roles',
     icon: Shield,

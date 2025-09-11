@@ -644,3 +644,13 @@ export function useDetailedHealthCheck() {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 }
+// Generic API Hook
+export function useApi<T>(endpoint: string) {
+  const { isAuthenticated } = useAuth();
+
+  return useQuery<T>({
+    queryKey: [endpoint],
+    queryFn: () => apiClient.get<T>(`/api/v1/${endpoint}`),
+    enabled: isAuthenticated,
+  });
+}

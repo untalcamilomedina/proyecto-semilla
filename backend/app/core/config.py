@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",  # Next.js dev server (Docker)
         "http://localhost:8000",  # FastAPI server
+        "http://localhost:3000",  # Explicitly allow frontend container
     ]
 
     # Additional CORS origins from environment

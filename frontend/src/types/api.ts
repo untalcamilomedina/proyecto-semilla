@@ -116,6 +116,8 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
+  full_name: string;
+  avatar?: string;
   is_active: boolean;
   role_id: string;
   created_at: string;

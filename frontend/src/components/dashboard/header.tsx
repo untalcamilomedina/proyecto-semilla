@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiClient } from '@/lib/api-client';
 import { useRouter } from 'next/navigation';
+import { TenantSwitcher } from './tenant-switcher';
 
 interface HeaderProps {
   user?: {
@@ -13,12 +14,9 @@ interface HeaderProps {
     last_name: string;
     email: string;
   };
-  tenant?: {
-    name: string;
-  };
 }
 
-export function Header({ user, tenant }: HeaderProps) {
+export function Header({ user }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
@@ -47,12 +45,8 @@ export function Header({ user, tenant }: HeaderProps) {
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* Tenant Info */}
-        {tenant && (
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">{tenant.name}</span>
-          </div>
-        )}
+        {/* Tenant Switcher */}
+        <TenantSwitcher />
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
