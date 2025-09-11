@@ -2,10 +2,12 @@
 
 import { useArticles, useArticleStats } from '../hooks/useArticles';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
 import { inputValidation } from '../lib/utils';
 
 export default function Home() {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<'draft' | 'published' | 'review'>('published');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginForm, setLoginForm] = useState({
@@ -69,13 +71,20 @@ export default function Home() {
     }
 
     try {
+      console.log('Intentando login con:', { email: emailValidation.sanitized });
       await apiClient.login({
         email: emailValidation.sanitized,
         password: loginForm.password
       });
+      console.log('Login exitoso, configurando autenticación');
       setIsAuthenticated(true);
     } catch (error: any) {
-      setLoginError(error.detail || 'Error de inicio de sesión');
+      console.error('Error en login:', error);
+      const errorMessage = error.response?.data?.detail ||
+                          error.detail ||
+                          error.message ||
+                          'Error de conexión con el servidor';
+      setLoginError(errorMessage);
     } finally {
       setIsLoggingIn(false);
     }
@@ -344,9 +353,34 @@ export default function Home() {
   }
 
   // Redirect to dashboard if authenticated
-  if (typeof window !== 'undefined') {
-    window.location.href = '/dashboard';
+  useEffect(() => {
+    if (isAuthenticated && typeof window !== 'undefined') {
+      // Small delay to show the redirect message
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, router]);
+
+  // Show redirect screen if authenticated
+  if (isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirigiendo al dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
-  return null;
+  // This should never be reached, but just in case
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center">
+        <p className="text-red-600">Error: Estado de autenticación inválido</p>
+      </div>
+    </div>
+  );
 }

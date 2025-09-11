@@ -32,13 +32,15 @@ export const useAuthStore = create<AuthState>()(
       login: async (credentials: LoginRequest) => {
         set({ isLoading: true, error: null });
         try {
-          await apiClient.login(credentials);
+          const loginResponse = await apiClient.login(credentials);
+          console.log('Login response:', loginResponse);
           // After successful login, fetch user info using cookies
           await get().refreshUser();
         } catch (error: any) {
+          console.error('Login error:', error);
           set({
             isLoading: false,
-            error: error.detail || 'Error al iniciar sesión'
+            error: error.response?.data?.detail || error.detail || error.message || 'Error al iniciar sesión'
           });
           throw error;
         }

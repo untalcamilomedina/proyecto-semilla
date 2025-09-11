@@ -15,8 +15,10 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm ci # Install all dependencies, including devDependencies
 
-# Copiar código fuente
+# Copiar código fuente, excluyendo archivos de desarrollo
 COPY frontend/ .
+# Remove .env.local to prevent it from interfering with production builds
+RUN rm -f .env.local
 
 # Explicitly install shadcn/ui dependencies
 RUN npm install class-variance-authority clsx tailwind-merge lucide-react

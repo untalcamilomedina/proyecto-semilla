@@ -10,9 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.app.core.database import Base, get_db
-from backend.app.core.config import settings
-from backend.app.main import app
+from app.core.database import Base, get_db
+from app.core.config import settings
+from app.main import app
 
 
 # Test database URL
@@ -78,9 +78,9 @@ def test_client(test_db) -> Generator[TestClient, None, None]:
 @pytest.fixture
 async def test_user(test_db):
     """Create a test user."""
-    from backend.app.models.user import User
-    from backend.app.models.tenant import Tenant
-    from backend.app.models.role import Role
+    from app.models.user import User
+    from app.models.tenant import Tenant
+    from app.models.role import Role
     from uuid import uuid4
     from passlib.context import CryptContext
 
@@ -148,7 +148,7 @@ async def auth_headers(test_client, test_user):
 @pytest.fixture
 async def test_article(test_db, test_user):
     """Create a test article."""
-    from backend.app.models.article import Article
+    from app.models.article import Article
     from uuid import uuid4
 
     article = Article(

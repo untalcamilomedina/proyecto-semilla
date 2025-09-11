@@ -128,19 +128,21 @@ export const useUIStore = create<UIState>((set, get) => ({
 
   setTheme: (theme) => {
     set({ theme });
-    // Apply theme to document
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else if (theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      // system
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      if (systemTheme === 'dark') {
+    // Apply theme to document (only on client side)
+    if (typeof window !== 'undefined') {
+      const root = document.documentElement;
+      if (theme === 'dark') {
         root.classList.add('dark');
-      } else {
+      } else if (theme === 'light') {
         root.classList.remove('dark');
+      } else {
+        // system
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        if (systemTheme === 'dark') {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
       }
     }
   },

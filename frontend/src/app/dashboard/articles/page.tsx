@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+
+// Disable static generation for this page since it requires authentication
+export const dynamic = 'force-dynamic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
