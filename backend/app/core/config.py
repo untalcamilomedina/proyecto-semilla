@@ -27,50 +27,17 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # CORS Configuration
+    # Pydantic will automatically read a comma-separated string from the environment
+    # variable `BACKEND_CORS_ORIGINS` and convert it into a list of strings.
+    # The default list below is used if the environment variable is not set.
     BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",  # Next.js dev server (Docker)
-        "http://localhost:8000",  # FastAPI server
-        "http://localhost:3000",  # Explicitly allow frontend container
+        "http://localhost:3000",
+        "http://localhost:8000",
     ]
 
-    # Additional CORS origins from environment
-    CORS_ORIGINS: str = ""
-
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def assemble_cors_origins(
-        cls, v: Union[str, List[str]], info: ValidationInfo
-    ) -> Union[List[str], str]:
-        # Get CORS_ORIGINS from environment/context
-        cors_origins_str = info.data.get("CORS_ORIGINS", "")
-
-        # Start with default origins
-        origins = [
-            "http://localhost:3000",  # Next.js dev server (Docker)
-            "http://localhost:8000",  # FastAPI server
-        ]
-
-        # Add additional origins from CORS_ORIGINS environment variable
-        if cors_origins_str:
-            additional_origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
-            origins.extend(additional_origins)
-
-        # Process the field value if it's a string
-        if isinstance(v, str) and not v.startswith("["):
-            field_origins = [i.strip() for i in v.split(",")]
-            origins.extend(field_origins)
-        elif isinstance(v, list):
-            origins.extend(v)
-
-        # Remove duplicates while preserving order
-        seen = set()
-        unique_origins = []
-        for origin in origins:
-            if origin not in seen:
-                seen.add(origin)
-                unique_origins.append(origin)
-
-        return unique_origins
+    # This field is added to prevent Pydantic from throwing an "extra inputs not permitted"
+    # error if a stray CORS_ORIGINS environment variable is present. It is not used by the application.
+    CORS_ORIGINS: Optional[str] = None
 
     # Trusted Hosts
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "proyecto-semilla.local", "api.proyecto-semilla.local"]

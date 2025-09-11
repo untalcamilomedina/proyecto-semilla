@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, ReactNode, useState } from 'react';
 import { QueryProvider } from '../lib/query-provider';
 import { useAuthStore } from '../stores/auth-store';
 import { User, LoginRequest } from '../types/api';
@@ -32,8 +32,10 @@ interface AuthProviderProps {
 
 function AuthProvider({ children }: AuthProviderProps) {
   const authStore = useAuthStore();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     // Initialize authentication state on app start
     authStore.initialize();
   }, [authStore]);
@@ -48,6 +50,10 @@ function AuthProvider({ children }: AuthProviderProps) {
     refreshUser: authStore.refreshUser,
     clearError: authStore.clearError,
   };
+
+  if (!isMounted) {
+    return null; // O un spinner de carga si se prefiere
+  }
 
   return (
     <AuthContext.Provider value={value}>

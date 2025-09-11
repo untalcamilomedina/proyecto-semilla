@@ -97,7 +97,7 @@ if not settings.DEBUG:
 app.middleware("http")(logging_middleware)
 app.middleware("http")(rate_limiting_middleware)
 app.middleware("http")(tenant_context_middleware)
-app.middleware("http")(log_request_middleware)
+# app.middleware("http")(log_request_middleware)
 
 # Add performance middleware (Sprint 5)
 app.add_middleware(AdvancedCompressionMiddleware, minimum_size=1000)

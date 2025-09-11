@@ -186,11 +186,7 @@ async def get_current_user_from_cookie(
     # Get user from database
     user = await db.get(User, user_uuid)
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return None
 
     if not user.is_active:
         raise HTTPException(

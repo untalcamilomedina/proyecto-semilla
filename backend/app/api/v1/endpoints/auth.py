@@ -275,6 +275,13 @@ async def read_users_me(
     # Get user from cookie-based authentication
     current_user = await security.get_current_user_from_cookie(request, db)
 
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     return {
         "id": str(current_user.id),
         "email": current_user.email,
