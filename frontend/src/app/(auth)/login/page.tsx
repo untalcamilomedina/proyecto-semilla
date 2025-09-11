@@ -20,9 +20,12 @@ export default function LoginPage() {
     try {
       const response = await fetch('http://localhost:7777/api/v1/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password }), // Backend expects username field
-        credentials: 'include', // Important for cookies
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          username: email,
+          password: password
+        }),
+        credentials: 'include',
       });
 
       if (!response.ok) {
