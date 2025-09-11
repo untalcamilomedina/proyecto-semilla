@@ -5,6 +5,7 @@ import { apiClient } from '../lib/api-client';
 interface AuthState {
   // State
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -18,17 +19,24 @@ interface AuthState {
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   initialize: () => Promise<void>;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   (set, get) => ({
       // Initial state
       user: null,
+      token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
 
       // Actions
+      setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
+      
+      setToken: (token: string | null) => set({ token }),
+
       login: async (credentials: LoginRequest) => {
         set({ isLoading: true, error: null });
         try {
