@@ -64,10 +64,17 @@ export default function RegisterPage() {
         ...(formData.telefono && { telefono: formData.telefono })
       };
 
+      const formDataUrl = new URLSearchParams();
+      Object.entries(registerData).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formDataUrl.append(key, String(value));
+        }
+      });
+
       const response = await fetch('http://localhost:7777/api/v1/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerData),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formDataUrl.toString(),
         credentials: 'include',
       });
 
