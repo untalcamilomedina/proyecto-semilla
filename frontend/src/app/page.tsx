@@ -1,6 +1,5 @@
 'use client';
 
-import { useArticles, useArticleStats } from '../hooks/useArticles';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../lib/api-client';
@@ -8,7 +7,6 @@ import { inputValidation } from '../lib/utils';
 
 export default function Home() {
   const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<'draft' | 'published' | 'review'>('published');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginForm, setLoginForm] = useState({
     email: process.env.NEXT_PUBLIC_DEMO_EMAIL || 'demo@demo-company.com',
@@ -26,11 +24,6 @@ export default function Home() {
   });
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerError, setRegisterError] = useState('');
-
-  const { data: articles, isLoading, error } = useArticles(
-    isAuthenticated ? { status_filter: statusFilter, limit: 10 } : undefined
-  );
-  const { data: stats } = useArticleStats();
 
   useEffect(() => {
     // Check if user is already authenticated by checking cookies

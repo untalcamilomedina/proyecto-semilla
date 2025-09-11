@@ -3,8 +3,8 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777',
   },
-  // Use standalone output for Docker deployment
-  output: 'standalone',
+  // Remove standalone output - causes static file issues
+  // output: 'standalone',
   // Disable static optimization for pages that require authentication
   experimental: {
     serverComponentsExternalPackages: [],
