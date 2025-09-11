@@ -138,14 +138,18 @@ npm run lint
 ## ✨ SIGUIENTE ACCIÓN RECOMENDADA
 
 ```bash
-# Probar el login ahora mismo:
+# 🎉 LOGIN FUNCIONAL - Prueba ahora:
 1. Asegúrate que npm run dev está corriendo
 2. Abre http://localhost:3000/login
-3. Usa las credenciales de prueba
-4. Si funciona, continúa con el registro
+3. Credenciales: admin@proyectosemilla.dev / admin123
+4. ¡Deberías poder acceder al dashboard!
 ```
+
+### 🔑 FIX CRÍTICO APLICADO
+El problema era el formato de datos. FastAPI espera `application/x-www-form-urlencoded` para el endpoint de login (OAuth2PasswordRequestForm), no JSON. Ahora funciona correctamente.
 
 ---
 
 *Documento actualizado en tiempo real durante el desarrollo*
-*Última actualización: 11 de Septiembre de 2025, 11:18 PM (hora local)*
+*Última actualización: 11 de Septiembre de 2025, 11:45 PM (hora local)*
+*FIX CRÍTICO: Login ahora funciona con formato correcto*
