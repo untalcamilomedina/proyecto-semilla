@@ -77,15 +77,6 @@ app = FastAPI(
 )
 
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Add trusted host middleware
 if not settings.DEBUG:
     app.add_middleware(
@@ -105,6 +96,17 @@ app.add_middleware(HTTP2ServerPushMiddleware)
 
 # Add security middleware (Sprint 5 Day 5)
 app.add_middleware(RateLimitMiddleware)
+
+# Add CORS middleware LAST so it executes FIRST (middleware stack is reversed)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,
+)
 
 # Configure default rate limits
 configure_default_limits()

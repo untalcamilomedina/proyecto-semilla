@@ -111,12 +111,11 @@ services:
       dockerfile: ./docker/frontend/Dockerfile
     container_name: proyecto_semilla_frontend
     restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:7777
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - proyecto_semilla_network
     healthcheck:

@@ -38,7 +38,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     setIsMounted(true);
     // Initialize authentication state on app start
     authStore.initialize();
-  }, [authStore]);
+  }, []);
 
   const value = {
     user: authStore.user,
@@ -51,9 +51,6 @@ function AuthProvider({ children }: AuthProviderProps) {
     clearError: authStore.clearError,
   };
 
-  if (!isMounted) {
-    return null; // O un spinner de carga si se prefiere
-  }
 
   return (
     <AuthContext.Provider value={value}>

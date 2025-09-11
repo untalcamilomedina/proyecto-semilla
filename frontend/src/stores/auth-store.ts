@@ -26,178 +26,151 @@ interface AuthState {
   setToken: (token: string | null) => void;
 }
 
+// Helper function to check for the session cookie
+const hasSessionCookie = () => {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.split(';').some((item) => item.trim().startsWith('access_token='));
+};
+
 export const useAuthStore = create<AuthState>()(
   (set, get) => ({
-      // Initial state
-      user: null,
-      token: null,
-      activeTenant: null,
-      tenants: [],
-      isAuthenticated: false,
-      isLoading: true,
-      error: null,
+    // Initial state
+    user: null,
+    token: null,
+    activeTenant: null,
+    tenants: [],
+    isAuthenticated: false,
+    isLoading: true,
+    error: null,
 
-      // Actions
-      setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
-      
-      setToken: (token: string | null) => set({ token }),
+    // Actions
+    setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
+    
+    setToken: (token: string | null) => set({ token }),
 
-      login: async (credentials: LoginRequest) => {
-        set({ isLoading: true, error: null });
+    login: async (credentials: LoginRequest) => {
+      set({ isLoading: true, error: null });
+      try {
+        await apiClient.login(credentials);
+        await get().refreshUser();
+      } catch (error: any) {
+        set({
+          isLoading: false,
+          error: error.response?.data?.detail || error.message || 'Error al iniciar sesión'
+        });
+        throw error;
+      }
+    },
+
+    register: async (userData: UserRegister) => {
+      set({ isLoading: true, error: null });
+      try {
+        const user = await apiClient.register(userData);
+        set({ user, isAuthenticated: true, isLoading: false });
+      } catch (error: any) {
+        set({
+          isLoading: false,
+          error: error.response?.data?.detail || 'Error al registrarse'
+        });
+        throw error;
+      }
+    },
+
+    logout: async () => {
+      try {
+        await apiClient.logout();
+      } catch (error) {
+        console.error("Logout API call failed, clearing state locally.", error);
+      } finally {
+        set({
+          user: null,
+          token: null,
+          activeTenant: null,
+          tenants: [],
+          isAuthenticated: false,
+          isLoading: false,
+          error: null
+        });
+      }
+    },
+
+    logoutAll: async () => {
+      try {
+        await apiClient.logoutAll();
+      } catch (error: any) {
+        console.error("Logout All API call failed, clearing state locally.", error);
+      } finally {
+        set({
+          user: null,
+          token: null,
+          activeTenant: null,
+          tenants: [],
+          isAuthenticated: false,
+          isLoading: false,
+          error: null
+        });
+      }
+    },
+
+    refreshUser: async () => {
+      set({ isLoading: true });
+      try {
+        const user = await apiClient.getCurrentUser();
+        const tenants = await apiClient.getUserTenants();
+        const activeTenant = user.tenant_id
+          ? tenants.find((t) => t.id === user.tenant_id)
+          : tenants[0] || null;
+        
+        set({
+          user,
+          tenants,
+          activeTenant,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null
+        });
+      } catch (error: any) {
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'Tu sesión ha expirado. Por favor, inicia sesión de nuevo.'
+        });
+        throw error;
+      }
+    },
+
+    switchTenant: async (tenantId: string) => {
+      set({ isLoading: true });
+      try {
+        await apiClient.switchTenant(tenantId);
+        await get().refreshUser();
+        // Opcional: forzar recarga si es necesario para limpiar estados de componentes
+        // window.location.reload();
+      } catch (error: any) {
+        set({
+          isLoading: false,
+          error: error.response?.data?.detail || 'Error al cambiar de tenant'
+        });
+        throw error;
+      }
+    },
+
+    clearError: () => set({ error: null }),
+
+    setLoading: (loading: boolean) => set({ isLoading: loading }),
+
+    initialize: async () => {
+      if (hasSessionCookie()) {
         try {
-          const loginResponse = await apiClient.login(credentials);
-          console.log('Login response:', loginResponse);
-          // After successful login, fetch user info using cookies
           await get().refreshUser();
-        } catch (error: any) {
-          console.error('Login error:', error);
-          set({
-            isLoading: false,
-            error: error.response?.data?.detail || error.detail || error.message || 'Error al iniciar sesión'
-          });
-          throw error;
+        } catch (error) {
+          // La sesión podría haber expirado, el estado ya se limpia en refreshUser
+          console.warn("Initialization failed: session might be expired.");
         }
-      },
-
-      register: async (userData: UserRegister) => {
-        set({ isLoading: true, error: null });
-        try {
-          const user = await apiClient.register(userData);
-          set({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          set({
-            isLoading: false,
-            error: error.detail || 'Error al registrarse'
-          });
-          throw error;
-        }
-      },
-
-      logout: async () => {
-        set({ isLoading: true });
-        try {
-          await apiClient.logout();
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          // Even if logout fails, clear local state
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null
-          });
-        }
-      },
-
-      logoutAll: async () => {
-        set({ isLoading: true });
-        try {
-          await apiClient.logoutAll();
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: error.detail || 'Error al cerrar todas las sesiones'
-          });
-          throw error;
-        }
-      },
-
-      refreshUser: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const user = await apiClient.getCurrentUser();
-          const tenants = await apiClient.getTenants();
-          const activeTenant = user.tenant_id
-            ? tenants.find((t: Tenant) => t.id === user.tenant_id) || null
-            : tenants.length > 0 ? tenants[0] : null;
-          
-          set({
-            user,
-            tenants,
-            activeTenant,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          set({
-            user: null,
-            tenants: [],
-            activeTenant: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: error.detail || 'Error al obtener información del usuario'
-          });
-          throw error;
-        }
-      },
-
-      switchTenant: async (tenantId: string) => {
-        set({ isLoading: true, error: null });
-        try {
-          const response = await apiClient.switchTenant(tenantId);
-          // The response should contain the new token
-          // but we rely on cookies, so we just need to refresh the user data
-          await get().refreshUser();
-          window.location.reload(); // Recargar para asegurar que todo el estado se actualice
-        } catch (error: any) {
-          set({
-            isLoading: false,
-            error: error.detail || 'Error al cambiar de inquilino'
-          });
-          throw error;
-        }
-      },
-
-      clearError: () => set({ error: null }),
-
-      setLoading: (loading: boolean) => set({ isLoading: loading }),
-
-      initialize: async () => {
-        set({ isLoading: true, error: null });
-        try {
-          const user = await apiClient.getCurrentUser();
-          const tenants = await apiClient.getTenants();
-          const activeTenant = user.tenant_id
-            ? tenants.find((t: Tenant) => t.id === user.tenant_id) || null
-            : tenants.length > 0 ? tenants[0] : null;
-
-          set({
-            user,
-            tenants,
-            activeTenant,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          set({
-            user: null,
-            tenants: [],
-            activeTenant: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null // Don't show error on initialization
-          });
-        }
-      },
-    })
+      } else {
+        set({ isLoading: false, isAuthenticated: false, user: null });
+      }
+    },
+  })
 );

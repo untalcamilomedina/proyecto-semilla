@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: Optional[str] = None
 
     # Trusted Hosts
-    ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "proyecto-semilla.local", "api.proyecto-semilla.local"]
+    ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "proyecto-semilla.local", "api.proyecto-semilla.local", "backend"]
 
     # Database Configuration
     DB_HOST: str = os.getenv("DB_HOST", "db")

@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
+import { apiClient } from '@/lib/api-client';
 
 function LoginComponent() {
   const router = useRouter();
@@ -27,31 +28,22 @@ function LoginComponent() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:7777/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          username: email,
-          password: password
-        }),
-        credentials: 'include',
+      // Use the centralized apiClient for login
+      // It's already configured with the base URL and withCredentials: true
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+
+      const { data } = await apiClient.post('/auth/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Login failed');
-      }
-
-      const data = await response.json();
-      
       // Store auth data in Zustand store
       setToken(data.access_token);
       setUser(data.user);
-      
-      // Store in localStorage as backup
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err) {

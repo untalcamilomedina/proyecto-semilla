@@ -1,6 +1,5 @@
 'use client';
 
-import { useRequireAuth } from '@/hooks/use-auth';
 import { useApi } from '@/hooks/use-api';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { UsersChart } from '@/components/dashboard/users-chart';
@@ -21,7 +20,6 @@ interface UsersOverTimeData {
 }
 
 export default function DashboardPage() {
-  useRequireAuth();
 
   const { data: metrics, isLoading: metricsLoading } = useApi<DashboardMetrics>('dashboard/metrics');
   const { data: usersOverTime, isLoading: usersOverTimeLoading } = useApi<UsersOverTimeData[]>('dashboard/users-over-time');

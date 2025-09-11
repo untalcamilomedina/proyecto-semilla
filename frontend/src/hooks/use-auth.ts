@@ -22,7 +22,7 @@ export function useAuth() {
   // Inicializar el estado de autenticación al montar
   useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   // Función para verificar si el usuario está autenticado
   const checkAuth = useCallback(async () => {
@@ -126,19 +126,9 @@ export function useAuth() {
   };
 }
 
-// Hook para proteger componentes
-export function useRequireAuth(redirectTo: string = '/login') {
-  const { isAuthenticated, isLoading } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo);
-    }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
-
-  return { isAuthenticated, isLoading };
-}
+// El hook useRequireAuth queda obsoleto. La protección de rutas
+// se manejará de forma más robusta con middleware en `src/middleware.ts`.
+// Esto centraliza la lógica de autenticación y evita problemas de renderizado en el cliente.
 
 // Hook para redirección si ya está autenticado
 export function useRedirectIfAuthenticated(redirectTo: string = '/dashboard') {

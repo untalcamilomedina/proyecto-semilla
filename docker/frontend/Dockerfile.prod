@@ -31,12 +31,18 @@ WORKDIR /app
 # Copiar el build de la etapa anterior
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.js ./next.config.js
 
+# Crear usuario no privilegiado
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
 # Instalar solo las dependencias de producción
 RUN npm install --omit=dev --ignore-scripts
+
+# Cambiar propietario de los archivos
+USER nextjs
 
 # Exponer el puerto
 EXPOSE 3000
