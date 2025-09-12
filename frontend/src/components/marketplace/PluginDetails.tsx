@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import {
   Star, Download, Heart, ExternalLink, Calendar, User,
-  Shield, Zap, Globe, Code, CheckCircle, AlertCircle,
+  Shield, CheckCircle, AlertCircle,
   ThumbsUp, ThumbsDown, MessageSquare
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -48,7 +48,6 @@ export const PluginDetails: React.FC<PluginDetailsProps> = ({
   plugin,
   reviews = [],
   onInstall,
-  onClose,
   isInstalled = false,
   isInstalling = false
 }) => {

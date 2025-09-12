@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
-import { apiClient } from '@/lib/api-client';
 
 function LoginComponent() {
   const router = useRouter();
@@ -28,17 +27,24 @@ function LoginComponent() {
     setError('');
 
     try {
-      // Use the centralized apiClient for login
-      // It's already configured with the base URL and withCredentials: true
       const formData = new URLSearchParams();
       formData.append('username', email);
       formData.append('password', password);
 
-      const { data } = await apiClient.post('/auth/login', formData, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777'}/api/v1/auth/login`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
+        body: formData.toString(),
+        credentials: 'include',
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Credenciales inválidas');
+      }
 
       // Store auth data in Zustand store
       setToken(data.access_token);
@@ -47,7 +53,7 @@ function LoginComponent() {
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid credentials');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado');
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -56,7 +62,7 @@ function LoginComponent() {
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             Iniciar Sesión
@@ -118,18 +124,21 @@ function LoginComponent() {
           </div>
         </div>
         
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-        </button>
+        <div>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          </button>
+        </div>
 
         <div className="text-sm text-center">
           <span className="text-gray-600">¿No tienes cuenta? </span>
-          <a 
-            href="/register" 
+          <a
+            href="/register"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             Regístrate aquí

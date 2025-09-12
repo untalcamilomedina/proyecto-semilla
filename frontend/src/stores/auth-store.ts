@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, LoginRequest, UserRegister, Tenant } from '../types/api';
+import { User, UserRegister, Tenant } from '../types/api';
 import { apiClient } from '../lib/api-client';
 
 interface AuthState {
@@ -13,7 +13,6 @@ interface AuthState {
   error: string | null;
 
   // Actions
-  login: (credentials: LoginRequest) => Promise<void>;
   register: (userData: UserRegister) => Promise<void>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -40,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
     activeTenant: null,
     tenants: [],
     isAuthenticated: false,
-    isLoading: true,
+    isLoading: false, // Default to false
     error: null,
 
     // Actions
@@ -48,19 +47,6 @@ export const useAuthStore = create<AuthState>()(
     
     setToken: (token: string | null) => set({ token }),
 
-    login: async (credentials: LoginRequest) => {
-      set({ isLoading: true, error: null });
-      try {
-        await apiClient.login(credentials);
-        await get().refreshUser();
-      } catch (error: any) {
-        set({
-          isLoading: false,
-          error: error.response?.data?.detail || error.message || 'Error al iniciar sesión'
-        });
-        throw error;
-      }
-    },
 
     register: async (userData: UserRegister) => {
       set({ isLoading: true, error: null });
@@ -162,14 +148,18 @@ export const useAuthStore = create<AuthState>()(
 
     initialize: async () => {
       if (hasSessionCookie()) {
+        set({ isLoading: true }); // Only set loading if a session might exist
         try {
           await get().refreshUser();
         } catch (error) {
-          // La sesión podría haber expirado, el estado ya se limpia en refreshUser
+          // The session might have expired, the state is already cleared in refreshUser
           console.warn("Initialization failed: session might be expired.");
+        } finally {
+          set({ isLoading: false });
         }
       } else {
-        set({ isLoading: false, isAuthenticated: false, user: null });
+        // No cookie, so no session to verify.
+        set({ isAuthenticated: false, user: null, isLoading: false });
       }
     },
   })

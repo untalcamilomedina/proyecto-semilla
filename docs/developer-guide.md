@@ -9,6 +9,7 @@
 ## 📋 **Tabla de Contenidos**
 
 - [🏗️ Arquitectura General](#-arquitectura-general)
+  - [Flujo de Autenticación](#-flujo-de-autenticación)
 - [🛠️ Configuración del Entorno](#-configuración-del-entorno)
 - [🔧 Desarrollo con Vibecoding](#-desarrollo-con-vibecoding)
 - [🧪 Testing y Calidad](#-testing-y-calidad)
@@ -28,7 +29,7 @@ Proyecto Semilla v0.2.0
 ├── 🔧 Backend (FastAPI + PostgreSQL + Redis)
 │   ├── API REST completa (/api/v1/)
 │   ├── Multi-tenancy con RLS
-│   ├── Autenticación JWT
+│   ├── Autenticación segura con Cookies HttpOnly
 │   └── Vibecoding CORE integrado
 │
 ├── 🤖 Vibecoding CORE
@@ -56,6 +57,22 @@ Proyecto Semilla v0.2.0
 3. **Enterprise-Grade**: Calidad production-ready
 4. **Modular Architecture**: Componentes desacoplados
 5. **Auto-Documentation**: Documentación viva
+
+### **Flujo de Autenticación**
+
+El sistema de autenticación se basa en cookies `HttpOnly` para mayor seguridad, evitando el almacenamiento de tokens en `localStorage`.
+
+1.  **Inicialización**: Al cargar la aplicación, el componente `AuthInitializer` se activa.
+2.  **Verificación de Sesión**: Llama a la función `initialize` del `auth-store`, que comprueba la existencia de una cookie de sesión (`access_token`).
+3.  **Validación de Sesión**: Si la cookie existe, se realiza una petición al endpoint `/api/v1/auth/me`. El navegador adjunta la cookie `HttpOnly` de forma automática.
+    -   **Éxito**: El estado global de Zustand se hidrata con la información del usuario, estableciendo la sesión como activa.
+    -   **Fallo**: Si la petición falla (ej. token expirado), se limpia cualquier estado de sesión residual.
+4.  **Inicio de Sesión Manual**:
+    -   El usuario envía sus credenciales a través de un formulario que realiza una petición `POST` directa al endpoint `/api/v1/auth/login` usando `fetch`.
+    -   El backend valida las credenciales y, si son correctas, establece una cookie `HttpOnly` en la respuesta.
+    -   El frontend actualiza el estado de Zustand con los datos del usuario y redirige al dashboard.
+5.  **Peticiones Autenticadas**: Para las peticiones subsiguientes a endpoints protegidos, el navegador adjunta automáticamente la cookie de sesión. El `api-client` está configurado con `withCredentials: true` para facilitar este proceso.
+6.  **Cierre de Sesión**: Al llamar a `logout`, se realiza una petición al backend para invalidar la cookie y se limpia el estado de Zustand.
 
 ---
 

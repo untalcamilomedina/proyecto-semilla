@@ -48,8 +48,6 @@ class User(Base):
     # Relationships
     tenant = relationship("Tenant", back_populates="users")
     user_roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
-    articles = relationship("Article", back_populates="author", cascade="all, delete-orphan")
-    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', tenant_id={self.tenant_id})>"

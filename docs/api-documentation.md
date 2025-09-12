@@ -1,513 +1,164 @@
-# 📚 API Documentation - Proyecto Semilla
-## Interactive API Documentation with Examples
+# Especificación de la API de Administración de Usuarios
 
-**Versión:** 0.5.0
-**Última actualización:** 5 de septiembre de 2025
-**Base URL:** `https://api.proyecto-semilla.dev/v1`
+Este documento detalla la API RESTful para la gestión de usuarios en el panel de administración.
 
----
+## Modelo de Datos
 
-## 🚀 Acceso Rápido
+### User
 
-- **📖 Swagger UI:** [https://api.proyecto-semilla.dev/docs](https://api.proyecto-semilla.dev/docs)
-- **📋 ReDoc:** [https://api.proyecto-semilla.dev/redoc](https://api.proyecto-semilla.dev/redoc)
-- **🔗 OpenAPI JSON:** [https://api.proyecto-semilla.dev/openapi.json](https://api.proyecto-semilla.dev/openapi.json)
-
----
-
-## 🔐 Autenticación
-
-Todas las APIs requieren autenticación JWT. Incluya el token en el header:
-
-```http
-Authorization: Bearer <your_jwt_token>
-X-Tenant-ID: <tenant_uuid>
-```
-
-### Obtener Token JWT
-
-```bash
-curl -X POST "https://api.proyecto-semilla.dev/v1/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "password123"
-  }'
-```
-
-**Respuesta:**
-```json
-{
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "token_type": "bearer",
-  "expires_in": 3600
-}
-```
+| Campo | Tipo | Descripción |
+| --- | --- | --- |
+| `id` | UUID | Identificador único del usuario. |
+| `email` | String | Dirección de correo electrónico (única). |
+| `first_name` | String | Nombre del usuario. |
+| `last_name` | String | Apellido del usuario. |
+| `full_name` | String | Nombre completo (campo calculado). |
+| `is_active` | Boolean | Indica si la cuenta del usuario está activa. |
+| `is_verified` | Boolean | Indica si el correo ha sido verificado. |
+| `tenant_id` | UUID | ID del tenant al que pertenece el usuario. |
+| `role_ids` | Array[UUID] | Lista de IDs de los roles asignados. |
+| `created_at` | DateTime | Fecha de creación. |
+| `updated_at` | DateTime | Fecha de última actualización. |
 
 ---
 
-## 📋 Endpoints Principales
+## Endpoints de la API
 
-### 📰 Articles API
+La URL base para estos endpoints es `/api/v1`.
 
-#### Listar Artículos
-```http
-GET /api/v1/articles
-```
+### Endpoints de Autenticación
 
-**Parámetros de Query:**
-- `skip` (integer, opcional): Número de artículos a saltar (default: 0)
-- `limit` (integer, opcional): Número máximo de artículos (default: 100, max: 1000)
-- `status_filter` (string, opcional): Filtrar por estado (`draft`, `published`, `review`)
-- `category_id` (UUID, opcional): Filtrar por categoría
+#### 1. Iniciar Sesión
 
-**Ejemplo:**
-```bash
-curl -X GET "https://api.proyecto-semilla.dev/v1/articles?limit=10&status_filter=published" \
-  -H "Authorization: Bearer <token>" \
-  -H "X-Tenant-ID: <tenant_id>"
-```
+- **Endpoint:** `POST /auth/login`
+- **Descripción:** Autentica a un usuario y, si tiene éxito, establece una cookie de sesión `HttpOnly` segura.
+- **Cuerpo de la Solicitud (`application/x-www-form-urlencoded`):**
+  - `username`: El correo electrónico del usuario.
+  - `password`: La contraseña del usuario.
+- **Respuestas:**
+  - `200 OK`: Autenticación exitosa. Devuelve un objeto con el `access_token` y los datos del usuario. La cookie de sesión se establece automáticamente en la respuesta.
+  - `400 Bad Request`: Credenciales inválidas o mal formateadas.
 
-**Respuesta:**
-```json
-[
+#### 2. Registrar un Nuevo Usuario
+
+- **Endpoint:** `POST /auth/register`
+- **Descripción:** Crea una nueva cuenta de usuario.
+- **Cuerpo de la Solicitud (`application/json`):**
+  ```json
   {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "tenant_id": "550e8400-e29b-41d4-a716-446655440001",
-    "title": "Mi Primer Artículo",
-    "slug": "mi-primer-articulo",
-    "content": "Contenido completo del artículo...",
-    "excerpt": "Resumen del artículo...",
-    "author_id": "550e8400-e29b-41d4-a716-446655440002",
-    "category_id": "550e8400-e29b-41d4-a716-446655440003",
-    "seo_title": "Título SEO",
-    "seo_description": "Descripción SEO",
-    "featured_image": "https://example.com/image.jpg",
-    "status": "published",
-    "is_featured": true,
-    "view_count": 150,
-    "comment_count": 5,
-    "like_count": 25,
-    "tags": ["tutorial", "beginners"],
-    "published_at": "2025-09-05T10:00:00Z",
-    "created_at": "2025-09-05T09:00:00Z",
-    "updated_at": "2025-09-05T10:00:00Z",
-    "author_name": "Juan Pérez",
-    "category_name": "Tutoriales"
+    "email": "newuser@example.com",
+    "password": "a-strong-password",
+    "first_name": "New",
+    "last_name": "User"
   }
-]
-```
+  ```
+- **Respuestas:**
+  - `201 Created`: Usuario registrado exitosamente.
+  - `400 Bad Request`: Datos de entrada inválidos.
+  - `409 Conflict`: El correo electrónico ya está en uso.
 
-#### Crear Artículo
-```http
-POST /api/v1/articles
-```
+#### 3. Obtener el Usuario Actual
 
-**Body:**
-```json
-{
-  "title": "Nuevo Artículo",
-  "slug": "nuevo-articulo",
-  "content": "Contenido del artículo en formato Markdown o HTML",
-  "excerpt": "Resumen breve del artículo",
-  "category_id": "550e8400-e29b-41d4-a716-446655440003",
-  "seo_title": "Título para SEO",
-  "seo_description": "Descripción para SEO",
-  "featured_image": "https://example.com/image.jpg",
-  "status": "draft",
-  "is_featured": false,
-  "tags": ["tutorial", "react"]
-}
-```
+- **Endpoint:** `GET /auth/me`
+- **Descripción:** Devuelve los detalles del usuario autenticado actualmente, validando la sesión a través de la cookie `HttpOnly`.
+- **Respuestas:**
+  - `200 OK`: Detalles del usuario.
+  - `401 Unauthorized`: Sesión no válida o expirada.
 
-**Ejemplo con curl:**
-```bash
-curl -X POST "https://api.proyecto-semilla.dev/v1/articles" \
-  -H "Authorization: Bearer <token>" \
-  -H "X-Tenant-ID: <tenant_id>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Mi Nuevo Artículo",
-    "slug": "mi-nuevo-articulo",
-    "content": "Contenido del artículo...",
-    "status": "draft"
-  }'
-```
+#### 4. Cerrar Sesión
 
-#### Obtener Artículo por ID
-```http
-GET /api/v1/articles/{article_id}
-```
-
-**Parámetros de Path:**
-- `article_id` (UUID, requerido): ID del artículo
-
-**Ejemplo:**
-```bash
-curl -X GET "https://api.proyecto-semilla.dev/v1/articles/550e8400-e29b-41d4-a716-446655440000" \
-  -H "Authorization: Bearer <token>" \
-  -H "X-Tenant-ID: <tenant_id>"
-```
-
-#### Actualizar Artículo
-```http
-PUT /api/v1/articles/{article_id}
-```
-
-**Body (solo campos a actualizar):**
-```json
-{
-  "title": "Título Actualizado",
-  "status": "published",
-  "tags": ["tutorial", "updated"]
-}
-```
-
-#### Eliminar Artículo
-```http
-DELETE /api/v1/articles/{article_id}
-```
-
-#### Estadísticas de Artículos
-```http
-GET /api/v1/articles/stats/overview
-```
-
-**Respuesta:**
-```json
-{
-  "total_articles": 25,
-  "published_articles": 20,
-  "draft_articles": 5,
-  "total_views": 1250,
-  "total_comments": 45,
-  "total_likes": 180
-}
-```
+- **Endpoint:** `POST /auth/logout`
+- **Descripción:** Invalida la sesión del usuario actual eliminando la cookie de sesión del navegador.
+- **Respuestas:**
+  - `200 OK`: Sesión cerrada exitosamente.
 
 ---
 
-### 👥 Users API
+### Endpoints de Gestión de Usuarios
 
-#### Listar Usuarios
-```http
-GET /api/v1/users
-```
+### 1. Crear un Nuevo Usuario
 
-**Parámetros de Query:**
-- `skip` (integer): Paginación
-- `limit` (integer): Límite de resultados
-- `role_id` (UUID): Filtrar por rol
-
-#### Crear Usuario
-```http
-POST /api/v1/users
-```
-
-**Body:**
-```json
-{
-  "email": "nuevo@usuario.com",
-  "first_name": "Juan",
-  "last_name": "Pérez",
-  "password": "SecurePass123!",
-  "role_id": "550e8400-e29b-41d4-a716-446655440004"
-}
-```
-
-#### Obtener Perfil de Usuario
-```http
-GET /api/v1/users/profile
-```
-
-#### Actualizar Perfil
-```http
-PUT /api/v1/users/profile
-```
-
----
-
-### 🏢 Tenants API
-
-#### Listar Tenants
-```http
-GET /api/v1/tenants
-```
-
-#### Crear Tenant
-```http
-POST /api/v1/tenants
-```
-
-**Body:**
-```json
-{
-  "name": "Mi Empresa",
-  "slug": "mi-empresa",
-  "description": "Descripción de la empresa",
-  "is_active": true
-}
-```
-
----
-
-### 🔐 Authentication API
-
-#### Login
-```http
-POST /api/v1/auth/login
-```
-
-**Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-#### Refresh Token
-```http
-POST /api/v1/auth/refresh
-```
-
-**Body:**
-```json
-{
-  "refresh_token": "refresh_token_here"
-}
-```
-
-#### Logout
-```http
-POST /api/v1/auth/logout
-```
-
----
-
-## 📊 Rate Limiting
-
-La API implementa rate limiting inteligente:
-
-- **Requests por minuto:** 100 (configurable por endpoint)
-- **Burst limit:** 200 requests
-- **Headers de respuesta:**
-  - `X-RateLimit-Limit`: Límite total
-  - `X-RateLimit-Remaining`: Requests restantes
-  - `X-RateLimit-Reset`: Timestamp de reset
-
-```http
-HTTP/1.1 429 Too Many Requests
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1630785600
-Retry-After: 60
-```
-
----
-
-## 🛡️ Security Features
-
-### Threat Detection
-- **ML-based analysis** de patrones maliciosos
-- **IP reputation checking**
-- **Request pattern analysis**
-- **Automated blocking** de amenazas
-
-### Input Validation
-- **Enterprise-grade validation** con sanitización
-- **SQL injection prevention**
-- **XSS protection**
-- **Input length limits**
-
-### Audit Logging
-- **Complete audit trail** de todas las operaciones
-- **Compliance-ready logging**
-- **Real-time monitoring**
-
----
-
-## 🚨 Error Handling
-
-### Códigos de Error Comunes
-
-| Código | Descripción | Solución |
-|--------|-------------|----------|
-| 400 | Bad Request | Verificar datos enviados |
-| 401 | Unauthorized | Verificar token JWT |
-| 403 | Forbidden | Verificar permisos |
-| 404 | Not Found | Verificar ID del recurso |
-| 429 | Too Many Requests | Esperar y reintentar |
-| 500 | Internal Server Error | Contactar soporte |
-
-### Ejemplo de Error
-```json
-{
-  "detail": "Article with this slug already exists",
-  "error_code": "ARTICLE_SLUG_EXISTS",
-  "timestamp": "2025-09-05T10:00:00Z"
-}
-```
-
----
-
-## 📱 SDKs y Librerías
-
-### JavaScript/TypeScript SDK
-```javascript
-import { ProyectoSemillaAPI } from '@proyecto-semilla/sdk';
-
-const api = new ProyectoSemillaAPI({
-  baseURL: 'https://api.proyecto-semilla.dev/v1',
-  tenantId: 'your-tenant-id'
-});
-
-// Login
-const tokens = await api.auth.login('user@example.com', 'password');
-
-// Get articles
-const articles = await api.articles.list({ limit: 10 });
-
-// Create article
-const newArticle = await api.articles.create({
-  title: 'My Article',
-  content: 'Article content...',
-  status: 'draft'
-});
-```
-
-### Python SDK
-```python
-from proyecto_semilla import APIClient
-
-client = APIClient(
-    base_url="https://api.proyecto-semilla.dev/v1",
-    tenant_id="your-tenant-id"
-)
-
-# Login
-tokens = client.auth.login("user@example.com", "password")
-
-# Get articles
-articles = client.articles.list(limit=10)
-
-# Create article
-article = client.articles.create({
-    "title": "My Article",
-    "content": "Article content...",
-    "status": "draft"
-})
-```
-
----
-
-## 🔧 Troubleshooting
-
-### Problemas Comunes
-
-#### "Connection timeout"
-```bash
-# Verificar conectividad
-curl -v https://api.proyecto-semilla.dev/health
-
-# Verificar DNS
-nslookup api.proyecto-semilla.dev
-```
-
-#### "Rate limit exceeded"
-```bash
-# Esperar el tiempo indicado
-sleep 60
-curl -X GET "https://api.proyecto-semilla.dev/v1/articles" \
-  -H "Authorization: Bearer <token>"
-```
-
-#### "Invalid token"
-```bash
-# Refresh token
-curl -X POST "https://api.proyecto-semilla.dev/v1/auth/refresh" \
-  -H "Content-Type: application/json" \
-  -d '{"refresh_token": "your_refresh_token"}'
-```
-
----
-
-## 📈 Monitoring & Analytics
-
-### Health Check Endpoint
-```http
-GET /health
-```
-
-**Respuesta:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-09-05T10:00:00Z",
-  "version": "0.5.0",
-  "services": {
-    "database": "healthy",
-    "redis": "healthy",
-    "external_apis": "healthy"
-  },
-  "metrics": {
-    "uptime": "99.9%",
-    "response_time_p95": "45ms",
-    "error_rate": "0.01%"
+- **Endpoint:** `POST /users/`
+- **Descripción:** Crea un nuevo usuario en el sistema. Requiere permisos de administrador.
+- **Cuerpo de la Solicitud (`application/json`):**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "a-strong-password",
+    "first_name": "John",
+    "last_name": "Doe",
+    "tenant_id": "uuid-of-the-tenant",
+    "role_ids": ["uuid-of-a-role"]
   }
-}
-```
+  ```
+- **Respuestas:**
+  - `201 Created`: Usuario creado exitosamente. Devuelve el objeto del usuario creado.
+  - `400 Bad Request`: Datos de entrada inválidos.
+  - `409 Conflict`: El correo electrónico ya existe.
+  - `403 Forbidden`: Sin permisos suficientes.
 
-### Metrics Endpoint
-```http
-GET /metrics
-```
+### 2. Obtener una Lista de Usuarios
 
-Proporciona métricas en formato Prometheus para monitoring avanzado.
+- **Endpoint:** `GET /users/`
+- **Descripción:** Devuelve una lista paginada de usuarios.
+- **Parámetros de Consulta:**
+  - `skip` (opcional, `int`, default: 0): Número de registros a omitir.
+  - `limit` (opcional, `int`, default: 100): Número máximo de registros a devolver.
+- **Respuestas:**
+  - `200 OK`: Lista de usuarios.
+    ```json
+    [
+      {
+        "id": "user-uuid-1",
+        "email": "user1@example.com",
+        ...
+      },
+      {
+        "id": "user-uuid-2",
+        "email": "user2@example.com",
+        ...
+      }
+    ]
+    ```
 
----
+### 3. Obtener un Usuario Específico
 
-## 🌐 Webhooks & Integrations
+- **Endpoint:** `GET /users/{user_id}`
+- **Descripción:** Devuelve los detalles de un usuario por su ID.
+- **Parámetros de Ruta:**
+  - `user_id` (requerido, `UUID`): El ID del usuario a obtener.
+- **Respuestas:**
+  - `200 OK`: Detalles del usuario.
+  - `404 Not Found`: Usuario no encontrado.
 
-### Configurar Webhooks
-```http
-POST /api/v1/webhooks
-```
+### 4. Actualizar un Usuario
 
-**Body:**
-```json
-{
-  "url": "https://your-app.com/webhook",
-  "events": ["article.published", "user.created"],
-  "secret": "your-webhook-secret"
-}
-```
+- **Endpoint:** `PUT /users/{user_id}`
+- **Descripción:** Actualiza la información de un usuario existente.
+- **Parámetros de Ruta:**
+  - `user_id` (requerido, `UUID`): El ID del usuario a actualizar.
+- **Cuerpo de la Solicitud (`application/json`):**
+  ```json
+  {
+    "email": "new.email@example.com",
+    "first_name": "Jane",
+    "is_active": false,
+    "role_ids": ["new-role-uuid"]
+  }
+  ```
+- **Respuestas:**
+  - `200 OK`: Usuario actualizado exitosamente. Devuelve el objeto del usuario actualizado.
+  - `400 Bad Request`: Datos de entrada inválidos.
+  - `404 Not Found`: Usuario no encontrado.
+  - `403 Forbidden`: Sin permisos suficientes.
 
-### Eventos Disponibles
-- `article.created`
-- `article.updated`
-- `article.published`
-- `article.deleted`
-- `user.created`
-- `user.updated`
-- `tenant.created`
+### 5. Eliminar un Usuario
 
----
-
-## 📞 Soporte
-
-### Canales de Soporte
-- **📧 Email:** support@proyecto-semilla.dev
-- **💬 Discord:** [discord.gg/proyecto-semilla](https://discord.gg/proyecto-semilla)
-- **📚 Documentación:** [docs.proyecto-semilla.dev](https://docs.proyecto-semilla.dev)
-
-### Reportar Issues
-- **🐛 Bug Reports:** [GitHub Issues](../../issues)
-- **💡 Feature Requests:** [GitHub Discussions](../../discussions)
-- **🔒 Security Issues:** security@proyecto-semilla.dev
-
----
-
-*"Esta documentación se mantiene automáticamente sincronizada con el código. Última actualización: 5 de septiembre de 2025"*
-
-🇨🇴 **Proyecto Semilla** - Documentación API v0.5.0
+- **Endpoint:** `DELETE /users/{user_id}`
+- **Descripción:** Elimina un usuario del sistema.
+- **Parámetros de Ruta:**
+  - `user_id` (requerido, `UUID`): El ID del usuario a eliminar.
+- **Respuestas:**
+  - `204 No Content`: Usuario eliminado exitosamente.
+  - `404 Not Found`: Usuario no encontrado.
+  - `403 Forbidden`: Sin permisos suficientes.

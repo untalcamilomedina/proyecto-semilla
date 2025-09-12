@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Rutas públicas que no requieren autenticación
-const publicPaths = ['/login', '/register', '/', '/api/health'];
 
 // Rutas que requieren autenticación
 const protectedPaths = ['/dashboard'];
@@ -14,7 +13,6 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('access_token')?.value;
   
   // Verificar si la ruta actual es pública
-  const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`));
   
   // Verificar si la ruta actual es protegida
   const isProtectedPath = protectedPaths.some(path => pathname === path || pathname.startsWith(`${path}/`));

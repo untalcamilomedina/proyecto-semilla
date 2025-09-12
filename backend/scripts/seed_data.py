@@ -14,6 +14,7 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.core.database import get_db
 from app.core.security import get_password_hash
 from app.models.tenant import Tenant
@@ -24,35 +25,44 @@ from uuid import uuid4
 
 
 async def create_initial_tenant(db: AsyncSession) -> Tenant:
-    """Create the initial tenant"""
-    print("🌱 Creating initial tenant...")
+    """Create the initial tenant if it doesn't exist"""
+    print("🌱 Checking for initial tenant...")
+    result = await db.execute(select(Tenant).filter_by(slug="proyecto-semilla"))
+    tenant = result.scalars().first()
+    if tenant:
+        print("✅ Initial tenant already exists.")
+        return tenant
 
+    print("🌱 Creating initial tenant...")
     tenant = Tenant(
         name="Proyecto Semilla",
         slug="proyecto-semilla",
         description="Plataforma SaaS multi-tenant de Proyecto Semilla",
         settings='{"theme": "default", "features": ["auth", "tenants", "users"]}'
     )
-
     db.add(tenant)
     await db.commit()
     await db.refresh(tenant)
-
     print(f"✅ Created tenant: {tenant.name} (ID: {tenant.id})")
     return tenant
 
 
 async def create_super_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
-    """Create super admin role"""
-    print("👑 Creating super admin role...")
+    """Create super admin role if it doesn't exist"""
+    print("👑 Checking for super admin role...")
+    result = await db.execute(select(Role).filter_by(name="Super Admin", tenant_id=tenant.id))
+    role = result.scalars().first()
+    if role:
+        print("✅ Super admin role already exists.")
+        return role
 
+    print("👑 Creating super admin role...")
     permissions = [
         "users:read", "users:write", "users:delete",
         "tenants:read", "tenants:write", "tenants:delete",
         "roles:read", "roles:write", "roles:delete",
         "system:admin", "system:config"
     ]
-
     role = Role(
         tenant_id=tenant.id,
         name="Super Admin",
@@ -62,26 +72,29 @@ async def create_super_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
         color="#FF0000",
         is_default=False
     )
-
     db.add(role)
     await db.commit()
     await db.refresh(role)
-
     print(f"✅ Created role: {role.name} (ID: {role.id})")
     return role
 
 
 async def create_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
-    """Create admin role"""
-    print("👑 Creating admin role...")
+    """Create admin role if it doesn't exist"""
+    print("👑 Checking for admin role...")
+    result = await db.execute(select(Role).filter_by(name="Admin", tenant_id=tenant.id))
+    role = result.scalars().first()
+    if role:
+        print("✅ Admin role already exists.")
+        return role
 
+    print("👑 Creating admin role...")
     permissions = [
         "users:read", "users:write", "users:delete",
         "tenants:read", "tenants:write",
         "roles:read", "roles:write", "roles:delete",
         "system:config"
     ]
-
     role = Role(
         tenant_id=tenant.id,
         name="Admin",
@@ -91,23 +104,24 @@ async def create_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
         color="#FF6B35",
         is_default=False
     )
-
     db.add(role)
     await db.commit()
     await db.refresh(role)
-
     print(f"✅ Created role: {role.name} (ID: {role.id})")
     return role
 
 
 async def create_manager_role(db: AsyncSession, tenant: Tenant) -> Role:
-    """Create manager role"""
+    """Create manager role if it doesn't exist"""
+    print("👔 Checking for manager role...")
+    result = await db.execute(select(Role).filter_by(name="Manager", tenant_id=tenant.id))
+    role = result.scalars().first()
+    if role:
+        print("✅ Manager role already exists.")
+        return role
+
     print("👔 Creating manager role...")
-
-    permissions = [
-        "users:read", "users:write",
-    ]
-
+    permissions = ["users:read", "users:write"]
     role = Role(
         tenant_id=tenant.id,
         name="Manager",
@@ -117,22 +131,24 @@ async def create_manager_role(db: AsyncSession, tenant: Tenant) -> Role:
         color="#4ECDC4",
         is_default=False
     )
-
     db.add(role)
     await db.commit()
     await db.refresh(role)
-
     print(f"✅ Created role: {role.name} (ID: {role.id})")
     return role
 
 
 async def create_editor_role(db: AsyncSession, tenant: Tenant) -> Role:
-    """Create editor role"""
+    """Create editor role if it doesn't exist"""
+    print("✏️ Checking for editor role...")
+    result = await db.execute(select(Role).filter_by(name="Editor", tenant_id=tenant.id))
+    role = result.scalars().first()
+    if role:
+        print("✅ Editor role already exists.")
+        return role
+
     print("✏️ Creating editor role...")
-
-    permissions = [
-    ]
-
+    permissions = []
     role = Role(
         tenant_id=tenant.id,
         name="Editor",
@@ -142,23 +158,24 @@ async def create_editor_role(db: AsyncSession, tenant: Tenant) -> Role:
         color="#45B7D1",
         is_default=False
     )
-
     db.add(role)
     await db.commit()
     await db.refresh(role)
-
     print(f"✅ Created role: {role.name} (ID: {role.id})")
     return role
 
 
 async def create_user_role(db: AsyncSession, tenant: Tenant) -> Role:
-    """Create user role"""
+    """Create user role if it doesn't exist"""
+    print("👤 Checking for user role...")
+    result = await db.execute(select(Role).filter_by(name="User", tenant_id=tenant.id))
+    role = result.scalars().first()
+    if role:
+        print("✅ User role already exists.")
+        return role
+
     print("👤 Creating user role...")
-
-    permissions = [
-        "users:read",
-    ]
-
+    permissions = ["users:read"]
     role = Role(
         tenant_id=tenant.id,
         name="User",
@@ -168,27 +185,27 @@ async def create_user_role(db: AsyncSession, tenant: Tenant) -> Role:
         color="#96CEB4",
         is_default=True
     )
-
     db.add(role)
     await db.commit()
     await db.refresh(role)
-
     print(f"✅ Created role: {role.name} (ID: {role.id})")
     return role
 
 
 async def create_super_admin(db: AsyncSession, tenant: Tenant, admin_role: Role) -> User:
-    """Create super admin user"""
-    print("🦸 Creating super admin user...")
+    """Create super admin user if it doesn't exist"""
+    print("🦸 Checking for super admin user...")
+    result = await db.execute(select(User).filter_by(email="admin@proyectosemilla.dev"))
+    user = result.scalars().first()
+    if user:
+        print("✅ Super admin user already exists.")
+        return user
 
-    # Get password from environment or use secure default
+    print("🦸 Creating super admin user...")
     admin_password = os.getenv("SEED_ADMIN_PASSWORD", "ChangeMeSecure123!")
     if admin_password == "ChangeMeSecure123!":
         print("⚠️  Using default admin password. Set SEED_ADMIN_PASSWORD environment variable for security.")
-
-    # Hash password
     hashed_password = get_password_hash(admin_password)
-
     user = User(
         tenant_id=tenant.id,
         email="admin@proyectosemilla.dev",
@@ -200,56 +217,62 @@ async def create_super_admin(db: AsyncSession, tenant: Tenant, admin_role: Role)
         is_verified=True,
         preferences='{"language": "es", "theme": "dark"}'
     )
-
     db.add(user)
     await db.commit()
     await db.refresh(user)
-
-    # Assign admin role
-    user_role = UserRole(
-        user_id=user.id,
-        role_id=admin_role.id
-    )
-
+    user_role = UserRole(user_id=user.id, role_id=admin_role.id)
     db.add(user_role)
     await db.commit()
-
     print(f"✅ Created super admin: {user.email} (ID: {user.id})")
     print(f"🔐 Password: {admin_password} (Set SEED_ADMIN_PASSWORD environment variable for security)")
     return user
 
 
 async def create_demo_tenant(db: AsyncSession) -> Tenant:
-    """Create demo tenant for testing"""
-    print("🎭 Creating demo tenant...")
+    """Create demo tenant for testing if it doesn't exist"""
+    print("🎭 Checking for demo tenant...")
+    result = await db.execute(select(Tenant).filter_by(slug="demo-company"))
+    tenant = result.scalars().first()
+    if tenant:
+        print("✅ Demo tenant already exists.")
+        return tenant
 
+    print("🎭 Creating demo tenant...")
     tenant = Tenant(
         name="Demo Company",
         slug="demo-company",
         description="Tenant de demostración para testing",
         settings='{"theme": "light", "features": ["auth", "tenants", "users"]}'
     )
-
     db.add(tenant)
     await db.commit()
     await db.refresh(tenant)
-
     print(f"✅ Created demo tenant: {tenant.name} (ID: {tenant.id})")
     return tenant
 
 
 async def create_demo_user(db: AsyncSession, tenant: Tenant, user_role: Role) -> User:
-    """Create demo user"""
-    print("🎭 Creating demo user...")
-
-    # Get password from environment or use secure default
-    demo_password = os.getenv("SEED_DEMO_PASSWORD", "DemoSecure456!")
-    if demo_password == "DemoSecure456!":
-        print("⚠️  Using default demo password. Set SEED_DEMO_PASSWORD environment variable for security.")
-
-    # Hash password
+    """Create demo user if it doesn't exist"""
+    print("🎭 Checking for demo user...")
+    result = await db.execute(select(User).filter_by(email="demo@demo-company.com"))
+    user = result.scalars().first()
+    demo_password = os.getenv("SEED_DEMO_PASSWORD", "demo123")
     hashed_password = get_password_hash(demo_password)
 
+    if user:
+        print("✅ Demo user already exists. Updating password...")
+        user.hashed_password = hashed_password
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        print("🔐 Demo user password updated.")
+        return user
+
+    print("🎭 Creating demo user...")
+    demo_password = os.getenv("SEED_DEMO_PASSWORD", "demo123")
+    if demo_password == "demo123":
+        print("⚠️  Using default demo password. Set SEED_DEMO_PASSWORD environment variable for security.")
+    hashed_password = get_password_hash(demo_password)
     user = User(
         tenant_id=tenant.id,
         email="demo@demo-company.com",
@@ -261,20 +284,12 @@ async def create_demo_user(db: AsyncSession, tenant: Tenant, user_role: Role) ->
         is_verified=True,
         preferences='{"language": "es", "theme": "light"}'
     )
-
     db.add(user)
     await db.commit()
     await db.refresh(user)
-
-    # Assign user role
-    user_role_association = UserRole(
-        user_id=user.id,
-        role_id=user_role.id
-    )
-
+    user_role_association = UserRole(user_id=user.id, role_id=user_role.id)
     db.add(user_role_association)
     await db.commit()
-
     print(f"✅ Created demo user: {user.email} (ID: {user.id})")
     print(f"🔐 Password: {demo_password} (Set SEED_DEMO_PASSWORD environment variable for security)")
     return user
@@ -286,6 +301,8 @@ async def seed_database():
     print("=" * 50)
 
     db = await get_db().__anext__()
+    admin_password = os.getenv("SEED_ADMIN_PASSWORD", "ChangeMeSecure123!")
+    demo_password = os.getenv("SEED_DEMO_PASSWORD", "demo123")
     try:
         # Create initial tenant
         tenant = await create_initial_tenant(db)

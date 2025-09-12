@@ -36,7 +36,7 @@ export const MarketplaceGrid: React.FC<MarketplaceGridProps> = ({
 
   // Filter and sort plugins
   const filteredAndSortedPlugins = useMemo(() => {
-    let filtered = plugins.filter(plugin => {
+    const filtered = plugins.filter(plugin => {
       const matchesSearch = !searchQuery ||
         plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         plugin.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -193,7 +193,7 @@ export const MarketplaceGrid: React.FC<MarketplaceGridProps> = ({
         <div className="text-sm text-gray-600">
           {filteredAndSortedPlugins.length} plugin{filteredAndSortedPlugins.length !== 1 ? 's' : ''} encontrado{filteredAndSortedPlugins.length !== 1 ? 's' : ''}
           {searchQuery && (
-            <span> para "<strong>{searchQuery}</strong>"</span>
+            <span> para <strong>&quot;{searchQuery}&quot;</strong></span>
           )}
           {selectedCategory !== 'all' && (
             <span> en <Badge variant="secondary">{selectedCategory}</Badge></span>

@@ -9,11 +9,10 @@ import {
   LayoutDashboard,
   Users,
   Building2,
-  FileText,
   Shield,
   Settings,
   Bell,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 const navigation = [

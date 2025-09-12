@@ -16,76 +16,93 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { User } from "@/types/api";
 import { apiClient } from "@/lib/api-client";
-import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 const formSchema = z.object({
-  email: z.string().email(),
-  first_name: z.string().min(2, {
-    message: "First name must be at least 2 characters.",
-  }),
-  last_name: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
-  password: z.string().min(8).optional(),
-  role_id: z.string(),
+  full_name: z.string().min(2, "El nombre es demasiado corto"),
+  email: z.string().email("Email inválido"),
+  password: z.string().optional(),
 });
 
 interface UserFormProps {
-  user?: User;
-  onSuccess: () => void;
+  user?: User | null;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function UserForm({ user, onSuccess }: UserFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
+export function UserForm({ user, isOpen, onClose }: UserFormProps) {
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: user?.email || "",
-      first_name: user?.first_name || "",
-      last_name: user?.last_name || "",
+      full_name: "",
+      email: "",
       password: "",
-      role_id: user?.role_id || "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        full_name: user.full_name,
+        email: user.email,
+        password: "",
+      });
+    } else {
+      form.reset({
+        full_name: "",
+        email: "",
+        password: "",
+      });
+    }
+  }, [user, form]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (user) {
         await apiClient.updateUser(user.id, values);
+        toast({ title: "Usuario actualizado" });
       } else {
         await apiClient.createUser(values);
+        toast({ title: "Usuario creado" });
       }
-      onSuccess();
-      setIsOpen(false);
+      onClose();
     } catch (error) {
-      console.error("Failed to save user:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo guardar el usuario.",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>{user ? "Edit User" : "Create User"}</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>{user ? "Edit User" : "Create User"}</DialogTitle>
-          <DialogDescription>
-            {user
-              ? "Make changes to the user profile here. Click save when you're done."
-              : "Create a new user here. Click save when you're done."}
-          </DialogDescription>
+          <DialogTitle>{user ? "Editar Usuario" : "Crear Usuario"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre Completo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -101,57 +118,18 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
             />
             <FormField
               control={form.control}
-              name="first_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="last_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="********" {...field} />
+                    <Input type="password" placeholder="Dejar en blanco para no cambiar" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="role_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="role_id" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">Guardar</Button>
           </form>
         </Form>
       </DialogContent>

@@ -12,7 +12,6 @@ export function useAuth() {
     isAuthenticated,
     isLoading,
     error,
-    login,
     logout,
     refreshUser,
     initialize,
@@ -86,7 +85,7 @@ export function useAuth() {
   // Función para verificar permisos específicos
   // Por ahora retorna false ya que el User no tiene permisos directamente
   // Los permisos deberían obtenerse del rol del usuario
-  const hasPermission = useCallback((permission: string): boolean => {
+  const hasPermission = useCallback((_permission: string): boolean => {
     // TODO: Implementar cuando se agregue la funcionalidad de obtener permisos del rol
     return false;
   }, []);
@@ -105,7 +104,6 @@ export function useAuth() {
     error,
     
     // Funciones principales
-    login,
     logout: handleLogout,
     checkAuth,
     validateToken,

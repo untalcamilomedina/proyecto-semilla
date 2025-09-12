@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
     await create_tables()
 
     # Initialize audit logging
-    await init_audit_logging()
+    # await init_audit_logging()
 
     # Initialize plugin system
     print("🔌 Initializing Plugin System...")
@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
     print("🛑 Shutting down Proyecto Semilla Backend...")
 
     # Shutdown audit logging
-    await shutdown_audit_logging()
+    # await shutdown_audit_logging()
 
 
 # Create FastAPI application

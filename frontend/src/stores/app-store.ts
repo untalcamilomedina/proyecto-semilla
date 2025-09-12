@@ -44,7 +44,7 @@ const defaultConfig: AppConfig = {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       config: defaultConfig,
       currentTenant: null,

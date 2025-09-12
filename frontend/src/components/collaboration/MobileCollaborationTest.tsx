@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   Smartphone, Wifi, WifiOff, Battery, BatteryLow,
   CheckCircle, XCircle, AlertTriangle, Play, Pause,
-  RotateCcw, Settings, BarChart3
+  RotateCcw, BarChart3
 } from 'lucide-react';
 
 interface MobileCollaborationTestProps {
@@ -53,7 +53,6 @@ export const MobileCollaborationTest: React.FC<MobileCollaborationTestProps> = (
   };
 
   const getNetworkInfo = () => {
-    // @ts-ignore - navigator.connection is experimental
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
     if (connection) {
@@ -72,10 +71,8 @@ export const MobileCollaborationTest: React.FC<MobileCollaborationTestProps> = (
   };
 
   const getBatteryInfo = async () => {
-    // @ts-ignore - navigator.getBattery is experimental
-    if ('getBattery' in navigator) {
+    if (navigator.getBattery) {
       try {
-        // @ts-ignore
         const battery = await navigator.getBattery();
         return {
           level: Math.round(battery.level * 100),
@@ -167,11 +164,6 @@ export const MobileCollaborationTest: React.FC<MobileCollaborationTestProps> = (
     }
   };
 
-  const getTestStatus = (testName: string) => {
-    if (currentTest === testName) return 'running';
-    if (testResults) return 'completed';
-    return 'pending';
-  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {

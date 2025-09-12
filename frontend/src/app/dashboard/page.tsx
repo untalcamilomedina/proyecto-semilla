@@ -4,7 +4,7 @@ import { useApi } from '@/hooks/use-api';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { UsersChart } from '@/components/dashboard/users-chart';
 import { RecentUsers } from '@/components/dashboard/recent-users';
-import { Loader2, Users, Building2, FileText, Shield } from 'lucide-react';
+import { Loader2, Users, Building2, Shield } from 'lucide-react';
 import { User } from '@/types/api';
 
 // Definir los tipos para los datos del dashboard

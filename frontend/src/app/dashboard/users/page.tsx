@@ -1,35 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { UserTable } from "./user-table";
-import { getColumns } from "./columns";
-import { apiClient } from "@/lib/api-client";
+import { useState, useEffect } from "react";
 import { User } from "@/types/api";
-import { UserForm } from "./user-form";
+import { ColumnDef } from "@tanstack/react-table";
+import { UserTable } from "./user-table";
+import { UserActions } from "./user-actions";
+import { apiClient } from "@/lib/api-client";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [data, setData] = useState<User[]>([]);
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     try {
-      const data = await apiClient.getUsers();
-      setUsers(data);
+      const users = await apiClient.getUsers();
+      setData(users);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error("Failed to fetch users", error);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchData();
   }, []);
+
+  const columns: ColumnDef<User>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
+      accessorKey: "full_name",
+      header: "Nombre Completo",
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "is_active",
+      header: "Activo",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const user = row.original;
+        return <UserActions user={user} onSuccess={fetchData} />;
+      },
+    },
+  ];
 
   return (
     <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Users</h1>
-        <UserForm onSuccess={fetchUsers} />
-      </div>
-      <UserTable columns={getColumns(fetchUsers)} data={users} />
+      <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+      <UserTable columns={columns} data={data} refreshData={fetchData} />
     </div>
   );
 }

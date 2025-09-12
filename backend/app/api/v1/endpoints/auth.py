@@ -23,6 +23,10 @@ from app.services.permission_service import PermissionService
 router = APIRouter()
 
 
+@router.get("/test-auth")
+async def test_auth_endpoint():
+    return {"message": "Auth endpoint is working"}
+ 
 @router.post("/login", response_model=Token)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),

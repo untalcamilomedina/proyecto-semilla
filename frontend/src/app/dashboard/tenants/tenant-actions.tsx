@@ -21,7 +21,6 @@ interface TenantActionsProps {
 
 export function TenantActions({ tenant }: TenantActionsProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const handleDelete = async () => {

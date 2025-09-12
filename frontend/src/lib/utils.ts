@@ -89,7 +89,7 @@ export const inputValidation = {
       errors.push('Contraseña debe contener al menos un número');
     }
 
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       errors.push('Contraseña debe contener al menos un carácter especial');
     }
 

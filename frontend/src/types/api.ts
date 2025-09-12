@@ -63,7 +63,7 @@ export interface ArticleUpdate {
   seo_title?: string;
   seo_description?: string;
   featured_image?: string;
-  status?: 'draft' | 'published' | 'review';
+  status?: 'draft' | 'published' | 'review' | 'archived';
   is_featured?: boolean;
   tags?: string[];
 }

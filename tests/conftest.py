@@ -5,7 +5,8 @@ Shared test fixtures and configuration for Proyecto Semilla
 import asyncio
 import pytest
 from typing import AsyncGenerator, Generator
-from fastapi.testclient import TestClient
+
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -13,6 +14,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.database import Base, get_db
 from app.core.config import settings
 from app.main import app
+from app.models.user import User
 
 
 # Test database URL
@@ -28,170 +30,110 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 
 @pytest.fixture(scope="session")
-async def test_engine():
+async def test_engine() -> AsyncGenerator[AsyncSession, None]:
     """Create test database engine."""
     engine = create_async_engine(
         TEST_DATABASE_URL,
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
-        echo=False,
     )
 
-    # Create all tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     yield engine
 
-    # Drop all tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
 async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
-    """Create test database session."""
-    async_session = sessionmaker(
-        test_engine, class_=AsyncSession, expire_on_commit=False
+    """Create a new database session for a test."""
+    connection = await test_engine.connect()
+    transaction = await connection.begin()
+    
+    async_session_maker = sessionmaker(
+        bind=connection, class_=AsyncSession, expire_on_commit=False
     )
-
-    async with async_session() as session:
+    
+    session = async_session_maker()
+    
+    try:
         yield session
+    finally:
+        await session.close()
+        await transaction.rollback()
+        await connection.close()
 
 
 @pytest.fixture
-def test_client(test_db) -> Generator[TestClient, None, None]:
-    """Create test client with database session."""
-
-    def override_get_db():
+async def client(test_db: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
+    """Create an async test client."""
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield test_db
 
     app.dependency_overrides[get_db] = override_get_db
-
-    with TestClient(app) as client:
-        yield client
-
-    # Clean up
+    async with AsyncClient(app=app, base_url="http://test") as c:
+        yield c
     app.dependency_overrides.clear()
 
 
 @pytest.fixture
-async def test_user(test_db):
+async def test_user(test_db: AsyncSession) -> User:
     """Create a test user."""
-    from app.models.user import User
     from app.models.tenant import Tenant
     from app.models.role import Role
+    from app.models.user_role import UserRole
     from uuid import uuid4
     from passlib.context import CryptContext
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    # Create test tenant
-    tenant = Tenant(
-        id=uuid4(),
-        name="Test Tenant",
-        slug="test-tenant",
-        is_active=True
-    )
+    tenant = Tenant(id=uuid4(), name="Test Tenant", slug="test-tenant", is_active=True)
     test_db.add(tenant)
 
-    # Create test role
-    role = Role(
-        id=uuid4(),
-        tenant_id=tenant.id,
-        name="Admin",
-        description="Administrator role",
-        permissions=["*"],
-        is_system=True
-    )
+    role = Role(id=uuid4(), tenant_id=tenant.id, name="Admin", description="Admin", permissions=["*"])
     test_db.add(role)
 
-    # Create test user
     user = User(
         id=uuid4(),
         tenant_id=tenant.id,
-        email="test@example.com",
+        email=settings.TEST_USER_EMAIL,
         first_name="Test",
         last_name="User",
-        hashed_password=pwd_context.hash("password123"),
+        full_name="Test User",
+        hashed_password=pwd_context.hash(settings.TEST_USER_PASSWORD),
         is_active=True,
-        role_id=role.id
     )
     test_db.add(user)
 
+    user_role = UserRole(user_id=user.id, role_id=role.id)
+    test_db.add(user_role)
+
     await test_db.commit()
     await test_db.refresh(user)
-
     return user
 
 
 @pytest.fixture
-async def auth_headers(test_client, test_user):
+async def auth_headers(client: AsyncClient, test_user: User) -> dict:
     """Create authentication headers for test user."""
-    # Login to get access token
-    response = test_client.post(
+    response = await client.post(
         "/api/v1/auth/login",
-        json={
-            "email": "test@example.com",
-            "password": "password123"
-        }
+        json={"email": test_user.email, "password": settings.TEST_USER_PASSWORD},
     )
-
-    if response.status_code == 200:
-        token = response.json()["access_token"]
-        return {"Authorization": f"Bearer {token}"}
-    else:
-        # Return empty headers if login fails
-        return {}
+    token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
-async def test_article(test_db, test_user):
-    """Create a test article."""
-    from app.models.article import Article
-    from uuid import uuid4
-
-    article = Article(
-        id=uuid4(),
-        tenant_id=test_user.tenant_id,
-        title="Test Article",
-        slug="test-article",
-        content="This is a test article content.",
-        excerpt="Test excerpt",
-        author_id=test_user.id,
-        status="published",
-        is_featured=False,
-        view_count=0,
-        comment_count=0,
-        like_count=0,
-        tags=["test", "article"]
-    )
-
-    test_db.add(article)
-    await test_db.commit()
-    await test_db.refresh(article)
-
-    return article
+def test_tenant_id(test_user: User) -> str:
+    """Return the test user's tenant ID."""
+    return str(test_user.tenant_id)
 
 
-# Custom markers
-def pytest_configure(config):
-    """Configure custom pytest markers."""
-    config.addinivalue_line(
-        "markers", "unit: Unit tests"
-    )
-    config.addinivalue_line(
-        "markers", "integration: Integration tests"
-    )
-    config.addinivalue_line(
-        "markers", "e2e: End-to-end tests"
-    )
-    config.addinivalue_line(
-        "markers", "performance: Performance tests"
-    )
-    config.addinivalue_line(
-        "markers", "security: Security tests"
-    )
-    config.addinivalue_line(
-        "markers", "slow: Slow running tests"
-    )
+@pytest.fixture
+def test_user_id(test_user: User) -> str:
+    """Return the test user's ID."""
+    return str(test_user.id)

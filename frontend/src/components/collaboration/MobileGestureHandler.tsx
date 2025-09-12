@@ -101,7 +101,7 @@ export const MobileGestureHandler: React.FC<MobileGestureHandlerProps> = ({
     }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     // Clear long press timer
     if (longPressTimer) {
       clearTimeout(longPressTimer);

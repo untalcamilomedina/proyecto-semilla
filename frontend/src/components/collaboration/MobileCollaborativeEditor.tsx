@@ -1,13 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Edit3, Users, Save, Undo, Redo, Bold, Italic, Underline,
-  AlignLeft, AlignCenter, AlignRight, List, Link, Image,
-  Type, Palette, MoreHorizontal
+  Edit3, Save, Undo, Redo, Bold, Italic, Underline,
+  List, Link, Image,
+  MoreHorizontal
 } from 'lucide-react';
 import { MobileGestureHandler } from './MobileGestureHandler';
 
@@ -47,7 +46,7 @@ export const MobileCollaborativeEditor: React.FC<MobileCollaborativeEditorProps>
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState(0);
+  const [, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleContentChange = (newContent: string) => {

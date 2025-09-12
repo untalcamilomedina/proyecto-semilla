@@ -16,7 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Tenant } from "@/types/api";
 import { apiClient } from "@/lib/api-client";
 import { TenantForm } from "./tenant-form";
 

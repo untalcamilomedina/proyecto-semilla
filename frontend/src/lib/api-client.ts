@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   User,
-  LoginRequest,
   UserRegister,
   Article,
   ArticleCreate,
@@ -84,18 +83,6 @@ class ApiClient {
   }
 
   // Authentication methods
-  async login(credentials: LoginRequest): Promise<any> {
-    const formData = new URLSearchParams();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
-
-    const response: AxiosResponse<any> = await this.axiosInstance.post('/api/v1/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-    return response.data;
-  }
 
   async register(data: UserRegister): Promise<User> {
     const response: AxiosResponse<User> = await this.axiosInstance.post('/api/v1/auth/register', data);
@@ -116,8 +103,8 @@ class ApiClient {
   }
 
   // Article methods
-  async getArticles(params?: ArticleQueryParams): Promise<Article[]> {
-    const response: AxiosResponse<Article[]> = await this.axiosInstance.get('/api/v1/articles', { params });
+  async getArticles(params?: ArticleQueryParams): Promise<{ articles: Article[], total: number }> {
+    const response: AxiosResponse<{ articles: Article[], total: number }> = await this.axiosInstance.get('/api/v1/articles', { params });
     return response.data;
   }
 

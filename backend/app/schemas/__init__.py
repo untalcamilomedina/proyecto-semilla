@@ -2,3 +2,4 @@
 from .auth import *
 from .role import *
 from .tenant import *
+from .user import *

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { MarketplaceGrid } from '@/components/marketplace/MarketplaceGrid';
 import { PluginDetails } from '@/components/marketplace/PluginDetails';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Search, TrendingUp, Star, Download, Users,
-  ArrowLeft, Filter, Grid, List, Sparkles
+  TrendingUp, Star, Download, Users,
+  ArrowLeft, Grid, Sparkles
 } from 'lucide-react';
 
 // Mock data - in production this would come from the API

@@ -128,7 +128,7 @@ export function usePermissions(): UsePermissionsReturn {
 
 // Hook for checking specific permissions with memoization
 export function usePermissionCheck() {
-  const { hasPermission, hasAnyPermission, hasAllPermissions, canAccess } = usePermissions();
+  const { hasPermission, hasAnyPermission, canAccess } = usePermissions();
 
   return {
     // User management permissions

@@ -3,13 +3,12 @@
 import { createContext, useContext, useEffect, ReactNode, useState } from 'react';
 import { QueryProvider } from '../lib/query-provider';
 import { useAuthStore } from '../stores/auth-store';
-import { User, LoginRequest } from '../types/api';
+import { User } from '../types/api';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -32,7 +31,7 @@ interface AuthProviderProps {
 
 function AuthProvider({ children }: AuthProviderProps) {
   const authStore = useAuthStore();
-  const [isMounted, setIsMounted] = useState(false);
+  const [, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -44,7 +43,6 @@ function AuthProvider({ children }: AuthProviderProps) {
     user: authStore.user,
     isAuthenticated: authStore.isAuthenticated,
     isLoading: authStore.isLoading,
-    login: authStore.login,
     logout: authStore.logout,
     logoutAll: authStore.logoutAll,
     refreshUser: authStore.refreshUser,

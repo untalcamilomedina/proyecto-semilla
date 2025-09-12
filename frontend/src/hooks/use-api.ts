@@ -2,25 +2,17 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
 import { useAuth } from '../components/providers';
 import {
-  Article,
   ArticleCreate,
   ArticleUpdate,
   ArticleQueryParams,
-  Category,
   CategoryCreate,
   CategoryUpdate,
-  User,
   UserCreate,
   UserUpdate,
-  Tenant,
   TenantCreate,
   TenantUpdate,
-  Role,
   RoleCreate,
-  RoleUpdate,
-  ArticleStats,
-  LoginRequest,
-  UserRegister
+  RoleUpdate
 } from '../types/api';
 import { useUIStore } from '../stores';
 
