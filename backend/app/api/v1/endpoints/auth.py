@@ -92,15 +92,40 @@ async def login(
 
 @router.post("/register", response_model=UserResponse)
 async def register(
-    user_in: UserRegister,
+    user_data: dict,  # Accept flexible data structure
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Register a new user
+    Register a new user - accepts flexible data structure for frontend compatibility
     """
+    # Extract and validate required fields
+    email = user_data.get("email")
+    password = user_data.get("password")
+    nombre_completo = user_data.get("nombre_completo")  # Frontend sends this
+    first_name = user_data.get("first_name")  # Alternative format
+    last_name = user_data.get("last_name")   # Alternative format
+
+    if not email or not password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email and password are required"
+        )
+
+    # Parse name fields
+    if nombre_completo:
+        # Split full name into first and last name
+        name_parts = nombre_completo.strip().split()
+        first_name = name_parts[0] if name_parts else ""
+        last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+    elif not first_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Name information is required"
+        )
+
     # Check if user already exists
     from sqlalchemy import select
-    stmt = select(User.id).where(User.email == user_in.email)
+    stmt = select(User.id).where(User.email == email)
     result = await db.execute(stmt)
 
     if result.scalar_one_or_none():
@@ -111,7 +136,8 @@ async def register(
 
     # For testing purposes, allow registration without tenant_id
     # Create a default tenant if none provided
-    if not user_in.tenant_id:
+    tenant_id = user_data.get("tenant_id")
+    if not tenant_id:
         # Check if default tenant exists
         default_tenant = await db.execute(
             text("SELECT id FROM tenants WHERE slug = 'default' LIMIT 1")
@@ -119,7 +145,7 @@ async def register(
         tenant_row = default_tenant.fetchone()
 
         if tenant_row:
-            user_in.tenant_id = str(tenant_row[0])
+            tenant_id = str(tenant_row[0])
         else:
             # Create default tenant
             from uuid import uuid4
@@ -135,10 +161,10 @@ async def register(
                 }
             )
             await db.commit()
-            user_in.tenant_id = str(default_tenant_id)
+            tenant_id = str(default_tenant_id)
     else:
         # Verify tenant exists if provided
-        tenant = await db.get(Tenant, user_in.tenant_id)
+        tenant = await db.get(Tenant, tenant_id)
         if not tenant:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -146,7 +172,7 @@ async def register(
             )
 
     # Hash password
-    hashed_password = security.get_password_hash(user_in.password)
+    hashed_password = security.get_password_hash(password)
 
     # Create user
     from uuid import uuid4
@@ -154,12 +180,12 @@ async def register(
 
     new_user = User(
         id=user_id,
-        tenant_id=user_in.tenant_id,
-        email=user_in.email,
+        tenant_id=tenant_id,
+        email=email,
         hashed_password=hashed_password,
-        first_name=user_in.first_name,
-        last_name=user_in.last_name,
-        full_name=f"{user_in.first_name} {user_in.last_name}",
+        first_name=first_name,
+        last_name=last_name or "",
+        full_name=f"{first_name} {last_name}".strip(),
         is_active=True,
         is_verified=False
     )
@@ -171,16 +197,16 @@ async def register(
     # Return user data
     return {
         "id": str(user_id),
-        "email": user_in.email,
-        "first_name": user_in.first_name,
-        "last_name": user_in.last_name,
-        "full_name": f"{user_in.first_name} {user_in.last_name}",
+        "email": email,
+        "first_name": first_name,
+        "last_name": last_name or "",
+        "full_name": f"{first_name} {last_name}".strip(),
         "is_active": True,
         "is_verified": False,
-        "tenant_id": user_in.tenant_id,
+        "tenant_id": tenant_id,
         "role_ids": [],
-        "created_at": "2024-01-01T00:00:00Z",  # Placeholder
-        "updated_at": "2024-01-01T00:00:00Z"   # Placeholder
+        "created_at": new_user.created_at.isoformat() if new_user.created_at else None,
+        "updated_at": new_user.updated_at.isoformat() if new_user.updated_at else None
     }
 
 

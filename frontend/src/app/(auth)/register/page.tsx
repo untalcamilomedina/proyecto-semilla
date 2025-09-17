@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '../../../stores/auth-store';
 
 interface RegisterFormData {
   nombre_completo: string;
@@ -14,6 +15,7 @@ interface RegisterFormData {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { register, isLoading, error, clearError } = useAuthStore();
   const [formData, setFormData] = useState<RegisterFormData>({
     nombre_completo: '',
     email: '',
@@ -22,8 +24,6 @@ export default function RegisterPage() {
     confirmPassword: '',
     telefono: ''
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,66 +36,43 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    clearError();
     setSuccessMessage('');
 
     // Validar que las contraseñas coincidan
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      setLoading(false);
+      // Usar el error del store para mostrar este error
       return;
     }
 
     // Validar longitud mínima de contraseña
     if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      setLoading(false);
       return;
     }
 
     try {
-      // Preparar datos para enviar (sin confirmPassword)
+      // Preparar datos para el auth store
       const registerData = {
-        nombre_completo: formData.nombre_completo,
+        first_name: formData.nombre_completo.split(' ')[0] || '',
+        last_name: formData.nombre_completo.split(' ').slice(1).join(' ') || '',
         email: formData.email,
-        username: formData.username,
         password: formData.password,
-        ...(formData.telefono && { telefono: formData.telefono })
+        tenant_id: '' // El backend maneja la creación automática de tenant si no se proporciona
       };
 
-      const formDataUrl = new URLSearchParams();
-      Object.entries(registerData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formDataUrl.append(key, String(value));
-        }
-      });
-
-      const response = await fetch('http://localhost:7777/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formDataUrl.toString(),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Error al registrar usuario');
-      }
+      await register(registerData);
 
       // Registro exitoso
       setSuccessMessage('¡Registro exitoso! Redirigiendo al login...');
-      
+
       // Redirigir al login después de 2 segundos
       setTimeout(() => {
         router.push('/login?registered=true');
       }, 2000);
-      
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrar usuario');
+      // Error is handled by the store
       console.error('Registration error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -141,7 +118,7 @@ export default function RegisterPage() {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
-              disabled={loading}
+              disabled={isLoading}
             />
           </div>
 
@@ -162,7 +139,7 @@ export default function RegisterPage() {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
-              disabled={loading}
+              disabled={isLoading}
             />
           </div>
 
@@ -183,14 +160,14 @@ export default function RegisterPage() {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
-              disabled={loading}
+              disabled={isLoading}
             />
           </div>
 
           {/* Teléfono (opcional) */}
           <div>
-            <label 
-              htmlFor="telefono" 
+            <label
+              htmlFor="telefono"
               className="block text-sm font-medium text-gray-700"
             >
               Teléfono (opcional)
@@ -203,14 +180,14 @@ export default function RegisterPage() {
               value={formData.telefono}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              disabled={loading}
+              disabled={isLoading}
             />
           </div>
-          
+
           {/* Password */}
           <div>
-            <label 
-              htmlFor="password" 
+            <label
+              htmlFor="password"
               className="block text-sm font-medium text-gray-700"
             >
               Contraseña *
@@ -224,7 +201,7 @@ export default function RegisterPage() {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
-              disabled={loading}
+              disabled={isLoading}
               minLength={6}
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -234,8 +211,8 @@ export default function RegisterPage() {
 
           {/* Confirmar Password */}
           <div>
-            <label 
-              htmlFor="confirmPassword" 
+            <label
+              htmlFor="confirmPassword"
               className="block text-sm font-medium text-gray-700"
             >
               Confirmar Contraseña *
@@ -249,7 +226,7 @@ export default function RegisterPage() {
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
-              disabled={loading}
+              disabled={isLoading}
               minLength={6}
             />
             {formData.confirmPassword && formData.password !== formData.confirmPassword && (
@@ -259,13 +236,13 @@ export default function RegisterPage() {
             )}
           </div>
         </div>
-        
+
         <button
           type="submit"
-          disabled={loading || (!!formData.confirmPassword && formData.password !== formData.confirmPassword)}
+          disabled={isLoading || (!!formData.confirmPassword && formData.password !== formData.confirmPassword)}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Registrando...' : 'Crear Cuenta'}
+          {isLoading ? 'Registrando...' : 'Crear Cuenta'}
         </button>
 
         <div className="text-sm text-center">

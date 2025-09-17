@@ -7,6 +7,9 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE refresh_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 
 -- ===========================================
 -- POLÍTICAS PARA TENANTS
@@ -162,12 +165,72 @@ CREATE POLICY restrict_super_admin_role ON user_roles
     );
 
 -- ===========================================
+-- POLÍTICAS PARA ARTICLES
+-- ===========================================
+
+-- Política de aislamiento: Articles solo del tenant actual
+CREATE POLICY article_tenant_isolation_policy ON articles
+    FOR ALL
+    USING (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- Política de creación: Solo en tenant actual
+CREATE POLICY article_creation_policy ON articles
+    FOR INSERT
+    WITH CHECK (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- ===========================================
+-- POLÍTICAS PARA CATEGORIES
+-- ===========================================
+
+-- Política de aislamiento: Categories solo del tenant actual
+CREATE POLICY category_tenant_isolation_policy ON categories
+    FOR ALL
+    USING (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- Política de creación: Solo en tenant actual
+CREATE POLICY category_creation_policy ON categories
+    FOR INSERT
+    WITH CHECK (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- ===========================================
+-- POLÍTICAS PARA COMMENTS
+-- ===========================================
+
+-- Política de aislamiento: Comments solo del tenant actual
+CREATE POLICY comment_tenant_isolation_policy ON comments
+    FOR ALL
+    USING (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- Política de creación: Solo en tenant actual
+CREATE POLICY comment_creation_policy ON comments
+    FOR INSERT
+    WITH CHECK (
+        tenant_id = current_tenant_id() OR
+        is_super_admin()
+    );
+
+-- ===========================================
 -- MENSAJE DE CONFIRMACIÓN
 -- ===========================================
 
 DO $$
 BEGIN
     RAISE NOTICE 'Row Level Security policies configuradas correctamente';
-    RAISE NOTICE 'Políticas aplicadas a: tenants, users, roles, user_roles';
+    RAISE NOTICE 'Políticas aplicadas a: tenants, users, roles, user_roles, articles, categories, comments';
     RAISE NOTICE 'Todas las tablas tienen aislamiento por tenant';
 END $$;
