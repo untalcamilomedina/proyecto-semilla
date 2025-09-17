@@ -99,6 +99,10 @@ class Settings(BaseSettings):
     COOKIE_DOMAIN: str = ""  # Empty for localhost, set to domain in production
     COOKIE_SAME_SITE: str = "lax"
 
+    # Seed Data Configuration
+    SEED_ADMIN_PASSWORD: str = "admin123"
+    SEED_DEMO_PASSWORD: str = "demo123"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

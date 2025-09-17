@@ -14,6 +14,7 @@ interface AuthState {
 
   // Actions
   register: (userData: UserRegister) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -39,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
     activeTenant: null,
     tenants: [],
     isAuthenticated: false,
-    isLoading: false, // Default to false
+    isLoading: true, // Default to true to prevent race conditions on load
     error: null,
 
     // Actions
@@ -57,6 +58,25 @@ export const useAuthStore = create<AuthState>()(
         set({
           isLoading: false,
           error: error.response?.data?.detail || 'Error al registrarse'
+        });
+        throw error;
+      }
+    },
+
+    login: async (email, password) => {
+      set({ isLoading: true, error: null });
+      try {
+        const formData = new FormData();
+        formData.append('username', email);
+        formData.append('password', password);
+        await apiClient.login(formData);
+        await get().refreshUser(); // This will set isAuthenticated and user info
+      } catch (error: any) {
+        set({
+          isLoading: false,
+          isAuthenticated: false,
+          user: null,
+          error: error.response?.data?.detail || 'Email o contraseña incorrectos.',
         });
         throw error;
       }

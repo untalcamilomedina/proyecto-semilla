@@ -89,6 +89,15 @@ class ApiClient {
     return response.data;
   }
 
+  async login(data: FormData): Promise<any> {
+    const response = await this.axiosInstance.post('/api/v1/auth/login', data, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response.data;
+  }
+
   async logout(): Promise<void> {
     await this.axiosInstance.post('/api/v1/auth/logout');
   }
@@ -181,7 +190,7 @@ class ApiClient {
   }
 
   async getUserTenants(): Promise<Tenant[]> {
-    const response: AxiosResponse<Tenant[]> = await this.axiosInstance.get('/api/v1/tenants/user');
+    const response: AxiosResponse<Tenant[]> = await this.axiosInstance.get('/api/v1/tenants/user-tenants');
     return response.data;
   }
 

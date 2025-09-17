@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, ReactNode, useState } from 'react';
+import { createContext, useContext, useEffect, ReactNode } from 'react';
 import { QueryProvider } from '../lib/query-provider';
 import { useAuthStore } from '../stores/auth-store';
 import { User } from '../types/api';
@@ -30,25 +30,31 @@ interface AuthProviderProps {
 }
 
 function AuthProvider({ children }: AuthProviderProps) {
-  const authStore = useAuthStore();
-  const [, setIsMounted] = useState(false);
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    logout,
+    logoutAll,
+    refreshUser,
+    clearError,
+    initialize,
+  } = useAuthStore();
 
   useEffect(() => {
-    setIsMounted(true);
     // Initialize authentication state on app start
-    authStore.initialize();
-  }, []);
+    initialize();
+  }, [initialize]);
 
   const value = {
-    user: authStore.user,
-    isAuthenticated: authStore.isAuthenticated,
-    isLoading: authStore.isLoading,
-    logout: authStore.logout,
-    logoutAll: authStore.logoutAll,
-    refreshUser: authStore.refreshUser,
-    clearError: authStore.clearError,
+    user,
+    isAuthenticated,
+    isLoading,
+    logout,
+    logoutAll,
+    refreshUser,
+    clearError,
   };
-
 
   return (
     <AuthContext.Provider value={value}>

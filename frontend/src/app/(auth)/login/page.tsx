@@ -2,12 +2,10 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth-store';
 
 function LoginComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setUser, setToken } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -47,8 +45,6 @@ function LoginComponent() {
       }
 
       // Store auth data in Zustand store
-      setToken(data.access_token);
-      setUser(data.user);
 
       // Redirect to dashboard
       router.push('/dashboard');
@@ -149,8 +145,8 @@ function LoginComponent() {
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
             <p className="font-semibold">Credenciales de prueba:</p>
-            <p>Email: test@login.com</p>
-            <p>Password: test123</p>
+            <p>Email: demo@demo-company.com</p>
+            <p>Password: demo123</p>
             <p className="mt-1 text-gray-500">O crea una cuenta nueva con el registro</p>
           </div>
         )}

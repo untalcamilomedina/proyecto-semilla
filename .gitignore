@@ -181,6 +181,12 @@ PROTOCOLO_DESARROLLO_GEMINI_CLI.md
 # CUSTOM EXCLUDES
 # ==========================================
 
+# Security-sensitive files
+cookies.txt
+
+# Test results directories
+test-results/
+
 # Personal notes
 TODO.md
 NOTES.md

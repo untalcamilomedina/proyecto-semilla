@@ -270,7 +270,7 @@ async def logout_all_devices(
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(
-    current_user: User = Depends(security.get_current_user),
+    current_user: User = Depends(security.get_current_user_from_cookie),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """

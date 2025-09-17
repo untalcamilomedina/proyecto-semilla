@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
 from app.core.database import get_db
-from app.core.security import get_current_user, create_access_token
+from app.core.security import get_current_user, get_current_user_from_cookie, create_access_token
 from app.core.cookies import get_cookie_manager
 from app.models.user import User
 from app.models.tenant import Tenant
@@ -361,12 +361,22 @@ async def switch_tenant(
 @router.get("/user-tenants", response_model=List[TenantResponse])
 async def get_user_tenants(
     request: Request,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
     Get all tenants available to the current user
     """
+    # Check authentication
+    user_id = getattr(request.state, 'user_id', None)
+    tenant_id = getattr(request.state, 'tenant_id', None)
+
+    if not user_id or not tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # For now, return all active tenants
     # In production, filter based on user permissions
     result = await db.execute(
