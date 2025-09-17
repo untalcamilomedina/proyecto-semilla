@@ -282,6 +282,13 @@ class ApiClient {
     const response: AxiosResponse<{ permissions: string[] }> = await this.axiosInstance.get('/api/v1/auth/permissions');
     return response.data;
   }
+
+  // Setup status
+  async getSetupStatus(): Promise<{ needs_setup: boolean; user_count: number; message: string }> {
+    const response: AxiosResponse<{ needs_setup: boolean; user_count: number; message: string }> =
+      await this.axiosInstance.get('/api/v1/auth/setup-status');
+    return response.data;
+  }
 }
 
 // Export singleton instance

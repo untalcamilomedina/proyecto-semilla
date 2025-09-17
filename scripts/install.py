@@ -191,16 +191,17 @@ LOG_LEVEL=INFO
         print("\n👤 Creación de Superadministrador")
         print("-" * 35)
 
-        if not self.get_yes_no("¿Quieres crear datos iniciales (superadmin + demo)?", True):
-            print("ℹ️ Puedes crear los datos iniciales más tarde ejecutando: python scripts/seed_data.py")
+        if not self.get_yes_no("¿Quieres crear datos iniciales (superadmin + demo)?", False):
+            print("ℹ️ El superadministrador se puede crear desde el frontend después de iniciar la aplicación")
+            print("   Accede a la aplicación y usa la interfaz de configuración inicial")
             return
 
         print("Ejecutando script de seeding...")
         try:
             import subprocess
             result = subprocess.run([
-                "python3", "scripts/seed_data.py"
-            ], cwd=self.project_root, capture_output=True, text=True)
+                "python3", "-m", "app.initial_data"
+            ], cwd=self.project_root / "backend", capture_output=True, text=True)
 
             if result.returncode == 0:
                 print("✅ Datos iniciales creados exitosamente")
@@ -211,7 +212,7 @@ LOG_LEVEL=INFO
 
         except Exception as e:
             print(f"❌ Error ejecutando script de seeding: {e}")
-            print("Puedes ejecutar manualmente: python scripts/seed_data.py")
+            print("Puedes ejecutar manualmente: python -m app.initial_data")
 
     def test_installation(self):
         """Probar la instalación"""
@@ -248,9 +249,9 @@ LOG_LEVEL=INFO
         print("   - Documentación: http://localhost:8000/docs")
         print("   - Health check: http://localhost:8000/api/v1/health")
         print("   - Login: POST http://localhost:8000/api/v1/auth/login")
-        print("\n3. Credenciales de acceso:")
-        print("   - Super Admin: admin@proyectosemilla.dev / admin123")
-        print("   - Demo User: demo@demo-company.com / demo123")
+        print("\n3. Configuración inicial:")
+        print("   - Accede al frontend en http://localhost:3000")
+        print("   - Usa la interfaz de configuración inicial para crear el superadministrador")
         print("\n4. Acceder al frontend (una vez implementado):")
         print("   http://localhost:3000")
         print("\n📚 Para más información, consulta la documentación:")

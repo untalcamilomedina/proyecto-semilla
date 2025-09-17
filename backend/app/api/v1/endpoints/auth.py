@@ -26,6 +26,22 @@ router = APIRouter()
 @router.get("/test-auth")
 async def test_auth_endpoint():
     return {"message": "Auth endpoint is working"}
+
+
+@router.get("/setup-status")
+async def get_setup_status(db: AsyncSession = Depends(get_db)) -> Any:
+    """
+    Check if the system needs initial setup (no users exist)
+    """
+    from sqlalchemy import select, func
+    user_count_result = await db.execute(select(func.count(User.id)))
+    user_count = user_count_result.scalar()
+
+    return {
+        "needs_setup": user_count == 0,
+        "user_count": user_count,
+        "message": "System needs initial setup" if user_count == 0 else "System is already configured"
+    }
  
 @router.post("/login", response_model=Token)
 async def login(
@@ -174,6 +190,11 @@ async def register(
     # Hash password
     hashed_password = security.get_password_hash(password)
 
+    # Check if this is the first user in the system
+    from sqlalchemy import select, func
+    user_count_result = await db.execute(select(func.count(User.id)))
+    user_count = user_count_result.scalar()
+
     # Create user
     from uuid import uuid4
     user_id = uuid4()
@@ -187,12 +208,16 @@ async def register(
         last_name=last_name or "",
         full_name=f"{first_name} {last_name}".strip(),
         is_active=True,
-        is_verified=False
+        is_verified=True  # First user is automatically verified
     )
 
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+
+    # If this is the first user, make them superadmin
+    if user_count == 0:
+        await _setup_first_superadmin(db, new_user, tenant_id)
 
     # Return user data
     return {
@@ -202,7 +227,7 @@ async def register(
         "last_name": last_name or "",
         "full_name": f"{first_name} {last_name}".strip(),
         "is_active": True,
-        "is_verified": False,
+        "is_verified": True if user_count == 0 else False,
         "tenant_id": tenant_id,
         "role_ids": [],
         "created_at": new_user.created_at.isoformat() if new_user.created_at else None,
@@ -303,6 +328,11 @@ async def read_users_me(
     Get current user information
     """
 
+    # Get user roles
+    role_ids = []
+    if current_user.user_roles:
+        role_ids = [str(user_role.role_id) for user_role in current_user.user_roles]
+
     return {
         "id": str(current_user.id),
         "email": current_user.email,
@@ -312,7 +342,7 @@ async def read_users_me(
         "is_active": current_user.is_active,
         "is_verified": current_user.is_verified,
         "tenant_id": str(current_user.tenant_id),
-        "role_ids": [],  # TODO: Implement roles
+        "role_ids": role_ids,
         "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
         "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None
     }
@@ -339,3 +369,46 @@ async def get_user_permissions(
         "user_id": str(current_user.id),
         "tenant_id": str(current_user.tenant_id)
     }
+
+
+async def _setup_first_superadmin(db: AsyncSession, user: User, tenant_id: str):
+    """
+    Setup the first user as superadmin with all permissions
+    """
+    from app.models.role import Role
+    from app.models.user_role import UserRole
+    from uuid import uuid4
+
+    try:
+        # Create superadmin role with all permissions
+        superadmin_role = Role(
+            id=uuid4(),
+            tenant_id=tenant_id,
+            name="Super Administrator",
+            description="Super administrator with all permissions",
+            permissions='["users:*", "roles:*", "tenants:*", "articles:*", "system:*"]',
+            color="#FF0000",
+            hierarchy_level=100,
+            is_default=False,
+            is_active=True
+        )
+
+        db.add(superadmin_role)
+        await db.commit()
+        await db.refresh(superadmin_role)
+
+        # Assign role to user
+        user_role = UserRole(
+            id=uuid4(),
+            user_id=user.id,
+            role_id=superadmin_role.id
+        )
+
+        db.add(user_role)
+        await db.commit()
+
+        print(f"✅ First user {user.email} has been set up as superadmin")
+
+    except Exception as e:
+        print(f"⚠️  Error setting up first superadmin: {e}")
+        # Don't fail registration if role assignment fails
