@@ -69,11 +69,12 @@ export function UserForm({ user, isOpen, onClose }: UserFormProps) {
         await apiClient.updateUser(user.id, values);
         toast({ title: "Usuario actualizado" });
       } else {
-        await apiClient.createUser(values);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await apiClient.createUser(values as any);
         toast({ title: "Usuario creado" });
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo guardar el usuario.",

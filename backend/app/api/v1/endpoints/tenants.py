@@ -73,6 +73,59 @@ async def read_tenants(
     return tenant_list
 
 
+@router.get("/{tenant_id}", response_model=TenantWithUsers)
+async def read_tenant(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Get tenant by ID with user count
+    """
+    # Get tenant
+    result = await db.execute(
+        text("SELECT * FROM tenants WHERE id = :tenant_id"),
+        {"tenant_id": tenant_id}
+    )
+    tenant_data = result.fetchone()
+
+    if not tenant_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tenant not found"
+        )
+
+    # Get user count
+    user_count_result = await db.execute(
+        text("SELECT COUNT(*) FROM users WHERE tenant_id = :tenant_id"),
+        {"tenant_id": tenant_id}
+    )
+    user_count = user_count_result.fetchone()[0]
+
+    # Get role count
+    role_count_result = await db.execute(
+        text("SELECT COUNT(*) FROM roles WHERE tenant_id = :tenant_id"),
+        {"tenant_id": tenant_id}
+    )
+    role_count = role_count_result.fetchone()[0]
+
+    return {
+        "id": str(tenant_data[0]),
+        "name": tenant_data[1],
+        "slug": tenant_data[2],
+        "description": tenant_data[3],
+        "parent_tenant_id": tenant_data[4],
+        "settings": tenant_data[5],
+        "is_active": tenant_data[6],
+        "created_at": tenant_data[7].isoformat() if tenant_data[7] else None,
+        "updated_at": tenant_data[8].isoformat() if tenant_data[8] else None,
+        "user_count": user_count,
+        "role_count": role_count
+    }
+
+
+
+
 @router.post("/", response_model=TenantResponse)
 async def create_tenant(
     tenant_in: TenantCreate,
@@ -133,55 +186,6 @@ async def create_tenant(
     }
 
 
-@router.get("/{tenant_id}", response_model=TenantWithUsers)
-async def read_tenant(
-    tenant_id: UUID,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-) -> Any:
-    """
-    Get tenant by ID with user count
-    """
-    # Get tenant
-    result = await db.execute(
-        text("SELECT * FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
-    )
-    tenant_data = result.fetchone()
-
-    if not tenant_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tenant not found"
-        )
-
-    # Get user count
-    user_count_result = await db.execute(
-        text("SELECT COUNT(*) FROM users WHERE tenant_id = :tenant_id"),
-        {"tenant_id": tenant_id}
-    )
-    user_count = user_count_result.fetchone()[0]
-
-    # Get role count
-    role_count_result = await db.execute(
-        text("SELECT COUNT(*) FROM roles WHERE tenant_id = :tenant_id"),
-        {"tenant_id": tenant_id}
-    )
-    role_count = role_count_result.fetchone()[0]
-
-    return {
-        "id": str(tenant_data[0]),
-        "name": tenant_data[1],
-        "slug": tenant_data[2],
-        "description": tenant_data[3],
-        "parent_tenant_id": tenant_data[4],
-        "settings": tenant_data[5],
-        "is_active": tenant_data[6],
-        "created_at": tenant_data[7].isoformat() if tenant_data[7] else None,
-        "updated_at": tenant_data[8].isoformat() if tenant_data[8] else None,
-        "user_count": user_count,
-        "role_count": role_count
-    }
 
 
 @router.put("/{tenant_id}", response_model=TenantResponse)

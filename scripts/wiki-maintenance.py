@@ -12,8 +12,34 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
-import yaml
-import argparse
+def check_dependencies():
+    """Verificar dependencias necesarias para el script"""
+    print("🔍 Verificando dependencias para wiki-maintenance.py...")
+
+    required_modules = [
+        'yaml',  # Para configuración
+        'subprocess',  # Para ejecutar comandos
+        'pathlib',  # Para manejo de rutas
+    ]
+
+    missing_modules = []
+
+    for module in required_modules:
+        try:
+            __import__(module)
+            print(f"✅ {module} - OK")
+        except ImportError:
+            missing_modules.append(module)
+            print(f"❌ {module} - FALTANTE")
+
+    if missing_modules:
+        print(f"\n❌ Módulos faltantes: {', '.join(missing_modules)}")
+        print("\nPyYAML puede instalarse con:")
+        print("  pip install PyYAML")
+        return False
+
+    print("✅ Todas las dependencias están instaladas")
+    return True
 
 class WikiMaintenanceAgent:
     """Agente para mantenimiento automático del GitHub Wiki"""
@@ -311,6 +337,18 @@ Consulta nuestra [Guía de Contribución](../CONTRIBUTING.md) para empezar.
         return True
 
 def main():
+    # Verificar dependencias
+    if not check_dependencies():
+        sys.exit(1)
+
+    # Importar módulos después de verificar dependencias
+    try:
+        import yaml
+        import argparse
+    except ImportError as e:
+        print(f"❌ Error importando módulos: {e}")
+        sys.exit(1)
+
     parser = argparse.ArgumentParser(
         description="🤖 Claude Code Wiki Maintenance Agent"
     )
@@ -325,12 +363,12 @@ def main():
         default='claude-agents.config.yaml',
         help='Archivo de configuración'
     )
-    
+
     args = parser.parse_args()
-    
+
     agent = WikiMaintenanceAgent(args.config)
     success = agent.run(args.action)
-    
+
     sys.exit(0 if success else 1)
 
 if __name__ == "__main__":

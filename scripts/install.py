@@ -12,6 +12,37 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 
 
+def check_dependencies():
+    """Verificar que las dependencias Python necesarias estén instaladas"""
+    print("🔍 Verificando dependencias Python...")
+
+    required_modules = [
+        'alembic',  # Para migraciones de base de datos
+        'secrets',  # Para generación de secrets (incluido en Python 3.6+)
+    ]
+
+    missing_modules = []
+
+    for module in required_modules:
+        try:
+            __import__(module)
+            print(f"✅ {module} - OK")
+        except ImportError:
+            missing_modules.append(module)
+            print(f"❌ {module} - FALTANTE")
+
+    if missing_modules:
+        print(f"\n❌ Módulos faltantes: {', '.join(missing_modules)}")
+        print("\nPara instalar las dependencias faltantes:")
+        print("  pip install alembic")
+        print("\nO instala todas las dependencias del proyecto:")
+        print("  pip install -r backend/requirements.txt")
+        return False
+
+    print("✅ Todas las dependencias Python están instaladas")
+    return True
+
+
 class ProyectoSemillaInstaller:
     """
     Instalador interactivo para Proyecto Semilla
@@ -112,8 +143,8 @@ class ProyectoSemillaInstaller:
         )
         if not jwt_secret:
             import secrets
-            jwt_secret = secrets.token_urlsafe(32)
-            print(f"🔑 JWT Secret generado: {jwt_secret[:20]}...")
+            jwt_secret = secrets.token_urlsafe(64)  # Generar JWT_SECRET de al menos 64 caracteres
+            print(f"🔑 JWT Secret generado: {jwt_secret[:20]}... (longitud: {len(jwt_secret)})")
 
         config["JWT_SECRET"] = jwt_secret
 
@@ -131,26 +162,29 @@ class ProyectoSemillaInstaller:
 
 # Base de datos
 DB_PASSWORD={config["DB_PASSWORD"]}
-DB_HOST=localhost
+DB_HOST=db
 DB_PORT=5432
 DB_NAME=proyecto_semilla
 
 # Backend
 JWT_SECRET={config["JWT_SECRET"]}
-CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+CORS_ORIGINS=http://localhost:7701,http://localhost:7777
 DEBUG={config["DEBUG"]}
 
 # Frontend
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:7777
 
 # Configuración adicional
 LOG_LEVEL=INFO
 """
 
-        with open(self.env_file, "w", encoding="utf-8") as f:
-            f.write(env_content)
-
-        print(f"✅ Archivo .env creado en: {self.env_file}")
+        try:
+            with open(self.env_file, "w", encoding="utf-8") as f:
+                f.write(env_content)
+            print(f"✅ Archivo .env creado en: {self.env_file}")
+        except Exception as e:
+            print(f"❌ Error creando archivo .env: {e}")
+            raise
 
     def setup_database(self):
         """Configurar la base de datos"""
@@ -169,7 +203,7 @@ LOG_LEVEL=INFO
             # Ejecutar migraciones de Alembic
             print("📦 Ejecutando migraciones de base de datos...")
             result = subprocess.run([
-                "python3", "-m", "alembic", "upgrade", "head"
+                "PYTHONPATH=/app", "python3", "-m", "alembic", "upgrade", "head"
             ], cwd=self.project_root / "backend", capture_output=True, text=True)
 
             if result.returncode == 0:
@@ -191,7 +225,7 @@ LOG_LEVEL=INFO
         print("\n👤 Creación de Superadministrador")
         print("-" * 35)
 
-        if not self.get_yes_no("¿Quieres crear datos iniciales (superadmin + demo)?", False):
+        if not self.get_yes_no("¿Quieres crear datos iniciales (superadmin + demo)?", True):
             print("ℹ️ El superadministrador se puede crear desde el frontend después de iniciar la aplicación")
             print("   Accede a la aplicación y usa la interfaz de configuración inicial")
             return
@@ -200,7 +234,7 @@ LOG_LEVEL=INFO
         try:
             import subprocess
             result = subprocess.run([
-                "python3", "-m", "app.initial_data"
+                "PYTHONPATH=/app", "python3", "-m", "app.initial_data"
             ], cwd=self.project_root / "backend", capture_output=True, text=True)
 
             if result.returncode == 0:
@@ -244,22 +278,26 @@ LOG_LEVEL=INFO
         print("\n📋 Próximos pasos:")
         print("1. Levantar todos los servicios:")
         print("   docker-compose up -d")
-        print("\n2. Verificar que todo funciona:")
-        print("   - Backend API: http://localhost:8000")
-        print("   - Documentación: http://localhost:8000/docs")
-        print("   - Health check: http://localhost:8000/api/v1/health")
-        print("   - Login: POST http://localhost:8000/api/v1/auth/login")
-        print("\n3. Configuración inicial:")
-        print("   - Accede al frontend en http://localhost:3000")
-        print("   - Usa la interfaz de configuración inicial para crear el superadministrador")
-        print("\n4. Acceder al frontend (una vez implementado):")
-        print("   http://localhost:3000")
+        print("\n2. Verificar instalación:")
+        print("   python scripts/verify_installation.py")
+        print("\n3. Acceder a la aplicación:")
+        print("   - Frontend: http://localhost:7701")
+        print("   - Backend API: http://localhost:7777")
+        print("   - Documentación API: http://localhost:7777/docs")
+        print("   - MCP Server: http://localhost:8001/docs")
+        print("\n4. Credenciales de acceso:")
+        print("   - Usuario: admin@example.com")
+        print("   - Contraseña: admin123")
         print("\n📚 Para más información, consulta la documentación:")
         print("   https://github.com/proyecto-semilla/proyecto-semilla")
 
     def run(self):
         """Ejecutar el instalador"""
         self.print_header()
+
+        # Verificar dependencias Python
+        if not check_dependencies():
+            sys.exit(1)
 
         # Verificar prerrequisitos
         if not self.check_prerequisites():

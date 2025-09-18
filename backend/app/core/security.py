@@ -183,10 +183,24 @@ async def get_current_user_from_cookie(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Get user from database
-    user = await db.get(User, user_uuid)
+    # Get user from database with relationships loaded
+    from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
+
+    stmt = select(User).options(
+        selectinload(User.user_roles),
+        selectinload(User.tenant)
+    ).where(User.id == user_uuid)
+
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+
     if user is None:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if not user.is_active:
         raise HTTPException(
@@ -251,52 +265,6 @@ async def get_current_user_with_tenant(
 
 
 
-async def verify_refresh_token(db: AsyncSession, token: str) -> Optional["RefreshToken"]:
-    """
-    Verify a refresh token and return the token object if valid
-    """
-    from app.models.refresh_token import RefreshToken
-    from sqlalchemy import select
-
-    stmt = select(RefreshToken).where(
-        RefreshToken.token == token,
-        RefreshToken.is_revoked == False,
-        RefreshToken.expires_at > datetime.utcnow()
-    )
-    result = await db.execute(stmt)
-    return result.scalar_one_or_none()
-
-
-async def revoke_refresh_token(db: AsyncSession, token: str) -> None:
-    """
-    Revoke a refresh token
-    """
-    from app.models.refresh_token import RefreshToken
-    from sqlalchemy import update
-
-    stmt = (
-        update(RefreshToken)
-        .where(RefreshToken.token == token)
-        .values(is_revoked=True, revoked_at=datetime.utcnow())
-    )
-    await db.execute(stmt)
-    await db.commit()
-
-
-async def revoke_all_user_refresh_tokens(db: AsyncSession, user_id: str) -> None:
-    """
-    Revoke all refresh tokens for a user
-    """
-    from app.models.refresh_token import RefreshToken
-    from sqlalchemy import update
-
-    stmt = (
-        update(RefreshToken)
-        .where(RefreshToken.user_id == user_id)
-        .values(is_revoked=True, revoked_at=datetime.utcnow())
-    )
-    await db.execute(stmt)
-    await db.commit()
 
 
 def create_refresh_token(user: User) -> str:

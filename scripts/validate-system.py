@@ -13,6 +13,35 @@ from datetime import datetime
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
+def check_dependencies():
+    """Verificar dependencias necesarias para el script"""
+    print("🔍 Verificando dependencias para validate-system.py...")
+
+    required_modules = [
+        'fastapi',  # Para el backend
+        'sqlalchemy',  # Para la base de datos
+        'uvicorn',  # Para el servidor
+    ]
+
+    missing_modules = []
+
+    for module in required_modules:
+        try:
+            __import__(module)
+            print(f"✅ {module} - OK")
+        except ImportError:
+            missing_modules.append(module)
+            print(f"❌ {module} - FALTANTE")
+
+    if missing_modules:
+        print(f"\n❌ Módulos faltantes: {', '.join(missing_modules)}")
+        print("\nPara instalar las dependencias faltantes:")
+        print("  pip install -r backend/requirements.txt")
+        return False
+
+    print("✅ Todas las dependencias están instaladas")
+    return True
+
 def log(message, status="INFO"):
     """Simple logging function"""
     timestamp = datetime.now().strftime("%H:%M:%S")
@@ -136,6 +165,11 @@ async def main():
     """Main validation function"""
     log("🚀 Starting Proyecto Semilla Validation Suite")
     log("=" * 50)
+
+    # Verificar dependencias
+    if not check_dependencies():
+        log("❌ Dependency check failed", "ERROR")
+        return False
 
     start_time = time.time()
 

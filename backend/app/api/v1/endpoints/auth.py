@@ -19,6 +19,7 @@ from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, Refre
 from app.models.user import User
 from app.models.tenant import Tenant
 from app.services.permission_service import PermissionService
+from app.core.audit_logging import audit_logger, AuditEvent, AuditEventType, AuditEventSeverity
 
 router = APIRouter()
 
@@ -45,6 +46,7 @@ async def get_setup_status(db: AsyncSession = Depends(get_db)) -> Any:
  
 @router.post("/login", response_model=Token)
 async def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
@@ -57,7 +59,22 @@ async def login(
     result = await db.execute(stmt)
     user_obj = result.scalar_one_or_none()
 
+    client_ip = request.client.host if request.client else "unknown"
+
     if not user_obj:
+        # Log failed login attempt - user not found
+        await audit_logger.log_event(AuditEvent(
+            event_type=AuditEventType.SECURITY_EVENT,
+            severity=AuditEventSeverity.WARNING,
+            description=f"Login attempt failed - user not found: {form_data.username}",
+            metadata={
+                "action": "login_failed",
+                "reason": "user_not_found",
+                "email_attempted": form_data.username,
+                "ip_address": client_ip,
+                "user_agent": request.headers.get("user-agent", "unknown")
+            }
+        ))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password"
@@ -65,6 +82,21 @@ async def login(
 
     # Verify password
     if not security.verify_password(form_data.password, user_obj.hashed_password):
+        # Log failed login attempt - wrong password
+        await audit_logger.log_event(AuditEvent(
+            event_type=AuditEventType.SECURITY_EVENT,
+            severity=AuditEventSeverity.WARNING,
+            description=f"Login attempt failed - wrong password: {user_obj.email}",
+            user_id=str(user_obj.id),
+            tenant_id=str(user_obj.tenant_id),
+            metadata={
+                "action": "login_failed",
+                "reason": "wrong_password",
+                "email": user_obj.email,
+                "ip_address": client_ip,
+                "user_agent": request.headers.get("user-agent", "unknown")
+            }
+        ))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password"
@@ -96,6 +128,22 @@ async def login(
     tenant_name = tenant_result.fetchone()
     tenant_name = tenant_name[0] if tenant_name else "Unknown"
 
+    # Log successful login
+    client_ip = request.client.host if request.client else "unknown"
+    await audit_logger.log_event(AuditEvent(
+        event_type=AuditEventType.SECURITY_EVENT,
+        severity=AuditEventSeverity.LOW,
+        description=f"User login successful: {user_obj.email}",
+        user_id=str(user_obj.id),
+        tenant_id=str(user_obj.tenant_id),
+        metadata={
+            "action": "user_login",
+            "email": user_obj.email,
+            "ip_address": client_ip,
+            "user_agent": request.headers.get("user-agent", "unknown")
+        }
+    ))
+
     # Create response with secure cookies
     cookie_manager = get_cookie_manager()
     return cookie_manager.create_login_response(
@@ -108,36 +156,19 @@ async def login(
 
 @router.post("/register", response_model=UserResponse)
 async def register(
-    user_data: dict,  # Accept flexible data structure
+    user_data: UserRegister,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Register a new user - accepts flexible data structure for frontend compatibility
+    Register a new user with enterprise validation
     """
-    # Extract and validate required fields
-    email = user_data.get("email")
-    password = user_data.get("password")
-    nombre_completo = user_data.get("nombre_completo")  # Frontend sends this
-    first_name = user_data.get("first_name")  # Alternative format
-    last_name = user_data.get("last_name")   # Alternative format
-
-    if not email or not password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email and password are required"
-        )
-
-    # Parse name fields
-    if nombre_completo:
-        # Split full name into first and last name
-        name_parts = nombre_completo.strip().split()
-        first_name = name_parts[0] if name_parts else ""
-        last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
-    elif not first_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Name information is required"
-        )
+    # Extract validated fields
+    email = user_data.email
+    password = user_data.password
+    first_name = user_data.first_name
+    last_name = user_data.last_name
+    tenant_id = user_data.tenant_id
 
     # Check if user already exists
     from sqlalchemy import select
@@ -152,7 +183,6 @@ async def register(
 
     # For testing purposes, allow registration without tenant_id
     # Create a default tenant if none provided
-    tenant_id = user_data.get("tenant_id")
     if not tenant_id:
         # Check if default tenant exists
         default_tenant = await db.execute(
@@ -218,6 +248,22 @@ async def register(
     # If this is the first user, make them superadmin
     if user_count == 0:
         await _setup_first_superadmin(db, new_user, tenant_id)
+
+    # Log successful registration
+    client_ip = request.client.host if request.client else "unknown"
+    await audit_logger.log_event(AuditEvent(
+        event_type=AuditEventType.SECURITY_EVENT,
+        severity=AuditEventSeverity.LOW,
+        description=f"User registration successful: {email}",
+        user_id=str(user_id),
+        tenant_id=tenant_id,
+        metadata={
+            "action": "user_registration",
+            "email": email,
+            "ip_address": client_ip,
+            "user_agent": request.headers.get("user-agent", "unknown")
+        }
+    ))
 
     # Return user data
     return {

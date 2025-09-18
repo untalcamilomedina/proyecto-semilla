@@ -6,8 +6,24 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, Grid, List, SortAsc, SortDesc } from 'lucide-react';
 
+interface Plugin {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  author: string;
+  rating: number;
+  reviewCount: number;
+  downloads: number;
+  category: string;
+  tags: string[];
+  updatedAt: string;
+  featured?: boolean;
+  verified?: boolean;
+}
+
 interface MarketplaceGridProps {
-  plugins: any[];
+  plugins: Plugin[];
   onInstallPlugin?: (pluginId: string) => void;
   onViewPluginDetails?: (pluginId: string) => void;
   installedPlugins?: string[];
@@ -49,7 +65,7 @@ export const MarketplaceGrid: React.FC<MarketplaceGridProps> = ({
 
     // Sort plugins
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
 
       switch (sortBy) {
         case 'name':

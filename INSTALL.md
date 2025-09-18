@@ -1,182 +1,175 @@
-# 🏗️ Instalador Proyecto Semilla
+# 🚀 Guía de Instalación - Proyecto Semilla
 
-Script de instalación automática e interactiva para configurar Proyecto Semilla desde cero con mejores prácticas de seguridad.
+## Requisitos Previos
 
-## 🚀 Inicio Rápido
+- **Docker** y **Docker Compose** instalados
+- **Python 3.11+** (opcional, solo para desarrollo local)
+- **Git** para clonar el repositorio
 
+## Instalación Simple (Recomendado)
+
+### Paso 1: Clonar el repositorio
 ```bash
-# Desde el directorio raíz del proyecto
-cd backend/scripts
-python3 install.py
+git clone https://github.com/proyecto-semilla/proyecto-semilla.git
+cd proyecto-semilla
 ```
 
-## 📋 Lo que hace el instalador
-
-### ✅ Verificación de Prerrequisitos
-- Python 3.9+
-- pip
-- PostgreSQL
-- Node.js 16+
-- npm
-
-### 📦 Instalación de Dependencias
-- Instala dependencias Python desde `requirements.txt`
-- Instala dependencias Node.js con `npm install`
-
-### 🗄️ Configuración de Base de Datos
-- Solicita configuración de PostgreSQL
-- Crea la base de datos si no existe
-- Ejecuta migraciones y crea tablas
-
-### 🔐 Generación de Configuración Segura
-- Genera JWT_SECRET único de 64 caracteres
-- Crea contraseña segura para el super administrador
-- Configura variables de entorno en `.env`
-
-### 👑 Creación de Super Administrador
-- Crea tenant inicial "Proyecto Semilla"
-- Configura roles y permisos estándar
-- Crea usuario super administrador con email configurable
-
-### ✅ Validación de Instalación
-- Verifica que todos los archivos estén en su lugar
-- Valida la configuración generada
-
-## 🎯 Uso Interactivo
-
-El instalador es completamente interactivo y te guiará a través de cada paso:
-
-1. **Verificación de prerrequisitos**: Se ejecuta automáticamente
-2. **Instalación de dependencias**: Se ejecuta automáticamente
-3. **Configuración de base de datos**: Solicita información de PostgreSQL
-4. **Configuración de CORS**: Permite personalizar orígenes permitidos
-5. **Información del admin**: Solicita nombre y email del super administrador
-
-## 🔧 Configuración Personalizable
-
-### Variables de Entorno Generadas
-```env
-# Base de datos
-DB_PASSWORD=tu_password_seguro
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=proyecto_semilla
-DB_USER=tu_usuario
-
-# Backend
-JWT_SECRET=secret_jwt_unico_64_chars
-CORS_ORIGINS=http://localhost:3000,https://tu-dominio.com
-
-# Frontend
-NEXT_PUBLIC_API_URL=http://localhost:8000
-
-# Seed Data
-SEED_ADMIN_PASSWORD=password_seguro_generado
+### Paso 2: Ejecutar setup automático
+```bash
+./scripts/setup.sh
 ```
 
-### Roles y Permisos Iniciales
+El script setup:
+- ✅ Verifica que Docker esté corriendo
+- ✅ Crea archivos de configuración (.env)
+- ✅ Levanta servicios básicos (PostgreSQL + Redis)
+- ✅ Ejecuta migraciones de base de datos
+- ✅ Muestra instrucciones para próximos pasos
 
-**Super Admin** (`admin`):
-- `users:read`, `users:write`, `users:delete`
-- `tenants:read`, `tenants:write`
-- `roles:read`, `roles:write`
-- `articles:read`, `articles:write`, `articles:delete`
-- `system:admin`
-
-**Usuario Estándar** (`user`):
-- `users:read`
-- `tenants:read`
-- `articles:read`, `articles:write`
-
-## 🛡️ Mejores Prácticas de Seguridad
-
-### Secrets Generados Automáticamente
-- JWT_SECRET: 64 caracteres aleatorios
-- Contraseña de admin: 16 caracteres aleatorios
-- Todos los secrets usan caracteres seguros
-
-### Validaciones Incluidas
-- Verificación de fortaleza de JWT_SECRET
-- Validación de formato de email
-- Confirmación de conexión a base de datos
-
-## 📊 Resumen de Instalación
-
-Al finalizar, el instalador muestra:
-- ✅ Tenant principal creado
-- ✅ Super admin configurado
-- ✅ Base de datos lista
-- ✅ Configuración segura generada
-- 🚀 Comandos para iniciar la aplicación
-
-## 🔄 Próximos Pasos
-
-Después de la instalación:
-
+### Paso 3: Levantar servicios completos
 ```bash
-# Iniciar backend
+docker-compose up -d backend frontend
+```
+
+### Paso 4: Acceder al sistema
+- **Frontend**: http://localhost:7701
+- **Si es primera vez**: Verás el wizard de configuración inicial
+- **Después de configurar**: Podrás iniciar sesión normalmente
+
+### Paso 4: Acceder a la aplicación
+- **Frontend**: http://localhost:7701
+- **Backend API**: http://localhost:7777
+- **Documentación API**: http://localhost:7777/docs
+- **MCP Server**: http://localhost:8001/docs
+
+## Credenciales de Acceso
+
+Después de la instalación, puedes acceder con:
+- **Usuario**: admin@example.com
+- **Contraseña**: admin123
+
+## Instalación Manual (Alternativa)
+
+Si prefieres configurar manualmente:
+
+### 1. Configurar entorno
+```bash
+cp .env.example .env
+# Edita .env con tus configuraciones
+```
+
+### 2. Configurar frontend
+```bash
+cp frontend/.env.local.example frontend/.env.local
+# Edita frontend/.env.local si es necesario
+```
+
+### 3. Iniciar servicios
+```bash
+docker-compose up -d
+```
+
+### 4. Ejecutar migraciones
+```bash
+docker-compose exec backend alembic upgrade head
+```
+
+### 5. Crear datos iniciales
+```bash
+docker-compose exec backend python app/initial_data.py
+```
+
+## Solución de Problemas
+
+### Error: "Not authenticated"
+- Verifica que los servicios estén ejecutándose: `docker-compose ps`
+- Revisa los logs: `docker-compose logs backend`
+- Verifica la configuración en `.env`
+
+### Error: "Connection refused"
+- Asegúrate de que Docker esté ejecutándose
+- Espera a que los servicios estén healthy: `docker-compose ps`
+
+### Error: "Port already in use"
+- Los puertos están configurados para evitar conflictos:
+  - PostgreSQL: 5433 (interno 5432)
+  - Redis: 6380 (interno 6379)
+  - Frontend: 7701 (interno 3000)
+  - Backend: 7777 (interno 8000)
+  - MCP Server: 8001
+
+### Verificar estado de servicios
+```bash
+# Ver estado de contenedores
+docker-compose ps
+
+# Ver logs de un servicio específico
+docker-compose logs backend
+
+# Ver logs de todos los servicios
+docker-compose logs
+```
+
+## Configuración de Desarrollo
+
+Para desarrollo local sin Docker:
+
+### Backend
+```bash
 cd backend
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.initial_data
+uvicorn app.main:app --reload
+```
 
-# Iniciar frontend (en otra terminal)
+### Frontend
+```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-Accede a `http://localhost:3000` y usa las credenciales del super admin.
+## Variables de Entorno
 
-## ⚠️ Notas Importantes
+### Archivo .env principal
+```env
+# Base de datos
+DB_PASSWORD=changeme123
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=proyecto_semilla
 
-- **Guarda la contraseña del admin** en un lugar seguro
-- **Cambia la contraseña** después del primer login
-- **Configura variables de entorno** para producción
-- **Revisa la documentación de seguridad** antes del despliegue
+# Backend
+JWT_SECRET=your_jwt_secret_key_at_least_64_characters_long_for_security
+CORS_ORIGINS=http://localhost:7701,http://localhost:7777
+DEBUG=true
 
-## 🐛 Solución de Problemas
-
-### PostgreSQL no encontrado
-```bash
-# macOS con Homebrew
-brew install postgresql
-brew services start postgresql
-
-# Ubuntu/Debian
-sudo apt-get install postgresql postgresql-contrib
-sudo systemctl start postgresql
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:7777
 ```
 
-### Node.js versión incorrecta
-```bash
-# Instalar Node.js 16+ con nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
+### Archivo frontend/.env.local
+```env
+NEXT_PUBLIC_API_URL=http://localhost:7777
+NEXT_PUBLIC_DEMO_EMAIL=admin@example.com
+NEXT_PUBLIC_DEMO_PASSWORD=admin123
+NEXT_PUBLIC_DEFAULT_TENANT_ID=00000000-0000-0000-0000-000000000001
 ```
 
-### Error de permisos en base de datos
-```sql
--- Crear usuario con permisos
-CREATE USER proyecto_user WITH PASSWORD 'tu_password';
-ALTER USER proyecto_user CREATEDB;
-GRANT ALL PRIVILEGES ON DATABASE proyecto_semilla TO proyecto_user;
-```
+## Siguientes Pasos
 
-## 📝 Personalización
+Después de la instalación exitosa:
 
-El script se puede modificar para:
-- Cambiar el nombre del tenant inicial
-- Modificar roles y permisos por defecto
-- Agregar configuración adicional
-- Personalizar el flujo de instalación
+1. **Explora la aplicación** en http://localhost:7701
+2. **Revisa la documentación API** en http://localhost:7777/docs
+3. **Configura usuarios adicionales** desde el panel de administración
+4. **Personaliza la configuración** según tus necesidades
 
-## 🤝 Contribuir
+## Soporte
 
-Para mejorar el instalador:
-1. Reporta issues con detalles del error
-2. Sugiere mejoras en la UX
-3. Envía PRs con mejoras de seguridad
-4. Documenta casos de uso adicionales
-
----
-
-**Proyecto Semilla** - Instalador Seguro y Automático 🏗️✨
+Si encuentras problemas:
+1. Revisa los logs de Docker
+2. Verifica la configuración de puertos
+3. Asegúrate de que Docker tenga suficientes recursos
+4. Consulta la documentación en `docs/`

@@ -2,6 +2,8 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   User,
   UserRegister,
+  UserCreate,
+  UserUpdate,
   Article,
   ArticleCreate,
   ArticleUpdate,
@@ -15,7 +17,11 @@ import {
   RoleUpdate,
   Category,
   CategoryCreate,
-  CategoryUpdate
+  CategoryUpdate,
+  LoginResponse,
+  SwitchTenantResponse,
+  UserRoleResponse,
+  HealthCheckResponse
 } from '../types/api';
 
 
@@ -77,7 +83,7 @@ class ApiClient {
   }
 
   // Generic GET method
-  async get<T>(url: string, params?: any): Promise<T> {
+  async get<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     const response: AxiosResponse<T> = await this.axiosInstance.get(url, { params });
     return response.data;
   }
@@ -89,7 +95,7 @@ class ApiClient {
     return response.data;
   }
 
-  async login(data: FormData): Promise<any> {
+  async login(data: FormData): Promise<LoginResponse> {
     const response = await this.axiosInstance.post('/api/v1/auth/login', data, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -164,12 +170,12 @@ class ApiClient {
     return response.data;
   }
 
-  async createUser(user: any): Promise<User> {
+  async createUser(user: UserCreate): Promise<User> {
     const response: AxiosResponse<User> = await this.axiosInstance.post('/api/v1/users', user);
     return response.data;
   }
 
-  async updateUser(id: string, user: any): Promise<User> {
+  async updateUser(id: string, user: UserUpdate): Promise<User> {
     const response: AxiosResponse<User> = await this.axiosInstance.put(`/api/v1/users/${id}`, user);
     return response.data;
   }
@@ -208,8 +214,8 @@ class ApiClient {
     await this.axiosInstance.delete(`/api/v1/tenants/${id}`);
   }
 
-  async switchTenant(tenantId: string): Promise<any> {
-    const response: AxiosResponse<any> = await this.axiosInstance.post(`/api/v1/auth/switch-tenant/${tenantId}`);
+  async switchTenant(tenantId: string): Promise<SwitchTenantResponse> {
+    const response: AxiosResponse<SwitchTenantResponse> = await this.axiosInstance.post(`/api/v1/auth/switch-tenant/${tenantId}`);
     return response.data;
   }
 
@@ -238,8 +244,8 @@ class ApiClient {
     await this.axiosInstance.delete(`/api/v1/roles/${id}`);
   }
 
-  async assignRoleToUser(userId: string, roleId: string): Promise<any> {
-    const response: AxiosResponse<any> = await this.axiosInstance.post(`/api/v1/users/${userId}/roles/${roleId}`);
+  async assignRoleToUser(userId: string, roleId: string): Promise<UserRoleResponse> {
+    const response: AxiosResponse<UserRoleResponse> = await this.axiosInstance.post(`/api/v1/users/${userId}/roles/${roleId}`);
     return response.data;
   }
 
@@ -272,8 +278,8 @@ class ApiClient {
     await this.axiosInstance.delete(`/api/v1/categories/${id}`);
   }
 
-  async getCategoryStats(): Promise<any> {
-    const response: AxiosResponse<any> = await this.axiosInstance.get('/api/v1/categories/stats');
+  async getCategoryStats(): Promise<Record<string, unknown>> {
+    const response: AxiosResponse<Record<string, unknown>> = await this.axiosInstance.get('/api/v1/categories/stats');
     return response.data;
   }
 

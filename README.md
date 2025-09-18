@@ -110,60 +110,72 @@ backend/mcp/
 - **Cobertura de pruebas**: >80%
 - **Commits**: 56+ commits con histórico limpio
 
-## 🚀 Inicio Rápido
+## 🚀 Inicio Rápido (3 Pasos Simples)
+
+### **¡Como WordPress pero para Enterprise!**
+
+```bash
+# 1. Clonar y entrar al proyecto
+git clone https://github.com/proyecto-semilla/proyecto-semilla.git
+cd proyecto-semilla
+
+# 2. Ejecutar el script de inicio
+./start.sh
+
+# 3. ¡Listo! Accede a http://localhost:7701
+```
+
+### **¿Qué hace el script?**
+- ✅ Monta automáticamente todos los servicios Docker
+- ✅ Configura la base de datos y dependencias
+- ✅ Te lleva directamente al wizard de configuración
+
+### **Primer Uso - Wizard de Configuración**
+1. **Accede**: http://localhost:7701
+2. **Si es primera vez**: Verás el formulario de "Configuración Inicial"
+3. **Crea tu superadministrador**: Nombre, apellido, email y contraseña
+4. **¡Listo!** Tu plataforma estará configurada y lista para usar
+
+### **Inicio de Sesión Normal**
+Después de la configuración inicial:
+- **Email**: El que configuraste en el wizard
+- **Contraseña**: La que configuraste en el wizard
+
+### **¿Problemas?**
+```bash
+# Ver logs si algo falla
+docker-compose logs
+
+# Reiniciar servicios
+docker-compose restart
+
+# Limpiar todo y empezar de nuevo
+docker-compose down --volumes
+./start.sh
+```
 
 ### **Prerrequisitos**
-- Docker y Docker Compose
-- Node.js 18+ (desarrollo local opcional)
-- Python 3.11+ (desarrollo local opcional)
+- ✅ Docker y Docker Compose
+- ✅ Python 3.11+ (incluido en el instalador automático)
+- ✅ Node.js 18+ (opcional, solo para desarrollo local)
 
-### **1. Clonar el Repositorio**
-```bash
-git clone https://github.com/tu-usuario/proyecto-semilla.git
-cd proyecto-semilla
-```
-
-### **2. Configurar Variables de Entorno**
-```bash
-cp .env.example .env
-# Editar .env con tus configuraciones específicas
-```
-
-### **3. Ejecutar con Docker (Recomendado)**
-```bash
-# Modo Desarrollo
-docker-compose up -d
-
-# Modo Producción
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
-
-### **4. Validar Instalación**
-```bash
-# Verificar todos los servicios
-docker-compose ps
-
-# Health checks
-curl http://localhost:7777/api/v1/health  # Backend
-curl http://localhost:3000                # Frontend  
-curl http://localhost:8001/docs           # MCP Server
-```
+📖 **Para instrucciones detalladas, consulta [INSTALL.md](./INSTALL.md)**
 
 ## 🌐 Acceso al Sistema
 
 ### **URLs de Acceso**
-- **🌐 Frontend**: http://localhost:3000
+- **🌐 Frontend**: http://localhost:7701
 - **⚡ Backend API**: http://localhost:7777
 - **📖 Documentación API**: http://localhost:7777/docs
-- **🤖 MCP Server**: http://localhost:8001
+- **🤖 MCP Server**: http://localhost:8001/docs
 
 ### **Credenciales por Defecto**
 ```
-👤 Administrador
-Email: admin@proyectosemilla.dev
+👤 Administrador (creado automáticamente)
+Email: admin@example.com
 Password: admin123
 
-👤 Usuario Demo  
+👤 Usuario Demo (opcional)
 Email: demo@demo-company.com
 Password: demo123
 ```

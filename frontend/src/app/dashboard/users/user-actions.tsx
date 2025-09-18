@@ -32,7 +32,7 @@ export function UserActions({ user, onSuccess }: UserActionsProps) {
         description: `El usuario ${user.full_name} ha sido eliminado.`,
       });
       onSuccess();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo eliminar el usuario.",
