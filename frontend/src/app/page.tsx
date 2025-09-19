@@ -16,7 +16,7 @@ export default function HomePage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [needsSetup, setNeedsSetup] = useState<boolean | null>(true); // Default to true for first-time setup
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(null); // null = loading, true = needs setup, false = configured
   const [setupLoading, setSetupLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -49,9 +49,9 @@ export default function HomePage() {
         setNeedsSetup(status.needs_setup);
       } catch (error) {
         console.error('❌ Error checking setup status:', error);
-        // If we can't check setup status, assume it needs setup for first-time users
-        console.log('⚠️ Asumiendo que necesita setup debido al error');
-        setNeedsSetup(true);
+        // On error, assume system is already configured (safer default)
+        console.log('⚠️ Error al verificar setup status, asumiendo sistema configurado');
+        setNeedsSetup(false);
       } finally {
         setSetupLoading(false);
       }
@@ -60,14 +60,14 @@ export default function HomePage() {
     // Execute immediately without delay
     checkSetupStatus();
 
-    // Fallback: if it takes too long, assume setup is needed
+    // Fallback: if it takes too long, assume system is configured
     const timeout = setTimeout(() => {
       if (setupLoading) {
-        console.log('⏰ Timeout: asumiendo que necesita setup');
-        setNeedsSetup(true);
+        console.log('⏰ Timeout: asumiendo que el sistema está configurado');
+        setNeedsSetup(false);
         setSetupLoading(false);
       }
-    }, 3000); // 3 seconds timeout
+    }, 5000); // 5 seconds timeout
 
     return () => clearTimeout(timeout);
   }, []);
@@ -173,7 +173,7 @@ export default function HomePage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Verificando configuración del sistema...</p>
-          <p className="text-sm text-gray-500 mt-2">Si tarda demasiado, el wizard aparecerá automáticamente</p>
+          <p className="text-sm text-gray-500 mt-2">Si tarda demasiado, se mostrará el formulario de login</p>
           {/* Force show setup wizard after 5 seconds */}
           <script dangerouslySetInnerHTML={{
             __html: `
@@ -190,8 +190,8 @@ export default function HomePage() {
     );
   }
 
-  // Show setup form if system needs initial setup (default to true for first-time users)
-  if (needsSetup !== false) {
+  // Show setup form if system needs initial setup
+  if (needsSetup === true) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="w-full max-w-lg p-8 space-y-8 bg-white rounded-xl shadow-2xl border border-gray-200">
