@@ -32,16 +32,56 @@ async def test_auth_endpoint():
 @router.get("/setup-status")
 async def get_setup_status(db: AsyncSession = Depends(get_db)) -> Any:
     """
-    Check if the system needs initial setup (no users exist)
+    Check if the system needs initial setup (no real users exist, excluding system users)
+
+    SECURITY NOTE: This endpoint has been updated to use the new system user flag system
+    instead of hardcoded email lists. This improves security by:
+    - Removing hardcoded credentials from source code
+    - Allowing configurable system users
+    - Providing better separation between system and regular users
+
+    When HARDCODED_USERS_MIGRATION_ENABLED=true:
+        Uses SystemUserService to identify system users via flags
+    When HARDCODED_USERS_MIGRATION_ENABLED=false:
+        Falls back to legacy hardcoded email exclusion for backward compatibility
+
+    Returns:
+        needs_setup: True if no real (non-system) users exist
+        real_user_count: Number of non-system users
+        total_user_count: Total number of users in system
+        system_users_count: Number of system users (when migration enabled)
+        migration_enabled: Whether new system is active
     """
     from sqlalchemy import select, func
-    user_count_result = await db.execute(select(func.count(User.id)))
-    user_count = user_count_result.scalar()
+    from app.services.system_user_service import SystemUserService
+    from app.core.config import settings
+
+    # Get total user count
+    total_count_result = await db.execute(select(func.count(User.id)))
+    total_user_count = total_count_result.scalar()
+
+    real_user_count = total_user_count
+
+    if settings.HARDCODED_USERS_MIGRATION_ENABLED:
+        # Use new system user flags
+        system_users_count = await SystemUserService.get_system_users_count(db)
+        real_user_count = total_user_count - system_users_count
+    else:
+        # Fallback to legacy hardcoded logic for backward compatibility
+        hardcoded_emails = ["admin@proyectosemilla.dev", "demo@demo-company.com", "admin@example.com"]
+        hardcoded_result = await db.execute(
+            select(func.count(User.id)).where(User.email.in_(hardcoded_emails))
+        )
+        hardcoded_count = hardcoded_result.scalar()
+        real_user_count = total_user_count - hardcoded_count
 
     return {
-        "needs_setup": user_count == 0,
-        "user_count": user_count,
-        "message": "System needs initial setup" if user_count == 0 else "System is already configured"
+        "needs_setup": real_user_count == 0,
+        "real_user_count": real_user_count,
+        "total_user_count": total_user_count,
+        "system_users_count": await SystemUserService.get_system_users_count(db) if settings.HARDCODED_USERS_MIGRATION_ENABLED else hardcoded_count if 'hardcoded_count' in locals() else 0,
+        "migration_enabled": settings.HARDCODED_USERS_MIGRATION_ENABLED,
+        "message": "System needs initial setup" if real_user_count == 0 else "System is already configured"
     }
  
 @router.post("/login", response_model=Token)

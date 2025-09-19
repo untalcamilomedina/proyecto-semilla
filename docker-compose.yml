@@ -49,7 +49,7 @@ services:
     environment:
       DATABASE_URL: postgresql://admin:${DB_PASSWORD:-changeme123}@db:5432/proyecto_semilla?sslmode=disable
       DB_PASSWORD: ${DB_PASSWORD:-changeme123}
-      REDIS_URL: redis://redis:6380
+      REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-xO5kjaG4nj0WOaDYezPI/ArMQTFYIlS7Chz3WRnAmvo=}
       BACKEND_CORS_ORIGINS: '["http://localhost:7701", "http://frontend:3000"]'
       DEBUG: ${DEBUG:-false}

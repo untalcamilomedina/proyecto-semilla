@@ -101,9 +101,40 @@ class Settings(BaseSettings):
     COOKIE_DOMAIN: str = ""  # Empty for localhost, set to domain in production
     COOKIE_SAME_SITE: str = "lax"
 
-    # Seed Data Configuration
+    # Seed Data Configuration - LEGACY (to be removed)
     SEED_ADMIN_PASSWORD: str = "admin123"
     SEED_DEMO_PASSWORD: str = "demo123"
+
+    # System Users Configuration - NEW SECURE APPROACH
+    SEED_ADMIN_EMAIL: Optional[str] = None
+    SEED_ADMIN_FIRST_NAME: str = "Super"
+    SEED_ADMIN_LAST_NAME: str = "Admin"
+
+    SEED_DEMO_EMAIL: Optional[str] = None
+    SEED_DEMO_FIRST_NAME: str = "Demo"
+    SEED_DEMO_LAST_NAME: str = "User"
+
+    # Migration Feature Flag
+    HARDCODED_USERS_MIGRATION_ENABLED: bool = False
+
+    @field_validator("SEED_ADMIN_EMAIL", mode="after")
+    @classmethod
+    def validate_admin_email(cls, v: Optional[str]) -> Optional[str]:
+        """Validate admin email when migration is enabled"""
+        if cls.HARDCODED_USERS_MIGRATION_ENABLED and not v:
+            raise ValueError("SEED_ADMIN_EMAIL is required when HARDCODED_USERS_MIGRATION_ENABLED=true")
+        return v
+
+    @field_validator("SEED_ADMIN_PASSWORD", mode="after")
+    @classmethod
+    def validate_admin_password(cls, v: str) -> str:
+        """Validate admin password strength when migration is enabled"""
+        if cls.HARDCODED_USERS_MIGRATION_ENABLED:
+            if len(v) < 12:
+                raise ValueError("SEED_ADMIN_PASSWORD must be at least 12 characters when migration is enabled")
+            if v == "admin123":
+                raise ValueError("SEED_ADMIN_PASSWORD cannot use default insecure value when migration is enabled")
+        return v
 
     class Config:
         env_file = ".env"

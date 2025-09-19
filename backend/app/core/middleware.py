@@ -109,8 +109,7 @@ async def tenant_context_middleware(request: Request, call_next):
         request.url.path.startswith("/api/v1/auth/refresh") or
         request.url.path.startswith("/api/v1/auth/logout") or
         request.url.path.startswith("/api/v1/auth/logout-all") or
-        request.url.path.startswith("/api/v1/auth/setup-status") or
-        request.url.path.startswith("/api/v1/tenants/user-tenants")):
+        request.url.path.startswith("/api/v1/auth/setup-status")):
         return await call_next(request)
 
     response = Response("Internal server error", status_code=500)
@@ -137,8 +136,7 @@ async def tenant_context_middleware(request: Request, call_next):
                 not request.url.path.startswith("/api/v1/auth/refresh") and
                 not request.url.path.startswith("/api/v1/auth/logout") and
                 not request.url.path.startswith("/api/v1/auth/logout-all") and
-                not request.url.path.startswith("/api/v1/auth/setup-status") and
-                not request.url.path.startswith("/api/v1/tenants/user-tenants")
+                not request.url.path.startswith("/api/v1/auth/setup-status")
             )
             if requires_auth:
                 raise HTTPException(
@@ -208,8 +206,8 @@ async def rate_limiting_middleware(request: Request, call_next):
     """
     Redis-based rate limiting middleware
     """
-    # Skip rate limiting for health checks and user-tenants endpoint
-    if request.url.path in ["/health", "/api/v1/health", "/api/v1/health/detailed", "/api/v1/tenants/user-tenants"]:
+    # Skip rate limiting for health checks
+    if request.url.path in ["/health", "/api/v1/health", "/api/v1/health/detailed"]:
         return await call_next(request)
 
     client_ip = request.client.host if request.client else "unknown"
