@@ -158,13 +158,6 @@ class ProyectoSemillaMCPClient:
         """List users"""
         return await self.call_tool("users_list", tenant_id=tenant_id, limit=limit, skip=skip)
 
-    async def list_articles(self, status_filter: str = None, limit: int = 100, skip: int = 0) -> MCPToolResult:
-        """List articles"""
-        return await self.call_tool("articles_list", status_filter=status_filter, limit=limit, skip=skip)
-
-    async def create_article(self, title: str, content: str, status: str = "draft") -> MCPToolResult:
-        """Create a new article"""
-        return await self.call_tool("articles_create", title=title, content=content, status=status)
 
     async def get_system_info(self) -> MCPResourceResult:
         """Get system information"""

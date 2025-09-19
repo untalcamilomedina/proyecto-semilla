@@ -69,7 +69,7 @@ async def create_super_admin_role(db: AsyncSession, tenant: Tenant) -> Role:
 
     print("👑 Creating super admin role...")
     permissions = [
-        "users:*", "roles:*", "tenants:*", "articles:*", "system:*"
+        "users:*", "roles:*", "tenants:*", "system:*"
     ]
     role = Role(
         tenant_id=tenant.id,

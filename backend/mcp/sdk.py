@@ -82,8 +82,6 @@ class ProyectoSemillaSDK:
                 "authentication",
                 "tenants",
                 "users",
-                "articles",
-                "categories",
                 "audit_logging"
             ]
         }

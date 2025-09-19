@@ -139,35 +139,6 @@ class ProyectoSemillaMCPServer:
             handler=self._handle_users_list
         ))
 
-        # Article management tools
-        self.register_tool(MCPTool(
-            name="articles_list",
-            description="List articles in a tenant",
-            input_schema={
-                "type": "object",
-                "properties": {
-                    "status_filter": {"type": "string", "enum": ["draft", "published", "review"], "description": "Filter by article status"},
-                    "limit": {"type": "integer", "default": 100, "description": "Maximum number of articles to return"},
-                    "skip": {"type": "integer", "default": 0, "description": "Number of articles to skip"}
-                }
-            },
-            handler=self._handle_articles_list
-        ))
-
-        self.register_tool(MCPTool(
-            name="articles_create",
-            description="Create a new article",
-            input_schema={
-                "type": "object",
-                "properties": {
-                    "title": {"type": "string", "description": "Article title"},
-                    "content": {"type": "string", "description": "Article content"},
-                    "status": {"type": "string", "enum": ["draft", "published", "review"], "default": "draft", "description": "Article status"}
-                },
-                "required": ["title", "content"]
-            },
-            handler=self._handle_articles_create
-        ))
 
     def _register_core_resources(self):
         """Register core MCP resources"""
@@ -359,25 +330,6 @@ class ProyectoSemillaMCPServer:
             "skip": skip
         }
 
-    async def _handle_articles_list(self, status_filter: str = None, limit: int = 100, skip: int = 0):
-        """Handle articles listing"""
-        return {
-            "articles": [],
-            "total": 0,
-            "limit": limit,
-            "skip": skip,
-            "filter": status_filter
-        }
-
-    async def _handle_articles_create(self, title: str, content: str, status: str = "draft"):
-        """Handle article creation"""
-        return {
-            "id": str(uuid.uuid4()),
-            "title": title,
-            "content": content,
-            "status": status,
-            "created_at": datetime.utcnow().isoformat()
-        }
 
     # Resource handlers
     async def _handle_system_info(self):

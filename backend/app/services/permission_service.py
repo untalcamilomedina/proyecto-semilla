@@ -184,26 +184,10 @@ class Permissions:
     TENANTS_WRITE = "tenants:write"
     TENANTS_DELETE = "tenants:delete"
 
-    # Article permissions
-    ARTICLES_READ = "articles:read"
-    ARTICLES_WRITE = "articles:write"
-    ARTICLES_DELETE = "articles:delete"
-    ARTICLES_PUBLISH = "articles:publish"
-
     # Role permissions
     ROLES_READ = "roles:read"
     ROLES_WRITE = "roles:write"
     ROLES_DELETE = "roles:delete"
-
-    # Category permissions
-    CATEGORIES_READ = "categories:read"
-    CATEGORIES_WRITE = "categories:write"
-    CATEGORIES_DELETE = "categories:delete"
-
-    # Comment permissions
-    COMMENTS_READ = "comments:read"
-    COMMENTS_WRITE = "comments:write"
-    COMMENTS_DELETE = "comments:delete"
 
     # System permissions
     SYSTEM_ADMIN = "system:admin"
@@ -215,9 +199,6 @@ class Permissions:
         return [
             cls.USERS_READ, cls.USERS_WRITE, cls.USERS_DELETE,
             cls.TENANTS_READ, cls.TENANTS_WRITE, cls.TENANTS_DELETE,
-            cls.ARTICLES_READ, cls.ARTICLES_WRITE, cls.ARTICLES_DELETE, cls.ARTICLES_PUBLISH,
             cls.ROLES_READ, cls.ROLES_WRITE, cls.ROLES_DELETE,
-            cls.CATEGORIES_READ, cls.CATEGORIES_WRITE, cls.CATEGORIES_DELETE,
-            cls.COMMENTS_READ, cls.COMMENTS_WRITE, cls.COMMENTS_DELETE,
             cls.SYSTEM_ADMIN, cls.SYSTEM_CONFIG
         ]

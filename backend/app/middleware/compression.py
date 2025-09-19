@@ -111,12 +111,7 @@ class HTTP2ServerPushMiddleware(BaseHTTPMiddleware):
     def __init__(self, app: Callable):
         super().__init__(app)
         self.push_resources = {
-            "/api/v1/articles": [
-                "</api/v1/categories>; rel=preload",
-                "</api/v1/users/me>; rel=preload"
-            ],
             "/api/v1/dashboard": [
-                "</api/v1/articles/popular>; rel=preload",
                 "</api/v1/analytics/overview>; rel=preload"
             ],
             "/": [

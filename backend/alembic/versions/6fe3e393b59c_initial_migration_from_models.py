@@ -93,25 +93,6 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_roles_tenant_id'), 'roles', ['tenant_id'], unique=False)
 
-    op.create_table('categories',
-    sa.Column('id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tenant_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('name', sa.VARCHAR(length=100), autoincrement=False, nullable=False),
-    sa.Column('slug', sa.VARCHAR(length=100), autoincrement=False, nullable=False),
-    sa.Column('description', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('color', sa.VARCHAR(length=7), autoincrement=False, nullable=True),
-    sa.Column('parent_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('order_index', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.Column('is_active', sa.BOOLEAN(), autoincrement=False, nullable=False),
-    sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.Column('updated_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], name='categories_tenant_id_fkey'),
-    sa.PrimaryKeyConstraint('id', name='categories_pkey'),
-    postgresql_ignore_search_path=False
-    )
-    op.create_index(op.f('ix_categories_tenant_id'), 'categories', ['tenant_id'], unique=False)
-    op.create_index(op.f('ix_categories_slug'), 'categories', ['slug'], unique=True)
-    op.create_index(op.f('ix_categories_name'), 'categories', ['name'], unique=False)
 
     op.create_table('refresh_tokens',
     sa.Column('id', sa.UUID(), autoincrement=False, nullable=False),
@@ -139,63 +120,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('user_roles_user_id_fkey')),
     sa.PrimaryKeyConstraint('id', name=op.f('user_roles_pkey'))
     )
-
-    op.create_table('articles',
-    sa.Column('id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tenant_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('title', sa.VARCHAR(length=200), autoincrement=False, nullable=False),
-    sa.Column('slug', sa.VARCHAR(length=200), autoincrement=False, nullable=False),
-    sa.Column('content', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('excerpt', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('author_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('category_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('seo_title', sa.VARCHAR(length=60), autoincrement=False, nullable=True),
-    sa.Column('seo_description', sa.VARCHAR(length=160), autoincrement=False, nullable=True),
-    sa.Column('featured_image', sa.VARCHAR(length=500), autoincrement=False, nullable=True),
-    sa.Column('status', sa.VARCHAR(length=20), autoincrement=False, nullable=False),
-    sa.Column('is_featured', sa.BOOLEAN(), autoincrement=False, nullable=False),
-    sa.Column('view_count', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.Column('comment_count', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.Column('like_count', sa.INTEGER(), autoincrement=False, nullable=False),
-    sa.Column('tags', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('published_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=True),
-    sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.Column('updated_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['author_id'], ['users.id'], name=op.f('articles_author_id_fkey')),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], name=op.f('articles_category_id_fkey')),
-    sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], name=op.f('articles_tenant_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('articles_pkey'))
-    )
-    op.create_index(op.f('ix_articles_title'), 'articles', ['title'], unique=False)
-    op.create_index(op.f('ix_articles_tenant_id'), 'articles', ['tenant_id'], unique=False)
-    op.create_index(op.f('ix_articles_status'), 'articles', ['status'], unique=False)
-    op.create_index(op.f('ix_articles_slug'), 'articles', ['slug'], unique=True)
-    op.create_index(op.f('ix_articles_category_id'), 'articles', ['category_id'], unique=False)
-    op.create_index(op.f('ix_articles_author_id'), 'articles', ['author_id'], unique=False)
-    op.create_index(op.f('idx_articles_tenant_status'), 'articles', ['tenant_id', 'status'], unique=False)
-    op.create_index(op.f('idx_articles_tenant_published'), 'articles', ['tenant_id', 'published_at'], unique=False)
-    op.create_index(op.f('idx_articles_author'), 'articles', ['author_id'], unique=False)
-
-    op.create_table('comments',
-    sa.Column('id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('tenant_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('article_id', sa.UUID(), autoincrement=False, nullable=False),
-    sa.Column('author_name', sa.VARCHAR(length=100), autoincrement=False, nullable=False),
-    sa.Column('author_email', sa.VARCHAR(length=255), autoincrement=False, nullable=True),
-    sa.Column('content', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('user_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('is_approved', sa.BOOLEAN(), autoincrement=False, nullable=False),
-    sa.Column('is_spam', sa.BOOLEAN(), autoincrement=False, nullable=False),
-    sa.Column('parent_id', sa.UUID(), autoincrement=False, nullable=True),
-    sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.Column('updated_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], name=op.f('comments_article_id_fkey')),
-    sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], name=op.f('comments_tenant_id_fkey')),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('comments_user_id_fkey')),
-    sa.PrimaryKeyConstraint('id', name=op.f('comments_pkey'))
-    )
-    op.create_index(op.f('ix_comments_tenant_id'), 'comments', ['tenant_id'], unique=False)
-    op.create_index(op.f('ix_comments_article_id'), 'comments', ['article_id'], unique=False)
 
     op.create_table('room_participants',
     sa.Column('id', sa.VARCHAR(length=36), autoincrement=False, nullable=False),
@@ -289,28 +213,11 @@ def downgrade() -> None:
     op.drop_table('room_messages')
     op.drop_index(op.f('ix_room_participants_id'), table_name='room_participants')
     op.drop_table('room_participants')
-    op.drop_index(op.f('ix_comments_article_id'), table_name='comments')
-    op.drop_index(op.f('ix_comments_tenant_id'), table_name='comments')
-    op.drop_table('comments')
-    op.drop_index(op.f('idx_articles_author'), table_name='articles')
-    op.drop_index(op.f('idx_articles_tenant_published'), table_name='articles')
-    op.drop_index(op.f('idx_articles_tenant_status'), table_name='articles')
-    op.drop_index(op.f('ix_articles_author_id'), table_name='articles')
-    op.drop_index(op.f('ix_articles_category_id'), table_name='articles')
-    op.drop_index(op.f('ix_articles_slug'), table_name='articles')
-    op.drop_index(op.f('ix_articles_status'), table_name='articles')
-    op.drop_index(op.f('ix_articles_tenant_id'), table_name='articles')
-    op.drop_index(op.f('ix_articles_title'), table_name='articles')
-    op.drop_table('articles')
     op.drop_table('user_roles')
     op.drop_index(op.f('ix_refresh_tokens_user_id'), table_name='refresh_tokens')
     op.drop_index(op.f('ix_refresh_tokens_token'), table_name='refresh_tokens')
     op.drop_index(op.f('ix_refresh_tokens_tenant_id'), table_name='refresh_tokens')
     op.drop_table('refresh_tokens')
-    op.drop_index(op.f('ix_categories_name'), table_name='categories')
-    op.drop_index(op.f('ix_categories_slug'), table_name='categories')
-    op.drop_index(op.f('ix_categories_tenant_id'), table_name='categories')
-    op.drop_table('categories')
     op.drop_index(op.f('ix_roles_tenant_id'), table_name='roles')
     op.drop_table('roles')
     op.drop_index(op.f('ix_users_email'), table_name='users')

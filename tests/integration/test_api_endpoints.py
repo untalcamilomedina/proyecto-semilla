@@ -75,129 +75,6 @@ class TestAuthentication:
         assert "token_type" in data
 
 
-@pytest.mark.integration
-class TestArticlesAPI:
-    """Test articles CRUD operations"""
-
-    def test_get_articles_unauthorized(self, test_client):
-        """Test getting articles without authentication"""
-        response = test_client.get("/api/v1/articles")
-        assert response.status_code == 401
-
-    def test_get_articles_authorized(self, test_client, auth_headers):
-        """Test getting articles with authentication"""
-        response = test_client.get("/api/v1/articles", headers=auth_headers)
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-
-    def test_create_article(self, test_client, auth_headers):
-        """Test creating a new article"""
-        article_data = {
-            "title": "Test Article",
-            "slug": "test-article",
-            "content": "This is test content",
-            "excerpt": "Test excerpt",
-            "status": "draft",
-            "is_featured": False,
-            "tags": ["test", "article"]
-        }
-
-        response = test_client.post(
-            "/api/v1/articles",
-            json=article_data,
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["title"] == article_data["title"]
-        assert data["slug"] == article_data["slug"]
-        assert "id" in data
-
-    def test_get_article_by_id(self, test_client, auth_headers, test_article):
-        """Test getting article by ID"""
-        response = test_client.get(
-            f"/api/v1/articles/{test_article.id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["id"] == str(test_article.id)
-        assert data["title"] == test_article.title
-
-    def test_update_article(self, test_client, auth_headers, test_article):
-        """Test updating an article"""
-        update_data = {
-            "title": "Updated Test Article",
-            "content": "Updated content"
-        }
-
-        response = test_client.put(
-            f"/api/v1/articles/{test_article.id}",
-            json=update_data,
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["title"] == update_data["title"]
-
-    def test_delete_article(self, test_client, auth_headers, test_article):
-        """Test deleting an article"""
-        response = test_client.delete(
-            f"/api/v1/articles/{test_article.id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-
-        # Verify article is deleted
-        response = test_client.get(
-            f"/api/v1/articles/{test_article.id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 404
-
-    def test_get_article_stats(self, test_client, auth_headers):
-        """Test getting article statistics"""
-        response = test_client.get(
-            "/api/v1/articles/stats/overview",
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert "total_articles" in data
-        assert "published_articles" in data
-        assert "draft_articles" in data
-        assert "total_views" in data
-
-
-@pytest.mark.integration
-class TestCategoriesAPI:
-    """Test categories CRUD operations"""
-
-    def test_get_categories(self, test_client, auth_headers):
-        """Test getting categories"""
-        response = test_client.get("/api/v1/categories", headers=auth_headers)
-        assert response.status_code == 200
-        data = response.json()
-        assert isinstance(data, list)
-
-    def test_create_category(self, test_client, auth_headers):
-        """Test creating a category"""
-        category_data = {
-            "name": "Test Category",
-            "slug": "test-category",
-            "description": "Test category description"
-        }
-
-        response = test_client.post(
-            "/api/v1/categories",
-            json=category_data,
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["name"] == category_data["name"]
-        assert data["slug"] == category_data["slug"]
 
 
 @pytest.mark.integration
@@ -252,73 +129,15 @@ class TestRolesAPI:
 class TestMultiTenantIsolation:
     """Test multi-tenant data isolation"""
 
-    def test_tenant_isolation_articles(self, test_client, auth_headers):
-        """Test that users can only access their tenant's articles"""
-        # Create article for test tenant
-        article_data = {
-            "title": "Tenant Article",
-            "slug": "tenant-article",
-            "content": "Content for tenant",
-            "excerpt": "Tenant excerpt",
-            "status": "published",
-            "is_featured": False,
-            "tags": ["tenant", "test"]
-        }
-
-        response = test_client.post(
-            "/api/v1/articles",
-            json=article_data,
-            headers=auth_headers
-        )
-        assert response.status_code == 200
-
-        # Get articles and verify tenant isolation
-        response = test_client.get("/api/v1/articles", headers=auth_headers)
-        assert response.status_code == 200
-        articles = response.json()
-
-        # All returned articles should belong to the test tenant
-        for article in articles:
-            assert "tenant_id" in article
 
 
 @pytest.mark.integration
 class TestErrorHandling:
     """Test error handling and validation"""
 
-    def test_invalid_article_slug(self, test_client, auth_headers):
-        """Test creating article with invalid slug"""
-        article_data = {
-            "title": "Test Article",
-            "slug": "invalid slug with spaces",  # Invalid slug
-            "content": "Test content",
-            "excerpt": "Test excerpt",
-            "status": "draft",
-            "is_featured": False,
-            "tags": ["test"]
-        }
-
-        response = test_client.post(
-            "/api/v1/articles",
-            json=article_data,
-            headers=auth_headers
-        )
-        # Should return validation error
-        assert response.status_code in [400, 422]
-
-    def test_article_not_found(self, test_client, auth_headers):
-        """Test accessing non-existent article"""
-        fake_id = str(uuid4())
-        response = test_client.get(
-            f"/api/v1/articles/{fake_id}",
-            headers=auth_headers
-        )
-        assert response.status_code == 404
-
     def test_unauthorized_access(self, test_client):
         """Test accessing protected endpoints without auth"""
         endpoints = [
-            "/api/v1/articles",
             "/api/v1/users",
             "/api/v1/tenants",
             "/api/v1/roles"

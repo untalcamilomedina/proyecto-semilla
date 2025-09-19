@@ -177,55 +177,19 @@ class ErrorHandler:
         """Get fallback data for degraded operations"""
         try:
             # Try to get cached data or provide sensible defaults
-            if "articles" in str(request.url):
-                return await self._get_articles_fallback()
-            elif "users" in str(request.url):
+            if "users" in str(request.url):
                 return await self._get_users_fallback()
-            elif "categories" in str(request.url):
-                return await self._get_categories_fallback()
             else:
                 return {"status": "degraded_mode"}
         except Exception as e:
             logger.error(f"Error getting fallback data: {e}")
             return {"status": "degraded_mode"}
 
-    async def _get_articles_fallback(self) -> Dict[str, Any]:
-        """Get fallback data for articles"""
-        # In a real implementation, this would fetch from cache
-        return {
-            "articles": [
-                {
-                    "id": "fallback-1",
-                    "title": "Service Temporarily Unavailable",
-                    "content": "Please try again in a few moments.",
-                    "status": "published",
-                    "created_at": "2024-01-01T00:00:00Z"
-                }
-            ],
-            "total": 1,
-            "status": "degraded"
-        }
-
     async def _get_users_fallback(self) -> Dict[str, Any]:
         """Get fallback data for users"""
         return {
             "users": [],
             "total": 0,
-            "status": "degraded"
-        }
-
-    async def _get_categories_fallback(self) -> Dict[str, Any]:
-        """Get fallback data for categories"""
-        return {
-            "categories": [
-                {
-                    "id": "fallback-1",
-                    "name": "General",
-                    "slug": "general",
-                    "description": "General category"
-                }
-            ],
-            "total": 1,
             "status": "degraded"
         }
 
