@@ -52,8 +52,18 @@ export const useAuthStore = create<AuthState>()(
     register: async (userData: UserRegister) => {
       set({ isLoading: true, error: null });
       try {
-        const user = await apiClient.register(userData);
-        set({ user, isAuthenticated: true, isLoading: false });
+        // Register the user
+        await apiClient.register(userData);
+
+        // After successful registration, automatically login with the same credentials
+        // This will set the authentication cookies that the backend middleware expects
+        const formData = new FormData();
+        formData.append('username', userData.email);
+        formData.append('password', userData.password);
+        await apiClient.login(formData);
+
+        // Now refresh user data and set authenticated state
+        await get().refreshUser();
       } catch (error: any) {
         set({
           isLoading: false,

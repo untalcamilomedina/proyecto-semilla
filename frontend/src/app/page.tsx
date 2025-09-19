@@ -7,37 +7,69 @@ import { apiClient } from '@/lib/api-client';
 import { UserRegister } from '@/types/api';
 
 export default function HomePage() {
+  console.log('🏠 HomePage component rendered');
+
   const router = useRouter();
   const { login, register, isAuthenticated, isLoading, error, clearError } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
+  const [passwordError, setPasswordError] = useState('');
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(true); // Default to true for first-time setup
   const [setupLoading, setSetupLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    console.log('🔐 Estado de autenticación:', { isAuthenticated, isLoading, authInitialized });
+    // Only redirect if auth is initialized and user is authenticated
+    if (authInitialized && isAuthenticated && !isLoading) {
+      console.log('🔄 Redirigiendo a dashboard...');
       router.replace('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, authInitialized, router]);
 
   useEffect(() => {
-    // Check if system needs initial setup
+    // Mark auth as initialized when loading is complete
+    if (!isLoading && !authInitialized) {
+      console.log('✅ Autenticación inicializada');
+      setAuthInitialized(true);
+    }
+  }, [isLoading, authInitialized]);
+
+  useEffect(() => {
+    // Check if system needs initial setup immediately
     const checkSetupStatus = async () => {
+      console.log('🔍 Iniciando verificación de setup status...');
+
       try {
+        console.log('📡 Llamando a apiClient.getSetupStatus()...');
         const status = await apiClient.getSetupStatus();
+        console.log('✅ Setup status recibido:', status);
         setNeedsSetup(status.needs_setup);
       } catch (error) {
-        console.error('Error checking setup status:', error);
-        // If we can't check setup status, assume it needs setup
+        console.error('❌ Error checking setup status:', error);
+        // If we can't check setup status, assume it needs setup for first-time users
+        console.log('⚠️ Asumiendo que necesita setup debido al error');
         setNeedsSetup(true);
       } finally {
         setSetupLoading(false);
       }
     };
 
+    // Execute immediately without delay
     checkSetupStatus();
+
+    // Fallback: if it takes too long, assume setup is needed
+    const timeout = setTimeout(() => {
+      if (setupLoading) {
+        console.log('⏰ Timeout: asumiendo que necesita setup');
+        setNeedsSetup(true);
+        setSetupLoading(false);
+      }
+    }, 3000); // 3 seconds timeout
+
+    return () => clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
@@ -59,27 +91,78 @@ export default function HomePage() {
     }
   };
 
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'La contraseña debe contener al menos una letra mayúscula';
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'La contraseña debe contener al menos una letra minúscula';
+    }
+    if (!/\d/.test(password)) {
+      return 'La contraseña debe contener al menos un número';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return 'La contraseña debe contener al menos un carácter especial';
+    }
+    return null;
+  };
+
   const handleSetup = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    setPasswordError('');
+
+    console.log('🚀 Iniciando proceso de registro...');
+    console.log('📝 Datos del formulario:', { email, firstName, lastName, passwordLength: password.length });
+
+    // Validate password
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      console.log('❌ Error de validación de contraseña:', passwordValidationError);
+      setPasswordError(passwordValidationError);
+      return;
+    }
+
+    console.log('✅ Validación de contraseña exitosa');
+
     try {
-      const userData = {
+      const userData: UserRegister = {
         email,
         password,
-        nombre_completo: `${firstName} ${lastName}`.trim(),
         first_name: firstName,
         last_name: lastName,
-        tenant_id: undefined // Let backend handle tenant creation
-      } as UserRegister & {
-        nombre_completo: string;
-        tenant_id: undefined;
+        // tenant_id is optional and will be handled by backend
       };
+
+      console.log('📡 Enviando datos de registro al backend:', { ...userData, password: '[REDACTED]' });
       await register(userData);
+
       // Success! The useEffect above will handle the redirect to dashboard
       console.log('✅ Superadministrador creado exitosamente');
-    } catch (err) {
-      // Error is already set in the store, just log it for debugging
-      console.error('Setup failed', err);
+    } catch (err: any) {
+      console.error('❌ Error en el registro:', err);
+
+      // Log detailed error information
+      if (err?.response) {
+        console.error('📋 Respuesta del servidor:', {
+          status: err.response.status,
+          statusText: err.response.statusText,
+          data: err.response.data,
+          headers: err.response.headers
+        });
+      } else if (err?.request) {
+        console.error('📡 Error de red - no se recibió respuesta:', err.request);
+      } else {
+        console.error('⚙️ Error de configuración:', err.message);
+      }
+
+      // Also set a more user-friendly error if the store error is not clear
+      if (!error && err?.response?.data?.detail) {
+        console.error('Setting fallback error:', err.response.data.detail);
+      }
     }
   };
 
@@ -90,13 +173,25 @@ export default function HomePage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Verificando configuración del sistema...</p>
+          <p className="text-sm text-gray-500 mt-2">Si tarda demasiado, el wizard aparecerá automáticamente</p>
+          {/* Force show setup wizard after 5 seconds */}
+          <script dangerouslySetInnerHTML={{
+            __html: `
+              setTimeout(() => {
+                const loadingElement = document.querySelector('.animate-spin');
+                if (loadingElement) {
+                  window.location.reload();
+                }
+              }, 5000);
+            `
+          }} />
         </div>
       </div>
     );
   }
 
-  // Show setup form if system needs initial setup
-  if (needsSetup) {
+  // Show setup form if system needs initial setup (default to true for first-time users)
+  if (needsSetup !== false) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="w-full max-w-lg p-8 space-y-8 bg-white rounded-xl shadow-2xl border border-gray-200">
@@ -167,9 +262,20 @@ export default function HomePage() {
                 autoComplete="new-password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError(''); // Clear password error on change
+                }}
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                  passwordError ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
+                }`}
               />
+              {passwordError && (
+                <p className="mt-1 text-sm text-red-600">{passwordError}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">
+                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
+              </p>
             </div>
 
             {error && (

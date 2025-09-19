@@ -108,7 +108,9 @@ async def tenant_context_middleware(request: Request, call_next):
         request.url.path.startswith("/api/v1/auth/register") or
         request.url.path.startswith("/api/v1/auth/refresh") or
         request.url.path.startswith("/api/v1/auth/logout") or
-        request.url.path.startswith("/api/v1/auth/logout-all")):
+        request.url.path.startswith("/api/v1/auth/logout-all") or
+        request.url.path.startswith("/api/v1/auth/setup-status") or
+        request.url.path.startswith("/api/v1/tenants/user-tenants")):
         return await call_next(request)
 
     response = Response("Internal server error", status_code=500)
@@ -127,7 +129,18 @@ async def tenant_context_middleware(request: Request, call_next):
 
         if not token:
             # For endpoints that require auth but no token provided
-            if request.url.path.startswith("/api/v1/") and not request.url.path.startswith("/api/v1/auth/login"):
+            # Skip auth check for endpoints in exceptions
+            requires_auth = (
+                request.url.path.startswith("/api/v1/") and
+                not request.url.path.startswith("/api/v1/auth/login") and
+                not request.url.path.startswith("/api/v1/auth/register") and
+                not request.url.path.startswith("/api/v1/auth/refresh") and
+                not request.url.path.startswith("/api/v1/auth/logout") and
+                not request.url.path.startswith("/api/v1/auth/logout-all") and
+                not request.url.path.startswith("/api/v1/auth/setup-status") and
+                not request.url.path.startswith("/api/v1/tenants/user-tenants")
+            )
+            if requires_auth:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Authentication required",
@@ -195,8 +208,8 @@ async def rate_limiting_middleware(request: Request, call_next):
     """
     Redis-based rate limiting middleware
     """
-    # Skip rate limiting for health checks
-    if request.url.path in ["/health", "/api/v1/health", "/api/v1/health/detailed"]:
+    # Skip rate limiting for health checks and user-tenants endpoint
+    if request.url.path in ["/health", "/api/v1/health", "/api/v1/health/detailed", "/api/v1/tenants/user-tenants"]:
         return await call_next(request)
 
     client_ip = request.client.host if request.client else "unknown"

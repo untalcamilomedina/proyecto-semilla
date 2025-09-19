@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
+        "http://localhost:7701",
+        "http://localhost:7777",
     ]
 
     # This field is added to prevent Pydantic from throwing an "extra inputs not permitted"
@@ -57,7 +59,7 @@ class Settings(BaseSettings):
         return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # Redis Configuration
-    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://redis:6379")
 
     # Rate Limiting Configuration
     RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "100"))

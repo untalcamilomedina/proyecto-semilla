@@ -20,8 +20,7 @@ import {
   CategoryUpdate,
   LoginResponse,
   SwitchTenantResponse,
-  UserRoleResponse,
-  HealthCheckResponse
+  UserRoleResponse
 } from '../types/api';
 
 

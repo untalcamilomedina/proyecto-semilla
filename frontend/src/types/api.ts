@@ -138,7 +138,7 @@ export interface UserRegister {
   first_name: string;
   last_name: string;
   password: string;
-  tenant_id: string;
+  tenant_id?: string;
 }
 
 export interface UserUpdate {
