@@ -13,7 +13,7 @@
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "type-check": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "echo 'Skipping husky in production'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

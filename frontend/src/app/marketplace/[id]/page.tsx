@@ -377,9 +377,9 @@ export default function ModuleDetailsPage() {
                 </Button>
               )}
 
-              {module.repository && (
+              {module.module.repository && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={module.repository} target="_blank" rel="noopener noreferrer">
+                  <a href={module.module.repository} target="_blank" rel="noopener noreferrer">
                     Código fuente
                   </a>
                 </Button>

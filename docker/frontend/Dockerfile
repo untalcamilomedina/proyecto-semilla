@@ -70,8 +70,9 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copiar built application
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 # Cambiar a usuario no privilegiado
 USER nextjs
@@ -88,4 +89,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
 # Comando para ejecutar la aplicación
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

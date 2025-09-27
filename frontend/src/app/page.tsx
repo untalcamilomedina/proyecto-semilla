@@ -47,13 +47,15 @@ export default function HomePage() {
         const status = await apiClient.getSetupStatus();
         console.log('✅ Setup status recibido:', status);
         setNeedsSetup(status.needs_setup);
+        setSetupLoading(false);
+        return true; // Success
       } catch (error) {
         console.error('❌ Error checking setup status:', error);
         // If we can't check setup status, assume it needs setup for first-time users
         console.log('⚠️ Asumiendo que necesita setup debido al error');
         setNeedsSetup(true);
-      } finally {
         setSetupLoading(false);
+        return false; // Error
       }
     };
 
@@ -62,12 +64,10 @@ export default function HomePage() {
 
     // Fallback: if it takes too long, assume setup is needed
     const timeout = setTimeout(() => {
-      if (setupLoading) {
-        console.log('⏰ Timeout: asumiendo que necesita setup');
-        setNeedsSetup(true);
-        setSetupLoading(false);
-      }
-    }, 3000); // 3 seconds timeout
+      console.log('⏰ Timeout: asumiendo que el sistema está configurado');
+      setNeedsSetup(false);
+      setSetupLoading(false);
+    }, 5000); // 5 seconds timeout
 
     return () => clearTimeout(timeout);
   }, []);
