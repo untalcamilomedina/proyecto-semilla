@@ -297,7 +297,7 @@ async def register(
         description=f"User registration successful: {email}",
         user_id=str(user_id),
         tenant_id=tenant_id,
-        metadata={
+        event_metadata={
             "action": "user_registration",
             "email": email,
             "ip_address": client_ip,
