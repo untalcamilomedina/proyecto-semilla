@@ -14,8 +14,8 @@ export const columns: ColumnDef<Tenant>[] = [
     header: "Nombre",
   },
   {
-    accessorKey: "domain",
-    header: "Dominio",
+    accessorKey: "description",
+    header: "Descripción",
   },
   {
     id: "actions",

@@ -26,7 +26,7 @@ import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
-  domain: z.string().optional(),
+  description: z.string().optional(),
 });
 
 interface TenantFormProps {
@@ -41,7 +41,7 @@ export function TenantForm({ tenant, isOpen, onClose }: TenantFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      domain: "",
+      description: "",
     },
   });
 
@@ -49,12 +49,12 @@ export function TenantForm({ tenant, isOpen, onClose }: TenantFormProps) {
     if (tenant) {
       form.reset({
         name: tenant.name,
-        domain: tenant.domain,
+        description: tenant.description ?? "",
       });
     } else {
       form.reset({
         name: "",
-        domain: "",
+        description: "",
       });
     }
   }, [tenant, form]);
@@ -62,14 +62,23 @@ export function TenantForm({ tenant, isOpen, onClose }: TenantFormProps) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (tenant) {
-        const updatedTenant: TenantUpdate = { ...values };
+        const updatedTenant: TenantUpdate = {
+          name: values.name,
+          description: values.description,
+        };
         await apiClient.updateTenant(tenant.id, updatedTenant);
         toast({
           title: "Inquilino actualizado",
           description: "El inquilino se ha actualizado correctamente.",
         });
       } else {
-        const newTenant: TenantCreate = { ...values, slug: values.name.toLowerCase().replace(/\s/g, "-") };
+        const newTenant: TenantCreate = {
+          name: values.name,
+          slug: values.name.toLowerCase().replace(/\s/g, "-"),
+          description: values.description,
+          settings: "{}",
+          is_active: true,
+        };
         await apiClient.createTenant(newTenant);
         toast({
           title: "Inquilino creado",
@@ -110,12 +119,12 @@ export function TenantForm({ tenant, isOpen, onClose }: TenantFormProps) {
             />
             <FormField
               control={form.control}
-              name="domain"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dominio</FormLabel>
+                  <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Input placeholder="dominio.com" {...field} />
+                    <Input placeholder="Descripción del inquilino" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

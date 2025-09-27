@@ -21,14 +21,13 @@ export interface Article {
   title: string;
   slug: string;
   content: string;
-  excerpt: string;
+  excerpt?: string;
   author_id: string;
   category_id?: string;
-  seo_title?: string;
-  seo_description?: string;
+  meta_title?: string;
+  meta_description?: string;
   featured_image?: string;
-  status: 'draft' | 'published' | 'review';
-  is_featured: boolean;
+  status: 'draft' | 'published' | 'archived';
   view_count: number;
   comment_count: number;
   like_count: number;
@@ -44,14 +43,15 @@ export interface ArticleCreate {
   title: string;
   slug: string;
   content: string;
-  excerpt: string;
+  excerpt?: string;
   category_id?: string;
-  seo_title?: string;
-  seo_description?: string;
+  meta_title?: string;
+  meta_description?: string;
   featured_image?: string;
-  status: 'draft' | 'published' | 'review';
-  is_featured: boolean;
+  status: 'draft' | 'published' | 'archived';
   tags: string[];
+  tenant_id: string;
+  author_id: string;
 }
 
 export interface ArticleUpdate {
@@ -60,11 +60,10 @@ export interface ArticleUpdate {
   content?: string;
   excerpt?: string;
   category_id?: string;
-  seo_title?: string;
-  seo_description?: string;
+  meta_title?: string;
+  meta_description?: string;
   featured_image?: string;
-  status?: 'draft' | 'published' | 'review' | 'archived';
-  is_featured?: boolean;
+  status?: 'draft' | 'published' | 'archived';
   tags?: string[];
 }
 
@@ -109,28 +108,87 @@ export interface CategoryUpdate {
   parent_id?: string;
 }
 
+// Comment Types
+export interface Comment {
+  id: string;
+  tenant_id: string;
+  article_id: string;
+  author_id: string;
+  parent_id?: string;
+  content: string;
+  status: 'pending' | 'approved' | 'rejected' | 'spam';
+  author_name: string;
+  author_email?: string;
+  like_count: number;
+  reply_count: number;
+  is_edited: string;
+  created_at: string;
+  updated_at: string;
+  article_title?: string;
+  parent_author_name?: string;
+}
+
+export interface CommentCreate {
+  article_id: string;
+  content: string;
+  parent_id?: string;
+  author_email?: string;
+}
+
+export interface CommentUpdate {
+  content?: string;
+  status?: 'pending' | 'approved' | 'rejected' | 'spam';
+}
+
+export interface CommentThread {
+  id: string;
+  content: string;
+  status: string;
+  author_id: string;
+  author_name: string;
+  author_email?: string;
+  parent_id?: string;
+  like_count: number;
+  is_edited: string;
+  created_at: string;
+  updated_at: string;
+  replies: CommentThread[];
+}
+
+export interface CommentStats {
+  total_comments: number;
+  pending_comments: number;
+  approved_comments: number;
+  rejected_comments: number;
+  spam_comments: number;
+  total_likes: number;
+  average_thread_depth: number;
+}
+
 // User Types
 export interface User {
   id: string;
   tenant_id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  full_name?: string | null;
   avatar?: string;
   is_active: boolean;
-  role_id: string;
-  created_at: string;
-  updated_at: string;
+  is_verified?: boolean;
+  role_ids?: string[];
+  created_at?: string;
+  updated_at?: string;
   role_name?: string;
 }
 
 export interface UserCreate {
   email: string;
   first_name: string;
-  last_name: string;
+  last_name?: string;
   password: string;
-  role_id: string;
+  tenant_id: string;
+  role_ids?: string[];
 }
 
 export interface UserRegister {
@@ -146,7 +204,7 @@ export interface UserUpdate {
   first_name?: string;
   last_name?: string;
   is_active?: boolean;
-  role_id?: string;
+  role_ids?: string[];
 }
 
 // Tenant Types
@@ -154,25 +212,27 @@ export interface Tenant {
   id: string;
   name: string;
   slug: string;
-  domain?: string;
-  logo?: string;
+  description?: string | null;
+  parent_tenant_id?: string | null;
+  settings?: string;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface TenantCreate {
   name: string;
   slug: string;
-  domain?: string;
-  logo?: string;
+  description?: string;
+  parent_tenant_id?: string;
+  settings?: string;
+  is_active?: boolean;
 }
 
 export interface TenantUpdate {
   name?: string;
-  slug?: string;
-  domain?: string;
-  logo?: string;
+  description?: string;
+  settings?: string;
   is_active?: boolean;
 }
 
@@ -266,8 +326,11 @@ export interface HealthCheckResponse {
 export interface ArticleQueryParams {
   skip?: number;
   limit?: number;
-  status_filter?: 'draft' | 'published' | 'review';
+  status?: 'draft' | 'published' | 'archived';
   category_id?: string;
+  author_id?: string;
+  search?: string;
+  published_only?: boolean;
 }
 
 export interface PaginationParams {

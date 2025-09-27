@@ -18,6 +18,11 @@ import {
   Category,
   CategoryCreate,
   CategoryUpdate,
+  Comment,
+  CommentCreate,
+  CommentUpdate,
+  CommentThread,
+  CommentStats,
   LoginResponse,
   SwitchTenantResponse,
   UserRoleResponse
@@ -29,7 +34,7 @@ class ApiClient {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777',
+      baseURL: '', // Use relative URLs for proxy in development
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +219,7 @@ class ApiClient {
   }
 
   async switchTenant(tenantId: string): Promise<SwitchTenantResponse> {
-    const response: AxiosResponse<SwitchTenantResponse> = await this.axiosInstance.post(`/api/v1/auth/switch-tenant/${tenantId}`);
+    const response: AxiosResponse<SwitchTenantResponse> = await this.axiosInstance.post(`/api/v1/tenants/switch/${tenantId}`);
     return response.data;
   }
 
@@ -285,6 +290,46 @@ class ApiClient {
   // User permissions
   async getUserPermissions(): Promise<{ permissions: string[] }> {
     const response: AxiosResponse<{ permissions: string[] }> = await this.axiosInstance.get('/api/v1/auth/permissions');
+    return response.data;
+  }
+
+  // Comments
+  async getComments(params?: { article_id?: string; status?: string; skip?: number; limit?: number }): Promise<Comment[]> {
+    const response: AxiosResponse<Comment[]> = await this.axiosInstance.get('/api/v1/comments', { params });
+    return response.data;
+  }
+
+  async getComment(id: string): Promise<Comment> {
+    const response: AxiosResponse<Comment> = await this.axiosInstance.get(`/api/v1/comments/${id}`);
+    return response.data;
+  }
+
+  async getCommentThread(articleId: string): Promise<CommentThread[]> {
+    const response: AxiosResponse<CommentThread[]> = await this.axiosInstance.get(`/api/v1/comments/thread/${articleId}`);
+    return response.data;
+  }
+
+  async createComment(comment: CommentCreate): Promise<Comment> {
+    const response: AxiosResponse<Comment> = await this.axiosInstance.post('/api/v1/comments', comment);
+    return response.data;
+  }
+
+  async updateComment(id: string, comment: CommentUpdate): Promise<Comment> {
+    const response: AxiosResponse<Comment> = await this.axiosInstance.put(`/api/v1/comments/${id}`, comment);
+    return response.data;
+  }
+
+  async deleteComment(id: string): Promise<void> {
+    await this.axiosInstance.delete(`/api/v1/comments/${id}`);
+  }
+
+  async getCommentStats(): Promise<CommentStats> {
+    const response: AxiosResponse<CommentStats> = await this.axiosInstance.get('/api/v1/comments/stats');
+    return response.data;
+  }
+
+  async bulkUpdateComments(data: { comment_ids: string[]; status: string }): Promise<{ message: string }> {
+    const response: AxiosResponse<{ message: string }> = await this.axiosInstance.post('/api/v1/comments/bulk-update', data);
     return response.data;
   }
 

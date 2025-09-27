@@ -9,9 +9,9 @@ import { User } from '@/types/api';
 
 // Definir los tipos para los datos del dashboard
 interface DashboardMetrics {
-  userCount: number;
-  tenantCount: number;
-  roleCount: number;
+  user_count: number;
+  tenant_count: number;
+  role_count: number;
 }
 
 interface UsersOverTimeData {
@@ -42,9 +42,9 @@ export default function DashboardPage() {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Users" value={metrics?.userCount || 0} icon={Users} />
-        <StatCard title="Total Tenants" value={metrics?.tenantCount || 0} icon={Building2} />
-        <StatCard title="Total Roles" value={metrics?.roleCount || 0} icon={Shield} />
+        <StatCard title="Total Users" value={metrics?.user_count || 0} icon={Users} />
+        <StatCard title="Total Tenants" value={metrics?.tenant_count || 0} icon={Building2} />
+        <StatCard title="Total Roles" value={metrics?.role_count || 0} icon={Shield} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

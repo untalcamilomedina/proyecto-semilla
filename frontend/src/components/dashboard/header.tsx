@@ -10,8 +10,8 @@ import { TenantSwitcher } from './tenant-switcher';
 
 interface HeaderProps {
   user?: {
-    first_name: string;
-    last_name: string;
+    first_name?: string | null;
+    last_name?: string | null;
     email: string;
   };
 }
@@ -25,8 +25,11 @@ export function Header({ user }: HeaderProps) {
     router.push('/');
   };
 
-  const userInitials = user
-    ? `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase()
+  const firstName = user?.first_name ?? '';
+  const lastName = user?.last_name ?? '';
+
+  const userInitials = (firstName || lastName)
+    ? `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
     : 'U';
 
   return (
@@ -60,7 +63,9 @@ export function Header({ user }: HeaderProps) {
         <div className="flex items-center space-x-3">
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">
-              {user ? `${user.first_name} ${user.last_name}` : 'Usuario'}
+              {(firstName || lastName)
+                ? `${firstName} ${lastName}`.trim()
+                : 'Usuario'}
             </p>
             <p className="text-xs text-gray-500">
               {user?.email || 'usuario@ejemplo.com'}
