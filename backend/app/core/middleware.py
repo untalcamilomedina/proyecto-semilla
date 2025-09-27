@@ -12,7 +12,7 @@ from sqlalchemy import text
 from jose import jwt, JWTError
 
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, set_tenant_context
 from app.core.logging import get_logger
 from app.core.cookies import get_cookie_manager
 from app.models.user import User
@@ -164,9 +164,11 @@ async def tenant_context_middleware(request: Request, call_next):
                 )
 
             # Add tenant and user info to request state
-            # The actual database verification will happen in the endpoint dependencies
             request.state.tenant_id = tenant_id
             request.state.user_id = user_id
+
+            # Set tenant context for RLS using context variable
+            set_tenant_context(tenant_id)
 
         except JWTError as e:
             logger.warning(f"JWT validation failed: {e}")

@@ -105,6 +105,10 @@ class Settings(BaseSettings):
     SEED_ADMIN_PASSWORD: str = "admin123"
     SEED_DEMO_PASSWORD: str = "demo123"
 
+    # Testing helpers
+    TEST_USER_EMAIL: str = "admin@example.com"
+    TEST_USER_PASSWORD: str = "admin123"
+
     # System Users Configuration - NEW SECURE APPROACH
     SEED_ADMIN_EMAIL: Optional[str] = None
     SEED_ADMIN_FIRST_NAME: str = "Super"
@@ -119,21 +123,29 @@ class Settings(BaseSettings):
 
     @field_validator("SEED_ADMIN_EMAIL", mode="after")
     @classmethod
-    def validate_admin_email(cls, v: Optional[str]) -> Optional[str]:
+    def validate_admin_email(cls, v: Optional[str], info: ValidationInfo) -> Optional[str]:
         """Validate admin email when migration is enabled"""
-        if cls.HARDCODED_USERS_MIGRATION_ENABLED and not v:
-            raise ValueError("SEED_ADMIN_EMAIL is required when HARDCODED_USERS_MIGRATION_ENABLED=true")
+        migration_enabled = info.data.get("HARDCODED_USERS_MIGRATION_ENABLED")
+        if migration_enabled and not v:
+            raise ValueError(
+                "SEED_ADMIN_EMAIL is required when HARDCODED_USERS_MIGRATION_ENABLED=true"
+            )
         return v
 
     @field_validator("SEED_ADMIN_PASSWORD", mode="after")
     @classmethod
-    def validate_admin_password(cls, v: str) -> str:
+    def validate_admin_password(cls, v: str, info: ValidationInfo) -> str:
         """Validate admin password strength when migration is enabled"""
-        if cls.HARDCODED_USERS_MIGRATION_ENABLED:
+        migration_enabled = info.data.get("HARDCODED_USERS_MIGRATION_ENABLED")
+        if migration_enabled:
             if len(v) < 12:
-                raise ValueError("SEED_ADMIN_PASSWORD must be at least 12 characters when migration is enabled")
+                raise ValueError(
+                    "SEED_ADMIN_PASSWORD must be at least 12 characters when migration is enabled"
+                )
             if v == "admin123":
-                raise ValueError("SEED_ADMIN_PASSWORD cannot use default insecure value when migration is enabled")
+                raise ValueError(
+                    "SEED_ADMIN_PASSWORD cannot use default insecure value when migration is enabled"
+                )
         return v
 
     class Config:

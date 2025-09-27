@@ -119,6 +119,10 @@ backend/mcp/
 git clone https://github.com/proyecto-semilla/proyecto-semilla.git
 cd proyecto-semilla
 
+# 2. Configurar variables de entorno
+cp .env.example .env
+# Edita .env con un JWT_SECRET fuerte y credenciales locales
+
 # 2. Ejecutar el script de inicio
 ./start.sh
 
@@ -158,6 +162,11 @@ docker-compose down --volumes
 - ✅ Docker y Docker Compose
 - ✅ Python 3.11+ (incluido en el instalador automático)
 - ✅ Node.js 18+ (opcional, solo para desarrollo local)
+
+### 🔐 Configuración de variables de entorno
+- Copia `.env.example` a `.env` y actualiza los valores obligatorios (`DB_PASSWORD`, `JWT_SECRET`).
+- Si ejecutarás pruebas automáticas, define también `TEST_USER_EMAIL` y `TEST_USER_PASSWORD`.
+- Para entornos Docker, asegúrate de exportar estas variables antes de lanzar `docker-compose` si no usas el archivo `.env`.
 
 📖 **Para instrucciones detalladas, consulta [INSTALL.md](./INSTALL.md)**
 
@@ -207,11 +216,11 @@ Password: demo123
 - [x] Jerarquías de roles automáticas
 - [x] Asignación flexible usuario-rol
 
-### ✅ **Dashboard Administrativo Avanzado**
-- [x] Métricas en tiempo real
-- [x] Gráficos interactivos y estadísticas
+### ✅ **Dashboard Administrativo Minimalista**
+- [x] Métricas core en tiempo real
 - [x] Vista consolidada multi-tenant
 - [x] Componentes reutilizables optimizados
+- [x] Interfaz elegante y funcional
 
 ### ✅ **Sistema Vibecoding (EXCLUSIVO MUNDIAL)**
 - [x] MCP Server completamente funcional

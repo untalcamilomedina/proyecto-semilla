@@ -27,6 +27,13 @@ from app.schemas.auth import TokenResponse
 router = APIRouter()
 
 
+def _to_iso(value):
+    """Convierte valores datetime en cadenas ISO8601 cuando aplica."""
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    return value
+
+
 @router.get("/", response_model=List[TenantResponse])
 async def read_tenants(
     request: Request,
@@ -66,8 +73,8 @@ async def read_tenants(
             "parent_tenant_id": str(row[4]) if row[4] else None,
             "settings": row[5] or "{}",
             "is_active": row[6],
-            "created_at": row[7].isoformat() if row[7] else None,
-            "updated_at": row[8].isoformat() if row[8] else None
+            "created_at": _to_iso(row[7]),
+            "updated_at": _to_iso(row[8]),
         })
 
     return tenant_list
@@ -85,7 +92,7 @@ async def read_tenant(
     # Get tenant
     result = await db.execute(
         text("SELECT * FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
     tenant_data = result.fetchone()
 
@@ -98,14 +105,14 @@ async def read_tenant(
     # Get user count
     user_count_result = await db.execute(
         text("SELECT COUNT(*) FROM users WHERE tenant_id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
     user_count = user_count_result.fetchone()[0]
 
     # Get role count
     role_count_result = await db.execute(
         text("SELECT COUNT(*) FROM roles WHERE tenant_id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
     role_count = role_count_result.fetchone()[0]
 
@@ -114,11 +121,11 @@ async def read_tenant(
         "name": tenant_data[1],
         "slug": tenant_data[2],
         "description": tenant_data[3],
-        "parent_tenant_id": tenant_data[4],
+        "parent_tenant_id": str(tenant_data[4]) if tenant_data[4] else None,
         "settings": tenant_data[5],
         "is_active": tenant_data[6],
-        "created_at": tenant_data[7].isoformat() if tenant_data[7] else None,
-        "updated_at": tenant_data[8].isoformat() if tenant_data[8] else None,
+        "created_at": _to_iso(tenant_data[7]),
+        "updated_at": _to_iso(tenant_data[8]),
         "user_count": user_count,
         "role_count": role_count
     }
@@ -149,8 +156,7 @@ async def create_tenant(
 
     # Create tenant
     tenant_id = uuid4()
-    from datetime import datetime
-    now = datetime.utcnow()
+    timestamp = datetime.utcnow().isoformat()
 
     await db.execute(
         text("""
@@ -158,15 +164,15 @@ async def create_tenant(
         VALUES (:id, :name, :slug, :description, :parent_tenant_id, :settings, :is_active, :created_at, :updated_at)
         """),
         {
-            "id": tenant_id,
+            "id": str(tenant_id),
             "name": tenant_in.name,
             "slug": tenant_in.slug,
             "description": tenant_in.description,
             "parent_tenant_id": tenant_in.parent_tenant_id,
             "settings": tenant_in.settings,
             "is_active": tenant_in.is_active,
-            "created_at": now,
-            "updated_at": now
+            "created_at": timestamp,
+            "updated_at": timestamp
         }
     )
 
@@ -181,8 +187,8 @@ async def create_tenant(
         "parent_tenant_id": tenant_in.parent_tenant_id,
         "settings": tenant_in.settings,
         "is_active": tenant_in.is_active,
-        "created_at": now.isoformat(),
-        "updated_at": now.isoformat()
+        "created_at": timestamp,
+        "updated_at": timestamp
     }
 
 
@@ -201,7 +207,7 @@ async def update_tenant(
     # Check if tenant exists
     existing = await db.execute(
         text("SELECT * FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
 
     if not existing.fetchone():
@@ -212,7 +218,7 @@ async def update_tenant(
 
     # Build update query dynamically
     update_fields = []
-    params = {"tenant_id": tenant_id}
+    params = {"tenant_id": str(tenant_id)}
 
     if tenant_in.name is not None:
         update_fields.append("name = :name")
@@ -249,7 +255,7 @@ async def update_tenant(
     # Return updated tenant
     result = await db.execute(
         text("SELECT * FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
     updated_data = result.fetchone()
 
@@ -258,11 +264,11 @@ async def update_tenant(
         "name": updated_data[1],
         "slug": updated_data[2],
         "description": updated_data[3],
-        "parent_tenant_id": updated_data[4],
+        "parent_tenant_id": str(updated_data[4]) if updated_data[4] else None,
         "settings": updated_data[5],
         "is_active": updated_data[6],
-        "created_at": updated_data[7].isoformat() if updated_data[7] else None,
-        "updated_at": updated_data[8].isoformat() if updated_data[8] else None
+        "created_at": _to_iso(updated_data[7]),
+        "updated_at": _to_iso(updated_data[8])
     }
 
 
@@ -278,7 +284,7 @@ async def delete_tenant(
     # Check if tenant exists
     existing = await db.execute(
         text("SELECT * FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
 
     if not existing.fetchone():
@@ -290,7 +296,7 @@ async def delete_tenant(
     # Soft delete - mark as inactive
     await db.execute(
         text("UPDATE tenants SET is_active = false, updated_at = NOW() WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
 
     await db.commit()
@@ -312,7 +318,7 @@ async def switch_tenant(
     # Verify tenant exists and is active
     tenant_result = await db.execute(
         text("SELECT id, name, is_active FROM tenants WHERE id = :tenant_id"),
-        {"tenant_id": tenant_id}
+        {"tenant_id": str(tenant_id)}
     )
     tenant_data = tenant_result.fetchone()
 
@@ -388,8 +394,8 @@ async def get_user_tenants(
             "parent_tenant_id": str(row[4]) if row[4] else None,
             "settings": row[5] or "{}",
             "is_active": row[6],
-            "created_at": row[7].isoformat() if row[7] else None,
-            "updated_at": row[8].isoformat() if row[8] else None
+            "created_at": _to_iso(row[7]),
+            "updated_at": _to_iso(row[8])
         })
 
     return tenant_list

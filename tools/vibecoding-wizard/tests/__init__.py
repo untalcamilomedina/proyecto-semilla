@@ -1,0 +1,1 @@
+# Test package for Vibecoding Configuration Wizard

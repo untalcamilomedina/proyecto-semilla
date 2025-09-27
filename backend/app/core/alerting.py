@@ -58,6 +58,7 @@ class AlertingEngine:
     def _initialize_default_rules(self):
         """Initialize default alerting rules"""
         default_rules = [
+            # Performance rules
             AlertRule(
                 metric="response_time_p95",
                 threshold=500,
@@ -89,6 +90,55 @@ class AlertingEngine:
                 severity="low",
                 description="Low cache hit rate",
                 cooldown_minutes=30
+            ),
+            # Security rules
+            AlertRule(
+                metric="failed_login_attempts_per_hour",
+                threshold=10,
+                condition="above",
+                severity="high",
+                description="High number of failed login attempts",
+                cooldown_minutes=15
+            ),
+            AlertRule(
+                metric="suspicious_requests_per_minute",
+                threshold=20,
+                condition="above",
+                severity="critical",
+                description="High number of suspicious requests detected",
+                cooldown_minutes=5
+            ),
+            AlertRule(
+                metric="blocked_ips_count",
+                threshold=5,
+                condition="above",
+                severity="medium",
+                description="Multiple IPs blocked by rate limiting",
+                cooldown_minutes=10
+            ),
+            AlertRule(
+                metric="sql_injection_attempts_per_hour",
+                threshold=3,
+                condition="above",
+                severity="critical",
+                description="SQL injection attempts detected",
+                cooldown_minutes=5
+            ),
+            AlertRule(
+                metric="xss_attempts_per_hour",
+                threshold=3,
+                condition="above",
+                severity="high",
+                description="XSS attempts detected",
+                cooldown_minutes=10
+            ),
+            AlertRule(
+                metric="unauthorized_access_attempts_per_hour",
+                threshold=15,
+                condition="above",
+                severity="critical",
+                description="High number of unauthorized access attempts",
+                cooldown_minutes=5
             )
         ]
 

@@ -51,7 +51,7 @@ class AuditEvent:
     action: Optional[str] = None
     status: str = "success"
     description: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    event_metadata: Dict[str, Any] = field(default_factory=dict)
     tags: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -97,7 +97,7 @@ class AuditLogEntry:
     action: Optional[str]
     status: str
     description: Optional[str]
-    metadata: Dict[str, Any]
+    event_metadata: Dict[str, Any]
     tags: List[str]
     hash: str  # For integrity verification
 
@@ -166,7 +166,7 @@ class AuditLogger:
             action="login",
             status="success" if success else "failure",
             description=f"User authentication {'successful' if success else 'failed'}",
-            metadata=metadata or {},
+            event_metadata=metadata or {},
             tags=["authentication", "security"]
         )
         await self.log_event(event)
@@ -184,7 +184,7 @@ class AuditLogger:
             action=action,
             status="allowed" if allowed else "denied",
             description=f"Access {'granted' if allowed else 'denied'} to {resource}",
-            metadata=metadata or {},
+            event_metadata=metadata or {},
             tags=["authorization", "access_control"]
         )
         await self.log_event(event)
@@ -201,7 +201,7 @@ class AuditLogger:
             resource=resource,
             action=action,
             description=f"Data access: {record_count} records",
-            metadata={"record_count": record_count, **(metadata or {})},
+            event_metadata={"record_count": record_count, **(metadata or {})},
             tags=["data_access", "privacy"]
         )
         await self.log_event(event)
@@ -218,7 +218,7 @@ class AuditLogger:
             resource=resource,
             action=action,
             description=f"Data modified: {resource} ({record_id})",
-            metadata={
+            event_metadata={
                 "record_id": record_id,
                 "changes": changes,
                 **(metadata or {})
@@ -236,7 +236,7 @@ class AuditLogger:
             severity=severity,
             ip_address=ip_address,
             description=description,
-            metadata=metadata or {},
+            event_metadata=metadata or {},
             tags=["security", event_type]
         )
         await self.log_event(event)
@@ -249,7 +249,7 @@ class AuditLogger:
             event_type=AuditEventType.SYSTEM_EVENT,
             severity=severity,
             description=description,
-            metadata=metadata or {},
+            event_metadata=metadata or {},
             tags=["system", event_type]
         )
         await self.log_event(event)
@@ -321,7 +321,7 @@ class AuditLogger:
                         "action": event.action,
                         "status": event.status,
                         "description": event.description,
-                        "metadata": json.dumps(event.metadata),
+                        "event_metadata": json.dumps(event.event_metadata),
                         "tags": json.dumps(event.tags),
                         "hash": event_hash
                     }
@@ -416,7 +416,7 @@ class AuditLogger:
                         'action': row[11],
                         'status': row[12],
                         'description': row[13],
-                        'metadata': json.loads(row[14]) if row[14] else {},
+                        'event_metadata': json.loads(row[14]) if row[14] else {},
                         'tags': row[15] if row[15] else []
                     }
                     events.append(AuditEvent.from_dict(event_data))
@@ -559,7 +559,7 @@ class AuditLogger:
                     'action': row[11],
                     'status': row[12],
                     'description': row[13],
-                    'metadata': json.loads(row[14]) if row[14] else {},
+                    'event_metadata': json.loads(row[14]) if row[14] else {},
                     'tags': row[15] if row[15] else []
                 }
 
@@ -614,7 +614,7 @@ async def log_request_middleware(request, call_next):
             action=method,
             status="success",
             description=f"API request completed in {duration:.2f}s",
-            metadata={"duration": duration, "status_code": response.status_code},
+            event_metadata={"duration": duration, "status_code": response.status_code},
             tags=["api", "request"]
         ))
 
@@ -635,7 +635,7 @@ async def log_request_middleware(request, call_next):
             action=method,
             status="error",
             description=f"API request failed: {str(e)}",
-            metadata={"duration": duration, "error": str(e)},
+            event_metadata={"duration": duration, "error": str(e)},
             tags=["api", "error", "security"]
         ))
 
@@ -653,7 +653,7 @@ async def audit_user_action(user_id: str, tenant_id: str, action: str,
         tenant_id=tenant_id,
         resource=resource,
         action=action,
-        metadata=metadata or {},
+        event_metadata=metadata or {},
         tags=["user_action"]
     ))
 

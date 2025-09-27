@@ -168,9 +168,68 @@ run_smoke_tests() {
 
     # Run basic validation script
     if python3 scripts/validate-system.py; then
-        log_success "Smoke tests passed"
+        log_success "System validation passed"
     else
-        log_error "Smoke tests failed"
+        log_error "System validation failed"
+        return 1
+    fi
+
+    # Test API endpoints
+    if test_api_endpoints; then
+        log_success "API smoke tests passed"
+    else
+        log_error "API smoke tests failed"
+        return 1
+    fi
+
+    # Test plugin system if available
+    if test_plugin_system; then
+        log_success "Plugin system tests passed"
+    else
+        log_warning "Plugin system tests failed (non-critical)"
+    fi
+}
+
+# Test API endpoints
+test_api_endpoints() {
+    log_info "Testing API endpoints..."
+
+    local base_url="http://localhost:8000"
+
+    # Test health endpoint
+    if ! curl -f -s --max-time 10 "$base_url/health" > /dev/null; then
+        log_error "Health endpoint test failed"
+        return 1
+    fi
+
+    # Test API docs
+    if ! curl -f -s --max-time 10 "$base_url/docs" > /dev/null; then
+        log_error "API docs test failed"
+        return 1
+    fi
+
+    # Test tenants endpoint
+    if ! curl -f -s --max-time 10 "$base_url/api/v1/tenants" > /dev/null; then
+        log_error "Tenants endpoint test failed"
+        return 1
+    fi
+
+    log_success "API endpoints tests passed"
+    return 0
+}
+
+# Test plugin system
+test_plugin_system() {
+    log_info "Testing plugin system..."
+
+    local base_url="http://localhost:8000"
+
+    # Test plugin status endpoint
+    if curl -f -s --max-time 10 "$base_url/api/v1/plugins/status" > /dev/null; then
+        log_success "Plugin system is accessible"
+        return 0
+    else
+        log_warning "Plugin system test failed"
         return 1
     fi
 }

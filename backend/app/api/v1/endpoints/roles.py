@@ -4,21 +4,21 @@ Role management with tenant isolation
 """
 
 from typing import Any, List
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+import json
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 
 from app.core.database import get_db
 from app.models.role import Role
+from app.models.user import User
 from app.models.user_role import UserRole
 from app.schemas.role import (
     RoleCreate,
     RoleResponse,
     RoleUpdate,
-    UserRoleAssignment,
-    UserRoleResponse
 )
 
 router = APIRouter()
@@ -45,38 +45,17 @@ async def read_roles(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Get roles for current tenant
-    result = await db.execute(
-        text("SELECT * FROM roles WHERE tenant_id = :tenant_id ORDER BY hierarchy_level DESC, created_at DESC LIMIT :limit OFFSET :skip"),
-        {"tenant_id": tenant_id, "limit": limit, "skip": skip}
+    stmt = (
+        select(Role)
+        .where(Role.tenant_id == tenant_id)
+        .order_by(Role.hierarchy_level.desc(), Role.created_at.desc())
+        .offset(skip)
+        .limit(limit)
     )
-    roles = result.fetchall()
+    result = await db.execute(stmt)
+    roles = result.scalars().all()
 
-    # Convert to response format
-    role_list = []
-    for row in roles:
-        # Parse permissions JSON string to list
-        import json
-        try:
-            permissions = json.loads(row[5]) if row[5] else []
-        except (json.JSONDecodeError, TypeError):
-            permissions = []
-
-        role_list.append({
-            "id": str(row[0]),
-            "tenant_id": str(row[1]),
-            "name": row[2],
-            "description": row[3],
-            "permissions": permissions,      # parsed JSON to list
-            "color": row[4],               # color is at index 4
-            "hierarchy_level": row[6],
-            "is_default": row[7],
-            "is_active": row[8],
-            "created_at": row[9].isoformat() if row[9] else None,
-            "updated_at": row[10].isoformat() if row[10] else None
-        })
-
-    return role_list
+    return [_serialize_role(role) for role in roles]
 
 
 @router.post("/", response_model=RoleResponse)
@@ -99,55 +78,34 @@ async def create_role(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Check if role name already exists in tenant
     existing = await db.execute(
-        text("SELECT id FROM roles WHERE tenant_id = :tenant_id AND name = :name"),
-        {"tenant_id": tenant_id, "name": role_in.name}
+        select(func.count(Role.id)).where(
+            Role.tenant_id == tenant_id, Role.name == role_in.name
+        )
     )
-
-    if existing.fetchone():
+    if (existing.scalar() or 0) > 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Role with this name already exists in your tenant"
         )
 
-    # Create role
-    import json
-    role_id = UUID()
-    await db.execute(
-        text("""
-        INSERT INTO roles (id, tenant_id, name, description, permissions, color, hierarchy_level, is_default, is_active)
-        VALUES (:id, :tenant_id, :name, :description, :permissions, :color, :hierarchy_level, :is_default, :is_active)
-        """),
-        {
-            "id": role_id,
-            "tenant_id": tenant_id,
-            "name": role_in.name,
-            "description": role_in.description,
-            "permissions": json.dumps(role_in.permissions),
-            "color": role_in.color,
-            "hierarchy_level": role_in.hierarchy_level,
-            "is_default": role_in.is_default,
-            "is_active": role_in.is_active
-        }
+    role = Role(
+        id=uuid4(),
+        tenant_id=tenant_id,
+        name=role_in.name,
+        description=role_in.description,
+        permissions=json.dumps(role_in.permissions or []),
+        color=role_in.color or "#ffffff",
+        hierarchy_level=role_in.hierarchy_level,
+        is_default=role_in.is_default,
+        is_active=role_in.is_active,
     )
 
+    db.add(role)
     await db.commit()
+    await db.refresh(role)
 
-    # Return created role
-    return {
-        "id": str(role_id),
-        "tenant_id": str(tenant_id),
-        "name": role_in.name,
-        "description": role_in.description,
-        "permissions": role_in.permissions,
-        "color": role_in.color,
-        "hierarchy_level": role_in.hierarchy_level,
-        "is_default": role_in.is_default,
-        "is_active": role_in.is_active,
-        "created_at": "2024-01-01T00:00:00Z",  # Placeholder
-        "updated_at": "2024-01-01T00:00:00Z"   # Placeholder
-    }
+    return _serialize_role(role)
 
 
 @router.get("/{role_id}", response_model=RoleResponse)
@@ -171,38 +129,17 @@ async def read_role(
         )
 
     # Get role
-    result = await db.execute(
-        text("SELECT * FROM roles WHERE id = :role_id AND tenant_id = :tenant_id"),
-        {"role_id": role_id, "tenant_id": tenant_id}
-    )
-    role_data = result.fetchone()
+    stmt = select(Role).where(Role.id == role_id, Role.tenant_id == tenant_id)
+    result = await db.execute(stmt)
+    role = result.scalar_one_or_none()
 
-    if not role_data:
+    if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role not found"
         )
 
-    # Parse permissions JSON string to list
-    import json
-    try:
-        permissions = json.loads(role_data[4]) if role_data[4] else []
-    except (json.JSONDecodeError, TypeError):
-        permissions = []
-
-    return {
-        "id": str(role_data[0]),
-        "tenant_id": str(role_data[1]),
-        "name": role_data[2],
-        "description": role_data[3],
-        "permissions": permissions,
-        "color": role_data[5],
-        "hierarchy_level": role_data[6],
-        "is_default": role_data[7],
-        "is_active": role_data[8],
-        "created_at": role_data[9].isoformat() if role_data[9] else None,
-        "updated_at": role_data[10].isoformat() if role_data[10] else None
-    }
+    return _serialize_role(role)
 
 
 @router.put("/{role_id}", response_model=RoleResponse)
@@ -227,91 +164,55 @@ async def update_role(
         )
 
     # Check if role exists and belongs to tenant
-    existing = await db.execute(
-        text("SELECT * FROM roles WHERE id = :role_id AND tenant_id = :tenant_id"),
-        {"role_id": role_id, "tenant_id": tenant_id}
-    )
+    stmt = select(Role).where(Role.id == role_id, Role.tenant_id == tenant_id)
+    result = await db.execute(stmt)
+    role = result.scalar_one_or_none()
 
-    if not existing.fetchone():
+    if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role not found"
         )
 
-    # Check name uniqueness if name is being updated
-    if role_in.name is not None:
+    if role_in.name and role_in.name != role.name:
         name_check = await db.execute(
-            text("SELECT id FROM roles WHERE tenant_id = :tenant_id AND name = :name AND id != :role_id"),
-            {"tenant_id": tenant_id, "name": role_in.name, "role_id": role_id}
+            select(func.count(Role.id)).where(
+                Role.tenant_id == tenant_id,
+                Role.name == role_in.name,
+                Role.id != role_id,
+            )
         )
-        if name_check.fetchone():
+        if (name_check.scalar() or 0) > 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Role with this name already exists in your tenant"
+                detail="Role with this name already exists in your tenant",
             )
 
-    # Build update query
-    update_fields = []
-    values = []
-    param_count = 1
-
     if role_in.name is not None:
-        update_fields.append(f"name = ${param_count}")
-        values.append(role_in.name)
-        param_count += 1
+        role.name = role_in.name
 
     if role_in.description is not None:
-        update_fields.append(f"description = ${param_count}")
-        values.append(role_in.description)
-        param_count += 1
+        role.description = role_in.description
 
     if role_in.permissions is not None:
-        import json
-        update_fields.append(f"permissions = ${param_count}")
-        values.append(json.dumps(role_in.permissions))
-        param_count += 1
+        role.permissions = json.dumps(role_in.permissions)
 
     if role_in.color is not None:
-        update_fields.append(f"color = ${param_count}")
-        values.append(role_in.color)
-        param_count += 1
+        role.color = role_in.color
 
     if role_in.hierarchy_level is not None:
-        update_fields.append(f"hierarchy_level = ${param_count}")
-        values.append(role_in.hierarchy_level)
-        param_count += 1
+        role.hierarchy_level = role_in.hierarchy_level
 
     if role_in.is_default is not None:
-        update_fields.append(f"is_default = ${param_count}")
-        values.append(role_in.is_default)
-        param_count += 1
+        role.is_default = role_in.is_default
 
     if role_in.is_active is not None:
-        update_fields.append(f"is_active = ${param_count}")
-        values.append(role_in.is_active)
-        param_count += 1
+        role.is_active = role_in.is_active
 
-    if not update_fields:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No fields to update"
-        )
-
-    # Add role_id to values
-    values.append(role_id)
-
-    # Execute update
-    update_query = f"""
-    UPDATE roles
-    SET {', '.join(update_fields)}, updated_at = NOW()
-    WHERE id = ${param_count}
-    """
-
-    await db.execute(text(update_query), values)
     await db.commit()
+    await db.refresh(role)
 
-    # Return updated role
-    return await read_role(request, role_id, db)
+    return _serialize_role(role)
 
 
 @router.delete("/{role_id}")
@@ -335,23 +236,17 @@ async def delete_role(
         )
 
     # Check if role exists and belongs to tenant
-    existing = await db.execute(
-        text("SELECT * FROM roles WHERE id = $1 AND tenant_id = $2"),
-        (role_id, tenant_id)
-    )
+    stmt = select(Role).where(Role.id == role_id, Role.tenant_id == tenant_id)
+    result = await db.execute(stmt)
+    role = result.scalar_one_or_none()
 
-    if not existing.fetchone():
+    if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role not found"
         )
 
-    # Soft delete - mark as inactive
-    await db.execute(
-        text("UPDATE roles SET is_active = false, updated_at = NOW() WHERE id = $1"),
-        (role_id,)
-    )
-
+    role.is_active = False
     await db.commit()
 
     return {"message": "Role deleted successfully"}
@@ -378,57 +273,45 @@ async def assign_role_to_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Verify user belongs to tenant
-    user_check = await db.execute(
-        text("SELECT id FROM users WHERE id = $1 AND tenant_id = $2"),
-        (user_id, tenant_id)
-    )
+    user_stmt = select(User).where(User.id == user_id, User.tenant_id == tenant_id)
+    user_result = await db.execute(user_stmt)
+    user = user_result.scalar_one_or_none()
 
-    if not user_check.fetchone():
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found in your tenant"
         )
 
-    # Verify role belongs to tenant
-    role_check = await db.execute(
-        text("SELECT name FROM roles WHERE id = $1 AND tenant_id = $2"),
-        (role_id, tenant_id)
-    )
+    role_stmt = select(Role).where(Role.id == role_id, Role.tenant_id == tenant_id)
+    role_result = await db.execute(role_stmt)
+    role = role_result.scalar_one_or_none()
 
-    role_data = role_check.fetchone()
-    if not role_data:
+    if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role not found in your tenant"
         )
 
-    # Check if assignment already exists
-    existing = await db.execute(
-        text("SELECT id FROM user_roles WHERE user_id = $1 AND role_id = $2"),
-        (user_id, role_id)
+    assignment_stmt = select(UserRole).where(
+        UserRole.user_id == user_id, UserRole.role_id == role_id
     )
-
-    if existing.fetchone():
+    existing = await db.execute(assignment_stmt)
+    if existing.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User already has this role"
         )
 
-    # Create assignment
-    assignment_id = UUID()
-    await db.execute(
-        text("INSERT INTO user_roles (id, user_id, role_id) VALUES ($1, $2, $3)"),
-        (assignment_id, user_id, role_id)
-    )
-
+    assignment = UserRole(user_id=user_id, role_id=role_id)
+    db.add(assignment)
     await db.commit()
 
     return {
         "message": "Role assigned successfully",
         "user_id": str(user_id),
         "role_id": str(role_id),
-        "role_name": role_data[0]
+        "role_name": role.name,
     }
 
 
@@ -454,29 +337,50 @@ async def remove_role_from_user(
         )
 
     # Verify user and role belong to tenant
-    assignment_check = await db.execute(
-        text("""
-        SELECT ur.id FROM user_roles ur
-        JOIN users u ON ur.user_id = u.id
-        JOIN roles r ON ur.role_id = r.id
-        WHERE ur.user_id = $1 AND ur.role_id = $2
-        AND u.tenant_id = $3 AND r.tenant_id = $3
-        """),
-        (user_id, role_id, tenant_id)
+    assignment_stmt = (
+        select(UserRole)
+        .join(User, User.id == UserRole.user_id)
+        .join(Role, Role.id == UserRole.role_id)
+        .where(
+            UserRole.user_id == user_id,
+            UserRole.role_id == role_id,
+            User.tenant_id == tenant_id,
+            Role.tenant_id == tenant_id,
+        )
     )
+    assignment_result = await db.execute(assignment_stmt)
+    assignment = assignment_result.scalar_one_or_none()
 
-    if not assignment_check.fetchone():
+    if not assignment:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Role assignment not found"
         )
 
-    # Remove assignment
-    await db.execute(
-        text("DELETE FROM user_roles WHERE user_id = $1 AND role_id = $2"),
-        (user_id, role_id)
-    )
-
+    await db.delete(assignment)
     await db.commit()
 
     return {"message": "Role removed successfully"}
+
+
+def _serialize_role(role: Role) -> dict[str, Any]:
+    """Serializa un rol de SQLAlchemy al formato de respuesta esperado."""
+
+    try:
+        permissions = json.loads(role.permissions) if role.permissions else []
+    except (json.JSONDecodeError, TypeError):
+        permissions = []
+
+    return {
+        "id": str(role.id),
+        "tenant_id": str(role.tenant_id),
+        "name": role.name,
+        "description": role.description,
+        "permissions": permissions,
+        "color": role.color,
+        "hierarchy_level": role.hierarchy_level,
+        "is_default": role.is_default,
+        "is_active": role.is_active,
+        "created_at": role.created_at.isoformat() if role.created_at else None,
+        "updated_at": role.updated_at.isoformat() if role.updated_at else None,
+    }

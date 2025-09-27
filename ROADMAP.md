@@ -10,6 +10,61 @@
 
 Desarrollar **Proyecto Semilla**, la primera plataforma SaaS Vibecoding-native del mundo, pionera en permitir que LLMs construyan aplicaciones enterprise siguiendo mejores prácticas y arquitecturas auto-documentadas.
 
+---
+
+## 📌 Estado Actual del MVP (Auditoría Septiembre 2025)
+
+**Resumen**
+- Backend FastAPI operativo para autenticación y CRUD básicos de usuarios/tenants, pero numerosos contratos REST aún no existen o devuelven datos incompletos.
+- Frontend Next.js presenta UI para dashboard, usuarios, tenants y roles; varias vistas consumen endpoints inexistentes (`/dashboard/*`, artículos, categorías) o con payload distinto al que espera el backend.
+- Suite de testing Pytest parcialmente configurada; fixtures dependen de settings ausentes y el entorno de pruebas no crea la base de datos, por lo que las ejecuciones fallan.
+- Contenedor Docker-compose funcional en teoría, pero requiere `.env` con `DB_PASSWORD` y `JWT_SECRET`; no hay plantilla ni validación clara para entornos locales.
+
+**Qué funciona hoy**
+- Autenticación JWT con cookies HTTP-only (`/api/v1/auth/login|logout|me`).
+- CRUD base de usuarios y tenants mediante SQLAlchemy y FastAPI (`/api/v1/users`, `/api/v1/tenants`).
+- Middleware multi-tenant y capa de seguridad (rate limiting básico, logging estructurado).
+- UI de login y panel administrativo con Zustand para estado de sesión.
+
+**Gaps detectados**
+- Endpoints `dashboard/*`, artículos, categorías, roles avanzados y módulo MCP declarados en el cliente sin implementación en el backend.
+- Desfase de esquemas: frontend espera campos `domain/logo` en tenants y `full_name/password` en usuarios, mientras el backend requiere `description/settings`, `first_name/last_name/tenant_id`.
+- Cambio de tenant (`switchTenant`) mapea a rutas distintas entre frontend/backend.
+- Tests: faltan valores `TEST_USER_*`, login de fixtures usa JSON en lugar de formulario y no se crean tablas en SQLite.
+- Documentación y scripts no explican variables obligatorias ni flujo de arranque.
+
+---
+
+## 🗂️ Plan de Sprints para estabilizar el MVP
+
+### 🔍 Sprint 0 – Auditoría y alineación (completo)
+- Inventario de endpoints reales vs. consumidos por el frontend.
+- Identificación de discrepancias en esquemas y variables de entorno.
+- Validación del estado de la suite de tests y dependencias Docker.
+
+### 🛠️ Sprint 1 – Contratos Backend ⇔ Frontend (Objetivo: 1 semana)
+- [x] Implementar endpoints mínimos que el dashboard necesita (`dashboard/metrics`, `dashboard/users-over-time`, `dashboard/recent-users`).
+- [x] Ajustar schemas de tenants/usuarios y el frontend para homogenizar campos requeridos.
+- [x] Unificar ruta de cambio de tenant (`/api/v1/tenants/switch/{id}`) y actualizar el cliente.
+- [x] Añadir respuestas coherentes en CRUD de roles (UUIDs válidos, timestamps reales) y cubrir permisos JSON.
+
+### 🧪 Sprint 2 – Entorno de pruebas y configuración (Objetivo: 1 semana)
+- Introducir `.env.example` y documentación de variables críticas (`DB_PASSWORD`, `JWT_SECRET`, `TEST_USER_*`).
+- Corregir fixtures Pytest: login vía formulario, creación de tablas SQLite, inclusión de la app en `PYTHONPATH`.
+- Ejecutar smoke tests locales y documentar resultados.
+
+### 🧩 Sprint 3 – Funcionalidades faltantes del dashboard (Objetivo: 1-2 semanas)
+- Deliverable: métricas reales y tablas operativas en frontend.
+- Implementar servicios de artículos/categorías **o** depurar la UI para que refleje solo lo disponible.
+- Revisar flujos de roles/permissions y exponer endpoints de asignación que el cliente ya invoca.
+
+### 📦 Sprint 4 – Preparación Docker y QA (Objetivo: 1 semana)
+- Validar `docker-compose` end-to-end con las nuevas variables y seeds.
+- Añadir chequeos automatizados (scripts) para health de backend/frontend.
+- Documentar pasos de despliegue y criterios de aceptación para prueba final.
+
+> Nota: No se montarán entornos de test aislados hasta completar los sprints 1-3; cada sprint incluirá validaciones manuales y documentación incremental. En cuanto concluya Sprint 4 se habilitará el stack Docker para que lo puedas probar.
+
 ### Principios Vibecoding-Native
 - **🤖 LLM-First Architecture**: Diseñado para que los AIs entiendan y extiendan el sistema
 - **📚 Machine-Readable Documentation**: Docs que leen humanos y LLMs por igual

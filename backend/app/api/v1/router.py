@@ -5,7 +5,7 @@ Combines all endpoint routers
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, tenants, users, roles
+from app.api.v1.endpoints import auth, health, tenants, users, roles, dashboard, rate_limiting, analytics, modules
 from app.routers.collaboration import router as collaboration_router
 # Create main API router
 api_router = APIRouter()
@@ -46,4 +46,29 @@ api_router.include_router(
     collaboration_router,
     prefix="",
     tags=["collaboration"]
+)
+
+api_router.include_router(
+    dashboard.router,
+    prefix="/dashboard",
+    tags=["dashboard"]
+)
+
+
+api_router.include_router(
+    rate_limiting.router,
+    prefix="/rate-limiting",
+    tags=["rate-limiting"]
+)
+
+api_router.include_router(
+    analytics.router,
+    prefix="/analytics",
+    tags=["analytics"]
+)
+
+api_router.include_router(
+    modules.router,
+    prefix="/modules",
+    tags=["modules"]
 )

@@ -13,13 +13,16 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from app.core.config import settings
 from app.core.database import create_tables, get_db
 from app.core.logging import setup_logging
-from app.core.middleware import tenant_context_middleware, rate_limiting_middleware, logging_middleware
-from app.core.rate_limiting import RateLimitMiddleware, configure_default_limits
+from app.core.middleware import tenant_context_middleware, logging_middleware
+from app.middleware.advanced_rate_limit import AdvancedRateLimitMiddleware
 from app.core.audit_logging import init_audit_logging, shutdown_audit_logging, log_request_middleware
 from app.middleware.compression import AdvancedCompressionMiddleware, HTTP2ServerPushMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.api.v1.router import api_router
 from app.websocket.collaboration import collaboration_manager
 from app.plugins import initialize_plugin_system, get_plugin_system_status
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 # Setup logger
 logger = logging.getLogger(__name__)
@@ -86,7 +89,6 @@ if not settings.DEBUG:
 
 # Add custom middleware
 app.middleware("http")(logging_middleware)
-app.middleware("http")(rate_limiting_middleware)
 app.middleware("http")(tenant_context_middleware)
 # app.middleware("http")(log_request_middleware)
 
@@ -94,8 +96,8 @@ app.middleware("http")(tenant_context_middleware)
 app.add_middleware(AdvancedCompressionMiddleware, minimum_size=1000)
 app.add_middleware(HTTP2ServerPushMiddleware)
 
-# Add security middleware (Sprint 5 Day 5)
-app.add_middleware(RateLimitMiddleware)
+# Add advanced rate limiting middleware with ML
+app.add_middleware(AdvancedRateLimitMiddleware)
 
 # Add CORS middleware LAST so it executes FIRST (middleware stack is reversed)
 app.add_middleware(
@@ -108,8 +110,15 @@ app.add_middleware(
     max_age=600,
 )
 
-# Configure default rate limits
-configure_default_limits()
+# Add security headers middleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Advanced rate limiting is now configured via AdvancedRateLimitMiddleware
+
+# Mount static files for uploads
+uploads_path = Path("uploads")
+uploads_path.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include API routers
 app.include_router(api_router, prefix=settings.API_V1_STR)

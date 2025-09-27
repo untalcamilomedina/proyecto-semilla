@@ -202,3 +202,57 @@ class Permissions:
             cls.ROLES_READ, cls.ROLES_WRITE, cls.ROLES_DELETE,
             cls.SYSTEM_ADMIN, cls.SYSTEM_CONFIG
         ]
+
+
+# FastAPI dependency functions
+def require_permission(permission: str):
+    """
+    FastAPI dependency to require a specific permission
+    """
+    from fastapi import Depends, HTTPException, status
+    from app.core.database import get_db
+    from app.models.user import User
+    from app.core.security import get_current_user
+    
+    async def permission_checker(
+        current_user: User = Depends(get_current_user),
+        db = Depends(get_db)
+    ) -> User:
+        if not await PermissionService.has_permission(
+            current_user.id, 
+            current_user.tenant_id, 
+            permission, 
+            db
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission '{permission}' required"
+            )
+        return current_user
+    
+    return permission_checker
+
+
+def has_permission(permission: str):
+    """
+    FastAPI dependency to check if user has a specific permission (returns user or None)
+    """
+    from fastapi import Depends
+    from app.core.database import get_db
+    from app.models.user import User
+    from app.core.security import get_current_user
+    
+    async def permission_checker(
+        current_user: User = Depends(get_current_user),
+        db = Depends(get_db)
+    ) -> Optional[User]:
+        if await PermissionService.has_permission(
+            current_user.id, 
+            current_user.tenant_id, 
+            permission, 
+            db
+        ):
+            return current_user
+        return None
+    
+    return permission_checker

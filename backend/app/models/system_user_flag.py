@@ -6,7 +6,7 @@ Model for marking users as system users instead of using hardcoded emails
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-from app.db.base import Base
+from app.core.database import Base
 
 
 class SystemUserFlag(Base):

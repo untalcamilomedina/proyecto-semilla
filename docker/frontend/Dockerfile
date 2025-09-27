@@ -1,14 +1,21 @@
-# Dockerfile para frontend Next.js - Proyecto Semilla
-FROM node:18-alpine
+# Multi-stage Dockerfile para frontend Next.js - Proyecto Semilla
 
-# Instalar dependencias del sistema
-RUN apk add --no-cache libc6-compat curl
+# Stage 1: Dependencies
+FROM node:18-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
 
-# Crear usuario no privilegiado
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Copiar package files
+COPY frontend/package.json frontend/package-lock.json* ./
 
-# Establecer directorio de trabajo
+# Instalar dependencias
+RUN \
+  if [ -f package-lock.json ]; then npm ci --only=production; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Stage 2: Builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Argumentos para variables de entorno
@@ -41,23 +48,30 @@ ENV NEXT_PUBLIC_DEMO_EMAIL=$NEXT_PUBLIC_DEMO_EMAIL
 ENV NEXT_PUBLIC_DEMO_PASSWORD=$NEXT_PUBLIC_DEMO_PASSWORD
 ENV NEXT_PUBLIC_DEFAULT_TENANT_ID=$NEXT_PUBLIC_DEFAULT_TENANT_ID
 
-# Copiar package.json e instalar dependencias
-COPY frontend/package*.json ./
-RUN npm ci # Install all dependencies, including devDependencies
+# Copiar dependencias desde deps stage
+COPY --from=deps /app/node_modules ./node_modules
 
-# Copiar código fuente, excluyendo archivos de desarrollo
+# Copiar código fuente
 COPY frontend/ .
-# Remove .env.local to prevent it from interfering with production builds
-RUN rm -f .env.local
-
-# Explicitly install shadcn/ui dependencies
-RUN npm install class-variance-authority clsx tailwind-merge lucide-react
 
 # Build the Next.js application
 RUN npm run build
 
-# Cambiar propietario de los archivos
-RUN chown -R nextjs:nodejs /app
+# Stage 3: Runner
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+# Instalar curl para health checks
+RUN apk add --no-cache curl
+
+# Crear usuario no privilegiado
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copiar built application
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Cambiar a usuario no privilegiado
 USER nextjs
@@ -74,4 +88,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
 # Comando para ejecutar la aplicación
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

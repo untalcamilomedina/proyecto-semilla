@@ -173,21 +173,55 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./backend
-        file: ./backend/Dockerfile
+        file: ./docker/backend/Dockerfile
         push: false
         tags: proyecto-semilla-backend:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
 
     - name: Build frontend Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./frontend
-        file: ./frontend/Dockerfile
+        context: .
+        file: ./docker/frontend/Dockerfile
         push: false
         tags: proyecto-semilla-frontend:test
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+          NEXT_PUBLIC_API_URL=http://localhost:7777
+          NEXT_PUBLIC_ENVIRONMENT=development
+
+    - name: Scan backend image for vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'image'
+        scan-ref: 'proyecto-semilla-backend:test'
+        format: 'sarif'
+        output: 'backend-trivy-results.sarif'
+
+    - name: Scan frontend image for vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'image'
+        scan-ref: 'proyecto-semilla-frontend:test'
+        format: 'sarif'
+        output: 'frontend-trivy-results.sarif'
+
+    - name: Upload backend Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'backend-trivy-results.sarif'
+
+    - name: Upload frontend Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'frontend-trivy-results.sarif'
 
   validate-system:
     runs-on: ubuntu-latest
