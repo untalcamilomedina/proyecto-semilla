@@ -6,7 +6,7 @@ Login, registration, and token management
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import text
@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import security
 from app.core.database import get_db
 from app.core.cookies import get_cookie_manager
-from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, RefreshTokenRequest
+from app.schemas.auth import Token, UserLogin, UserRegister, UserResponse, RefreshTokenRequest, PasswordResetRequest, PasswordReset
 from app.models.user import User
 from app.models.tenant import Tenant
 from app.services.permission_service import PermissionService
@@ -455,6 +455,168 @@ async def get_user_permissions(
         "user_id": str(current_user.id),
         "tenant_id": str(current_user.tenant_id)
     }
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Request password reset - sends reset email if user exists
+    Always returns success to prevent email enumeration attacks
+    """
+    from sqlalchemy import select
+    from app.core.security import create_password_reset_token
+    from app.utils.email import send_password_reset_email
+    
+    # Check if user exists
+    stmt = select(User).where(User.email == request.email, User.is_active == True)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    
+    client_ip = request.client.host if request.client else "unknown"
+    
+    if user:
+        # Generate reset token
+        reset_token = create_password_reset_token(str(user.id))
+        
+        # Store reset token in database (you might want to create a password_reset_tokens table)
+        # For now, we'll use a simple approach with the existing refresh_tokens table
+        
+        # Send reset email
+        background_tasks.add_task(send_password_reset_email, user.email, reset_token)
+        
+        # Log password reset request
+        await audit_logger.log_event(AuditEvent(
+            event_type=AuditEventType.SECURITY_EVENT,
+            severity=AuditEventSeverity.LOW,
+            description=f"Password reset requested for user: {user.email}",
+            user_id=str(user.id),
+            tenant_id=str(user.tenant_id),
+            metadata={
+                "action": "password_reset_requested",
+                "email": user.email,
+                "ip_address": client_ip,
+                "user_agent": request.headers.get("user-agent", "unknown")
+            }
+        ))
+    
+    # Always return success to prevent email enumeration
+    return {"message": "If the email exists, a password reset link has been sent."}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    request: PasswordReset,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Reset password using reset token
+    """
+    from app.core.security import verify_password_reset_token, get_password_hash
+    from sqlalchemy import select
+    
+    # Verify reset token
+    user_id = verify_password_reset_token(request.token)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+    
+    # Get user
+    user = await db.get(User, user_id)
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found or inactive"
+        )
+    
+    # Validate new password
+    if len(request.new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters long"
+        )
+    
+    # Update password
+    user.hashed_password = get_password_hash(request.new_password)
+    await db.commit()
+    
+    # Revoke all existing refresh tokens for security
+    await security.revoke_all_user_refresh_tokens(db, str(user.id))
+    
+    # Log password reset
+    await audit_logger.log_event(AuditEvent(
+        event_type=AuditEventType.SECURITY_EVENT,
+        severity=AuditEventSeverity.MEDIUM,
+        description=f"Password reset completed for user: {user.email}",
+        user_id=str(user.id),
+        tenant_id=str(user.tenant_id),
+        metadata={
+            "action": "password_reset_completed",
+            "email": user.email
+        }
+    ))
+    
+    return {"message": "Password reset successfully"}
+
+
+@router.post("/change-password")
+async def change_password(
+    request: dict,
+    current_user: User = Depends(security.get_current_user_from_cookie),
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """
+    Change password for authenticated user
+    """
+    current_password = request.get("current_password")
+    new_password = request.get("new_password")
+    
+    if not current_password or not new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password and new password are required"
+        )
+    
+    # Verify current password
+    if not security.verify_password(current_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Validate new password
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 8 characters long"
+        )
+    
+    # Update password
+    current_user.hashed_password = security.get_password_hash(new_password)
+    await db.commit()
+    
+    # Revoke all existing refresh tokens for security
+    await security.revoke_all_user_refresh_tokens(db, str(current_user.id))
+    
+    # Log password change
+    await audit_logger.log_event(AuditEvent(
+        event_type=AuditEventType.SECURITY_EVENT,
+        severity=AuditEventSeverity.MEDIUM,
+        description=f"Password changed for user: {current_user.email}",
+        user_id=str(current_user.id),
+        tenant_id=str(current_user.tenant_id),
+        metadata={
+            "action": "password_changed",
+            "email": current_user.email
+        }
+    ))
+    
+    return {"message": "Password changed successfully"}
 
 
 async def _setup_first_superadmin(db: AsyncSession, user: User, tenant_id: str):

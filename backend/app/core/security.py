@@ -394,3 +394,49 @@ async def revoke_all_user_refresh_tokens(db: AsyncSession, user_id: str):
         (user_id,)
     )
     await db.commit()
+
+
+def create_password_reset_token(user_id: str) -> str:
+    """
+    Create a password reset token for a user
+    """
+    from datetime import timedelta
+    expires_delta = timedelta(hours=1)  # Reset tokens expire in 1 hour
+    expire = datetime.utcnow() + expires_delta
+
+    to_encode = {
+        "sub": user_id,
+        "type": "password_reset",
+        "exp": expire
+    }
+
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM
+    )
+    return encoded_jwt
+
+
+def verify_password_reset_token(token: str) -> Optional[str]:
+    """
+    Verify and return user_id from password reset token
+    """
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+
+        if payload.get("type") != "password_reset":
+            return None
+
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+
+        return user_id
+
+    except JWTError:
+        return None
