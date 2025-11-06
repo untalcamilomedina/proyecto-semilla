@@ -193,3 +193,4 @@ NOTES.md
 personal/
 scratch/
 temp/
+.env.production
