@@ -5,7 +5,7 @@ Combines all endpoint routers
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, health, tenants, users, roles
+from app.api.v1.endpoints import auth, health, tenants, users, roles, setup
 from app.routers.collaboration import router as collaboration_router
 # Create main API router
 api_router = APIRouter()
@@ -21,6 +21,12 @@ api_router.include_router(
     auth.router,
     prefix="/auth",
     tags=["authentication"]
+)
+
+api_router.include_router(
+    setup.router,
+    prefix="/setup",
+    tags=["setup"]
 )
 
 api_router.include_router(

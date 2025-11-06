@@ -114,8 +114,8 @@ class Settings(BaseSettings):
     SEED_DEMO_FIRST_NAME: str = "Demo"
     SEED_DEMO_LAST_NAME: str = "User"
 
-    # Migration Feature Flag
-    HARDCODED_USERS_MIGRATION_ENABLED: bool = False
+    # Migration Feature Flag - ENABLED BY DEFAULT for production readiness
+    HARDCODED_USERS_MIGRATION_ENABLED: bool = True
 
     @field_validator("SEED_ADMIN_EMAIL", mode="after")
     @classmethod
@@ -134,6 +134,49 @@ class Settings(BaseSettings):
                 raise ValueError("SEED_ADMIN_PASSWORD must be at least 12 characters when migration is enabled")
             if v == "admin123":
                 raise ValueError("SEED_ADMIN_PASSWORD cannot use default insecure value when migration is enabled")
+        return v
+
+    @field_validator("DB_PASSWORD", mode="after")
+    @classmethod
+    def validate_db_password(cls, v: str, info: ValidationInfo) -> str:
+        """Validate database password strength for production"""
+        if not v:
+            raise ValueError("DB_PASSWORD is required")
+
+        # Check if DEBUG is False (production indicator)
+        is_production = not info.data.get("DEBUG", True)
+
+        if is_production:
+            # Stricter validation for production
+            if len(v) < 16:
+                raise ValueError("DB_PASSWORD must be at least 16 characters in production")
+
+            # Check for common insecure passwords
+            insecure_passwords = ["changeme123", "changeme", "admin", "password", "admin123", "12345678"]
+            if v.lower() in insecure_passwords:
+                raise ValueError("DB_PASSWORD cannot use a default or common insecure value in production")
+        else:
+            # Basic validation for development
+            if len(v) < 8:
+                raise ValueError("DB_PASSWORD must be at least 8 characters")
+
+        return v
+
+    @field_validator("COOKIE_SECURE", mode="after")
+    @classmethod
+    def validate_cookie_secure(cls, v: bool, info: ValidationInfo) -> bool:
+        """Validate COOKIE_SECURE setting for production"""
+        is_production = not info.data.get("DEBUG", True)
+
+        if is_production and not v:
+            # Warning level - don't fail, but log
+            import warnings
+            warnings.warn(
+                "COOKIE_SECURE should be True in production when using HTTPS. "
+                "Set COOKIE_SECURE=true in your environment variables.",
+                UserWarning
+            )
+
         return v
 
     class Config:

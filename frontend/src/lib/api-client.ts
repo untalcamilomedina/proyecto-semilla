@@ -294,6 +294,32 @@ class ApiClient {
       await this.axiosInstance.get('/api/v1/auth/setup-status');
     return response.data;
   }
+
+  // Setup wizard endpoints
+  async checkSystemRequirements(): Promise<any> {
+    const response = await this.axiosInstance.get('/api/v1/setup/check-requirements');
+    return response.data;
+  }
+
+  async generateSecrets(): Promise<any> {
+    const response = await this.axiosInstance.post('/api/v1/setup/generate-secrets');
+    return response.data;
+  }
+
+  async configureSystem(config: any): Promise<any> {
+    const response = await this.axiosInstance.post('/api/v1/setup/configure', config);
+    return response.data;
+  }
+
+  async checkProductionReadiness(): Promise<any> {
+    const response = await this.axiosInstance.get('/api/v1/setup/production-readiness');
+    return response.data;
+  }
+
+  async getSetupWizardStatus(): Promise<any> {
+    const response = await this.axiosInstance.get('/api/v1/setup/status');
+    return response.data;
+  }
 }
 
 // Export singleton instance

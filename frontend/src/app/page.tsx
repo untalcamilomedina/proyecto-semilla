@@ -4,19 +4,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { apiClient } from '@/lib/api-client';
-import { UserRegister } from '@/types/api';
+import SetupWizard from '@/components/setup/SetupWizard';
 
 export default function HomePage() {
   console.log('🏠 HomePage component rendered');
 
   const router = useRouter();
-  const { login, register, isAuthenticated, isLoading, error, clearError } = useAuthStore();
+  const { login, isAuthenticated, isLoading, error, clearError } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [needsSetup, setNeedsSetup] = useState<boolean | null>(true); // Default to true for first-time setup
+  const [needsSetup, setNeedsSetup] = useState<boolean | null>(true);
   const [setupLoading, setSetupLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -190,123 +187,9 @@ export default function HomePage() {
     );
   }
 
-  // Show setup form if system needs initial setup (default to true for first-time users)
+  // Show setup wizard if system needs initial setup
   if (needsSetup !== false) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="w-full max-w-lg p-8 space-y-8 bg-white rounded-xl shadow-2xl border border-gray-200">
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl">🌱</span>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">¡Bienvenido a Proyecto Semilla!</h1>
-            <p className="text-gray-600 text-lg">
-              La primera plataforma SaaS Vibecoding-native del mundo
-            </p>
-            <p className="mt-4 text-sm text-gray-500">
-              Solo necesitamos crear tu cuenta de superadministrador para comenzar
-            </p>
-          </div>
-
-          <form className="space-y-6" onSubmit={handleSetup}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="text-sm font-medium text-gray-700">Nombre</label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  autoComplete="given-name"
-                  required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Apellido</label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  autoComplete="family-name"
-                  required
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">Contraseña</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setPasswordError(''); // Clear password error on change
-                }}
-                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-                  passwordError ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {passwordError && (
-                <p className="mt-1 text-sm text-red-600">{passwordError}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500">
-                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-3 text-sm text-red-700 bg-red-100 rounded-md">
-                {error}
-              </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-3 px-6 border border-transparent rounded-lg shadow-lg text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition hover:scale-105"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Configurando tu plataforma...
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span className="mr-2">🚀</span>
-                    Comenzar mi viaje Vibecoding
-                  </div>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
+    return <SetupWizard />;
   }
 
   // Show login form if system is already configured
