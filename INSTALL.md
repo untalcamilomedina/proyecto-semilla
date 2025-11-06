@@ -6,7 +6,9 @@
 - **Python 3.11+** (opcional, solo para desarrollo local)
 - **Git** para clonar el repositorio
 
-## Instalación Simple (Recomendado)
+---
+
+## 📦 Instalación para Desarrollo
 
 ### Paso 1: Clonar el repositorio
 ```bash
@@ -31,22 +33,77 @@ El script setup:
 docker-compose up -d backend frontend
 ```
 
-### Paso 4: Acceder al sistema
-- **Frontend**: http://localhost:7701
-- **Si es primera vez**: Verás el wizard de configuración inicial
-- **Después de configurar**: Podrás iniciar sesión normalmente
+### Paso 4: Acceder al Wizard de Instalación
 
-### Paso 4: Acceder a la aplicación
+Abre tu navegador en **http://localhost:7701**
+
+🎯 **¡Nuevo!** Verás un wizard de instalación profesional en 3 pasos:
+
+1. **Verificación de Requisitos**: Comprueba automáticamente que todos los servicios estén funcionando
+2. **Crear Superadministrador**: Crea tu cuenta principal con validación de contraseña robusta
+3. **Finalización**: Resumen y acceso al dashboard
+
+> ⚠️ **Sin Credenciales Hardcodeadas**: Ya no hay usuarios por defecto. Crearás tu propio superadministrador de forma segura a través del wizard.
+
+### Paso 5: Acceder a los Servicios
+
+Después de completar el wizard:
 - **Frontend**: http://localhost:7701
 - **Backend API**: http://localhost:7777
 - **Documentación API**: http://localhost:7777/docs
 - **MCP Server**: http://localhost:8001/docs
 
-## Credenciales de Acceso
+---
 
-Después de la instalación, puedes acceder con:
-- **Usuario**: admin@example.com
-- **Contraseña**: admin123
+## 🏭 Instalación para Producción
+
+Para despliegue en producción, sigue la guía completa:
+
+### Paso 1: Generar Configuración Segura
+```bash
+./scripts/setup_production.sh
+```
+
+Este script genera automáticamente:
+- ✅ JWT_SECRET seguro (64 caracteres)
+- ✅ DB_PASSWORD seguro (32 caracteres)
+- ✅ Archivo `.env.production` completo
+
+### Paso 2: Verificar Configuración
+```bash
+./scripts/verify_production_readiness.sh
+```
+
+### Paso 3: Desplegar
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Documentación Completa de Producción
+
+📚 **Guía Detallada:** [docs/PRODUCTION_DEPLOYMENT.md](./docs/PRODUCTION_DEPLOYMENT.md)
+
+Incluye:
+- Configuración de HTTPS/SSL
+- Configuración de Nginx
+- Backups automáticos
+- Monitoreo y logs
+- Troubleshooting
+
+---
+
+## 🔒 Seguridad
+
+### Credenciales de Acceso
+
+**Ya no hay credenciales por defecto**. El sistema te guiará para crear tu propio superadministrador de forma segura.
+
+**Características de Seguridad:**
+- ✅ Generación automática de secrets
+- ✅ Validación de contraseñas fuertes
+- ✅ Sin credenciales hardcodeadas
+- ✅ Migración de usuarios de sistema habilitada
+- ✅ Configuración segura por defecto
 
 ## Instalación Manual (Alternativa)
 
