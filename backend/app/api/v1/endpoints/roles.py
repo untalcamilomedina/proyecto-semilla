@@ -5,12 +5,14 @@ Role management with tenant isolation
 
 from typing import Any, List
 from uuid import UUID
+import math
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
 from app.core.database import get_db
+from app.core.permissions import Permission, PermissionChecker
 from app.models.role import Role
 from app.models.user_role import UserRole
 from app.schemas.role import (
@@ -20,19 +22,26 @@ from app.schemas.role import (
     UserRoleAssignment,
     UserRoleResponse
 )
+from app.schemas.pagination import PaginatedResponse, PaginationMetadata
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[RoleResponse])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[RoleResponse],
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_READ))]
+)
 async def read_roles(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000)
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of items per page")
 ) -> Any:
     """
-    Retrieve roles with pagination
+    Retrieve roles with pagination.
+    Returns paginated list of roles with metadata.
+    Requires: role:read permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -45,10 +54,20 @@ async def read_roles(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Get roles for current tenant
+    # Calculate skip based on page
+    skip = (page - 1) * page_size
+
+    # Get total count for current tenant
+    count_result = await db.execute(
+        text("SELECT COUNT(*) FROM roles WHERE tenant_id = :tenant_id"),
+        {"tenant_id": tenant_id}
+    )
+    total = count_result.scalar() or 0
+
+    # Get roles for current tenant and page
     result = await db.execute(
         text("SELECT * FROM roles WHERE tenant_id = :tenant_id ORDER BY hierarchy_level DESC, created_at DESC LIMIT :limit OFFSET :skip"),
-        {"tenant_id": tenant_id, "limit": limit, "skip": skip}
+        {"tenant_id": tenant_id, "limit": page_size, "skip": skip}
     )
     roles = result.fetchall()
 
@@ -76,17 +95,34 @@ async def read_roles(
             "updated_at": row[10].isoformat() if row[10] else None
         })
 
-    return role_list
+    # Calculate pagination metadata
+    total_pages = math.ceil(total / page_size) if total > 0 else 0
+
+    metadata = PaginationMetadata(
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+        has_next=page < total_pages,
+        has_previous=page > 1
+    )
+
+    return PaginatedResponse(items=role_list, metadata=metadata)
 
 
-@router.post("/", response_model=RoleResponse)
+@router.post(
+    "/",
+    response_model=RoleResponse,
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_CREATE))]
+)
 async def create_role(
     request: Request,
     role_in: RoleCreate,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Create new role
+    Create new role.
+    Requires: role:create permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -150,14 +186,19 @@ async def create_role(
     }
 
 
-@router.get("/{role_id}", response_model=RoleResponse)
+@router.get(
+    "/{role_id}",
+    response_model=RoleResponse,
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_READ))]
+)
 async def read_role(
     request: Request,
     role_id: UUID,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Get role by ID
+    Get role by ID.
+    Requires: role:read permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -205,7 +246,11 @@ async def read_role(
     }
 
 
-@router.put("/{role_id}", response_model=RoleResponse)
+@router.put(
+    "/{role_id}",
+    response_model=RoleResponse,
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_UPDATE))]
+)
 async def update_role(
     request: Request,
     role_id: UUID,
@@ -213,7 +258,8 @@ async def update_role(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Update role
+    Update role.
+    Requires: role:update permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -314,14 +360,18 @@ async def update_role(
     return await read_role(request, role_id, db)
 
 
-@router.delete("/{role_id}")
+@router.delete(
+    "/{role_id}",
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_DELETE))]
+)
 async def delete_role(
     request: Request,
     role_id: UUID,
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Delete role (soft delete - mark as inactive)
+    Delete role (soft delete - mark as inactive).
+    Requires: role:delete permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -357,7 +407,10 @@ async def delete_role(
     return {"message": "Role deleted successfully"}
 
 
-@router.post("/users/{user_id}/roles/{role_id}")
+@router.post(
+    "/users/{user_id}/roles/{role_id}",
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_ASSIGN))]
+)
 async def assign_role_to_user(
     request: Request,
     user_id: UUID,
@@ -365,7 +418,8 @@ async def assign_role_to_user(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Assign role to user
+    Assign role to user.
+    Requires: role:assign permission
     """
     # Check authentication
     auth_user_id = getattr(request.state, 'user_id', None)
@@ -432,7 +486,10 @@ async def assign_role_to_user(
     }
 
 
-@router.delete("/users/{user_id}/roles/{role_id}")
+@router.delete(
+    "/users/{user_id}/roles/{role_id}",
+    dependencies=[Depends(PermissionChecker(Permission.ROLE_ASSIGN))]
+)
 async def remove_role_from_user(
     request: Request,
     user_id: UUID,
@@ -440,7 +497,8 @@ async def remove_role_from_user(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """
-    Remove role from user
+    Remove role from user.
+    Requires: role:assign permission
     """
     # Check authentication
     auth_user_id = getattr(request.state, 'user_id', None)

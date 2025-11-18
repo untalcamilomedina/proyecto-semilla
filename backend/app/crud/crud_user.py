@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import func
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
@@ -32,6 +33,11 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[U
         .limit(limit)
     )
     return result.scalars().all()
+
+async def count_users(db: AsyncSession) -> int:
+    """Count total number of users"""
+    result = await db.execute(select(func.count()).select_from(User))
+    return result.scalar() or 0
 
 async def create_user(db: AsyncSession, *, obj_in: UserCreate) -> User:
     """Create a new user"""

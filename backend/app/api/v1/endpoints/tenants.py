@@ -6,6 +6,7 @@ Multi-tenant management with proper authorization
 from typing import Any, List
 from uuid import UUID, uuid4
 from datetime import datetime, timedelta
+import math
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +15,7 @@ from sqlalchemy import text
 from app.core.database import get_db
 from app.core.security import get_current_user, get_current_user_from_cookie, create_access_token
 from app.core.cookies import get_cookie_manager
+from app.core.permissions import Permission, PermissionChecker
 from app.models.user import User
 from app.models.tenant import Tenant
 from app.schemas.tenant import (
@@ -23,19 +25,26 @@ from app.schemas.tenant import (
     TenantWithUsers
 )
 from app.schemas.auth import TokenResponse
+from app.schemas.pagination import PaginatedResponse, PaginationMetadata
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[TenantResponse])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[TenantResponse],
+    dependencies=[Depends(PermissionChecker(Permission.TENANT_READ))]
+)
 async def read_tenants(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000)
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of items per page")
 ) -> Any:
     """
-    Retrieve tenants with pagination
+    Retrieve tenants with pagination.
+    Returns paginated list of tenants with metadata.
+    Requires: tenant:read permission
     """
     # Check authentication
     user_id = getattr(request.state, 'user_id', None)
@@ -48,10 +57,17 @@ async def read_tenants(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # For now, return all tenants (will be filtered by RLS later)
+    # Calculate skip based on page
+    skip = (page - 1) * page_size
+
+    # Get total count
+    count_result = await db.execute(text("SELECT COUNT(*) FROM tenants"))
+    total = count_result.scalar() or 0
+
+    # Get tenants for current page
     result = await db.execute(
         text("SELECT * FROM tenants ORDER BY created_at DESC LIMIT :limit OFFSET :skip"),
-        {"limit": limit, "skip": skip}
+        {"limit": page_size, "skip": skip}
     )
     tenants = result.fetchall()
 
@@ -70,17 +86,34 @@ async def read_tenants(
             "updated_at": row[8].isoformat() if row[8] else None
         })
 
-    return tenant_list
+    # Calculate pagination metadata
+    total_pages = math.ceil(total / page_size) if total > 0 else 0
+
+    metadata = PaginationMetadata(
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+        has_next=page < total_pages,
+        has_previous=page > 1
+    )
+
+    return PaginatedResponse(items=tenant_list, metadata=metadata)
 
 
-@router.get("/{tenant_id}", response_model=TenantWithUsers)
+@router.get(
+    "/{tenant_id}",
+    response_model=TenantWithUsers,
+    dependencies=[Depends(PermissionChecker(Permission.TENANT_READ))]
+)
 async def read_tenant(
     tenant_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Get tenant by ID with user count
+    Get tenant by ID with user count.
+    Requires: tenant:read permission
     """
     # Get tenant
     result = await db.execute(
@@ -126,14 +159,19 @@ async def read_tenant(
 
 
 
-@router.post("/", response_model=TenantResponse)
+@router.post(
+    "/",
+    response_model=TenantResponse,
+    dependencies=[Depends(PermissionChecker(Permission.TENANT_CREATE))]
+)
 async def create_tenant(
     tenant_in: TenantCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Create new tenant
+    Create new tenant.
+    Requires: tenant:create permission
     """
     # Check if slug already exists
     existing = await db.execute(
@@ -188,7 +226,11 @@ async def create_tenant(
 
 
 
-@router.put("/{tenant_id}", response_model=TenantResponse)
+@router.put(
+    "/{tenant_id}",
+    response_model=TenantResponse,
+    dependencies=[Depends(PermissionChecker(Permission.TENANT_UPDATE))]
+)
 async def update_tenant(
     tenant_id: UUID,
     tenant_in: TenantUpdate,
@@ -196,7 +238,8 @@ async def update_tenant(
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Update tenant
+    Update tenant.
+    Requires: tenant:update permission
     """
     # Check if tenant exists
     existing = await db.execute(
@@ -266,14 +309,18 @@ async def update_tenant(
     }
 
 
-@router.delete("/{tenant_id}")
+@router.delete(
+    "/{tenant_id}",
+    dependencies=[Depends(PermissionChecker(Permission.TENANT_DELETE))]
+)
 async def delete_tenant(
     tenant_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Delete tenant (soft delete - mark as inactive)
+    Delete tenant (soft delete - mark as inactive).
+    Requires: tenant:delete permission
     """
     # Check if tenant exists
     existing = await db.execute(
