@@ -1,0 +1,16 @@
+{% load form_tags %}
+<div class="space-y-1">
+  <label class="block text-sm font-medium text-gray-700" for="{{ field.id_for_label }}">
+    {{ field.label }}
+  </label>
+  {{ field|add_class:"w-full rounded-md border-gray-300 focus:border-brand focus:ring-brand" }}
+  {% if field.help_text %}
+    <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+  {% endif %}
+  {% if field.errors %}
+    <p class="text-xs text-red-600">
+      {{ field.errors|striptags }}
+    </p>
+  {% endif %}
+</div>
+

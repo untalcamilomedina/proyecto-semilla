@@ -1,0 +1,81 @@
+services:
+  web:
+    build:
+      context: ..
+      target: dev
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ..:/app
+    ports:
+      - "7777:8000"
+    env_file:
+      - ../env/.env.dev.example
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - mailpit
+
+  worker:
+    build:
+      context: ..
+      target: dev
+    command: celery -A config.celery worker -l info
+    volumes:
+      - ..:/app
+    env_file:
+      - ../env/.env.dev.example
+    depends_on:
+      - postgres
+      - redis
+
+  beat:
+    build:
+      context: ..
+      target: dev
+    command: celery -A config.celery beat -l info
+    volumes:
+      - ..:/app
+    env_file:
+      - ../env/.env.dev.example
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: acme_saas
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  postgres_data:
+  minio_data:

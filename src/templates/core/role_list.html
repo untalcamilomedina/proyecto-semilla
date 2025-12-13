@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Roles{% endblock %}
+{% block content %}
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold">Roles</h1>
+      <p class="text-sm text-gray-600">Manage roles and granular permissions.</p>
+    </div>
+    <div class="flex gap-2">
+      <a class="px-3 py-2 rounded bg-brand text-white text-sm hover:bg-brand/90" href="{% url 'core:role_create' %}">New role</a>
+      <a class="px-3 py-2 rounded border text-sm hover:bg-gray-50" href="{% url 'core:role_import' %}">Import JSON</a>
+    </div>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-left text-gray-600">
+        <tr>
+          <th class="px-4 py-3 font-medium">Name</th>
+          <th class="px-4 py-3 font-medium">Slug</th>
+          <th class="px-4 py-3 font-medium">Permissions</th>
+          <th class="px-4 py-3 font-medium"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+      {% for role in object_list %}
+        <tr>
+          <td class="px-4 py-3">{{ role.name }}</td>
+          <td class="px-4 py-3 text-gray-500">{{ role.slug }}</td>
+          <td class="px-4 py-3">
+            {% for perm in role.permissions.all %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-xs mr-1">{{ perm.codename }}</span>
+            {% empty %}
+              <span class="text-gray-400">—</span>
+            {% endfor %}
+          </td>
+          <td class="px-4 py-3 text-right space-x-2">
+            <a class="text-brand hover:underline" href="{% url 'core:role_update' role.pk %}">Edit</a>
+            <a class="text-red-600 hover:underline" href="{% url 'core:role_delete' role.pk %}">Delete</a>
+            <a class="text-gray-600 hover:underline" href="{% url 'core:role_export' role.pk %}">Export</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td class="px-4 py-6 text-center text-gray-500" colspan="4">No roles yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

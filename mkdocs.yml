@@ -1,0 +1,37 @@
+site_name: Proyecto Semilla — Acme SaaS
+site_description: Boilerplate SaaS modular en Django.
+repo_name: proyecto-semilla
+repo_url: https://github.com/your-org/proyecto-semilla
+
+theme:
+  name: material
+  language: es
+  features:
+    - navigation.expand
+    - navigation.sections
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Multitenancy: multitenancy.md
+  - RBAC: rbac.md
+  - Billing: billing.md
+  - Observability: observability.md
+  - ADRs:
+      - adr/0001-repo-root.md
+      - adr/0002-tooling.md
+      - adr/0005-multitenancy-schema.md
+      - adr/0009-billing-stripe.md
+      - adr/0010-api.md
+      - adr/0011-frontend.md
+      - adr/0012-observability.md
+  - Runbooks:
+      - runbooks/local-dev.md
+      - runbooks/flyio.md
+

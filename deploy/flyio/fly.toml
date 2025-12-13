@@ -1,0 +1,49 @@
+app = "acme-saas"
+primary_region = "us"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  release_command = "python manage.py migrate_tenants --noinput"
+
+[env]
+  DJANGO_SETTINGS_MODULE = "config.settings.prod"
+  MULTITENANT_MODE = "schema"
+  PORT = "8000"
+
+[processes]
+  web = "gunicorn config.wsgi:application --bind 0.0.0.0:8000 --chdir /app/src"
+  worker = "celery -A config.celery worker -l info"
+  beat = "celery -A config.celery beat -l info"
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+  processes = ["web"]
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "2s"
+    method = "get"
+    path = "/healthz"
+    protocol = "http"
+
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "2s"
+    method = "get"
+    path = "/readyz"
+    protocol = "http"
+

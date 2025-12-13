@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Billing{% endblock %}
+{% block content %}
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold">Billing</h1>
+      <p class="text-sm text-gray-600">Manage your subscription and invoices.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm md:col-span-2">
+      <h2 class="text-lg font-semibold mb-2">Current subscription</h2>
+      {% if subscription %}
+        <p class="text-sm">
+          Plan: <span class="font-medium">{{ subscription.plan.name }}</span>
+          ({{ subscription.status }})
+        </p>
+        <p class="text-sm text-gray-600 mt-1">Seats: {{ subscription.quantity }}{% if subscription.plan.seat_limit %}/{{ subscription.plan.seat_limit }}{% endif %}</p>
+        {% if subscription.current_period_end %}
+          <p class="text-sm text-gray-600 mt-1">Renews {{ subscription.current_period_end|date:"Y-m-d" }}</p>
+        {% endif %}
+      {% else %}
+        <p class="text-sm text-gray-600">No active subscription yet.</p>
+      {% endif %}
+
+      <div class="mt-4 flex gap-2">
+        <a class="px-3 py-2 rounded bg-brand text-white text-sm hover:bg-brand/90" href="#">Checkout (coming)</a>
+        <a class="px-3 py-2 rounded border text-sm hover:bg-gray-50" href="#">Portal (coming)</a>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-lg font-semibold mb-2">Available plans</h2>
+      <ul class="space-y-2 text-sm">
+        {% for plan in plans %}
+          <li class="border rounded p-3">
+            <div class="font-medium">{{ plan.name }}</div>
+            <div class="text-gray-600">{{ plan.description|default:"" }}</div>
+            {% if plan.seat_limit %}
+              <div class="text-gray-500 text-xs mt-1">{{ plan.seat_limit }} seats</div>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="text-gray-500">No plans configured.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-8 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <h2 class="text-lg font-semibold px-5 py-4 border-b">Invoices</h2>
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-left text-gray-600">
+        <tr>
+          <th class="px-4 py-3 font-medium">Invoice</th>
+          <th class="px-4 py-3 font-medium">Status</th>
+          <th class="px-4 py-3 font-medium">Amount</th>
+          <th class="px-4 py-3 font-medium">Date</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for inv in invoices %}
+          <tr>
+            <td class="px-4 py-3">{{ inv.stripe_invoice_id }}</td>
+            <td class="px-4 py-3">{{ inv.status }}</td>
+            <td class="px-4 py-3">{{ inv.amount_paid }} {{ inv.currency }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ inv.created_at|date:"Y-m-d" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td class="px-4 py-6 text-center text-gray-500" colspan="4">No invoices yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+

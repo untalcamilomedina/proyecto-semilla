@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-600">Tenant</h2>
+      <p class="text-xl font-semibold mt-1">{{ tenant.name }}</p>
+      <p class="text-sm text-gray-500">{{ tenant.slug }}.{{ DOMAIN_BASE }}</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-600">Plan</h2>
+      <p class="text-xl font-semibold mt-1">{{ tenant.plan_code|default:"free" }}</p>
+      {% if tenant.trial_ends_at %}
+        <p class="text-sm text-gray-500">Trial ends {{ tenant.trial_ends_at }}</p>
+      {% endif %}
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-sm font-medium text-gray-600">Modules</h2>
+      {% if tenant.enabled_modules %}
+        <div class="mt-2 flex flex-wrap gap-1">
+          {% for mod in tenant.enabled_modules %}
+            <span class="px-2 py-0.5 rounded bg-gray-100 text-xs">{{ mod }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-sm text-gray-500 mt-1">Core only</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-lg font-semibold mb-2">Quick links</h2>
+      <ul class="text-sm space-y-1">
+        <li><a class="text-brand hover:underline" href="{% url 'core:member_list' %}">Manage members</a></li>
+        <li><a class="text-brand hover:underline" href="{% url 'core:role_list' %}">Manage roles</a></li>
+        <li><a class="text-brand hover:underline" href="{% url 'billing:dashboard' %}">Billing dashboard</a></li>
+        <li><a class="text-brand hover:underline" href="/api/docs/">API documentation</a></li>
+      </ul>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <h2 class="text-lg font-semibold mb-2">Getting started</h2>
+      <p class="text-sm text-gray-600">
+        Use the onboarding wizard, invite members, and connect Stripe to start charging.
+      </p>
+    </div>
+  </div>
+{% endblock %}
+

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Role{% endblock %}
+{% block content %}
+  <div class="max-w-2xl">
+    <h1 class="text-2xl font-semibold mb-4">{% if object %}Edit role{% else %}New role{% endif %}</h1>
+    <form method="post" class="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      {% csrf_token %}
+      {% include "components/field.html" with field=form.name %}
+      {% include "components/field.html" with field=form.description %}
+      {% include "components/field.html" with field=form.position %}
+
+      <div class="pt-4 border-t border-gray-100">
+        <h2 class="text-lg font-medium mb-2">Permissions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {% for checkbox in perm_form.permissions %}
+            <label class="flex items-start gap-2 p-2 rounded hover:bg-gray-50">
+              {{ checkbox.tag }}
+              <span class="text-sm">{{ checkbox.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        {% if perm_form.permissions.errors %}
+          <p class="text-xs text-red-600 mt-1">{{ perm_form.permissions.errors|striptags }}</p>
+        {% endif %}
+      </div>
+
+      <div class="flex items-center gap-2 pt-2">
+        <button class="px-4 py-2 rounded bg-brand text-white text-sm hover:bg-brand/90" type="submit">Save</button>
+        <a class="text-sm text-gray-600 hover:underline" href="{% url 'core:role_list' %}">Back</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

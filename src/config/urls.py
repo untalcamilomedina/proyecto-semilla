@@ -1,0 +1,30 @@
+from __future__ import annotations
+
+from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import include, path
+
+from common.metrics import metrics_view
+from oauth.views import RateLimitedLoginView, RateLimitedSignupView
+
+
+def healthz(_request):
+    return JsonResponse({"status": "ok"})
+
+
+def readyz(_request):
+    return JsonResponse({"status": "ready"})
+
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("accounts/login/", RateLimitedLoginView.as_view(), name="account_login"),
+    path("accounts/signup/", RateLimitedSignupView.as_view(), name="account_signup"),
+    path("accounts/", include("allauth.urls")),
+    path("healthz", healthz),
+    path("readyz", readyz),
+    path("metrics", metrics_view),
+    path("api/", include("api.urls")),
+    path("billing/", include("billing.urls")),
+    path("", include("core.urls")),
+]

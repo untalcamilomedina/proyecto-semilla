@@ -1,34 +1,30 @@
-"""
-Tests for health check endpoint
-"""
-
 import pytest
-from httpx import AsyncClient
+from django.contrib.auth import get_user_model
 
 
-@pytest.mark.asyncio
-async def test_health_check(client: AsyncClient):
-    """Test health check endpoint returns correct response"""
-    response = await client.get("/health")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "healthy"
-    assert "version" in data
-    assert data["version"] == "0.1.0"
+@pytest.mark.django_db
+def test_healthz(client):
+    res = client.get("/healthz")
+    assert res.status_code == 200
+    assert res.json() == {"status": "ok"}
 
 
-@pytest.mark.asyncio
-async def test_health_check_content_type(client: AsyncClient):
-    """Test health check returns correct content type"""
-    response = await client.get("/health")
+@pytest.mark.django_db
+def test_readyz(client):
+    res = client.get("/readyz")
+    assert res.status_code == 200
+    assert res.json() == {"status": "ready"}
 
-    assert response.headers["content-type"] == "application/json"
+
+@pytest.mark.django_db
+def test_metrics_endpoint(client):
+    res = client.get("/metrics")
+    assert res.status_code == 200
+    assert b"django_http_requests_total" in res.content
 
 
-@pytest.mark.asyncio
-async def test_health_check_method_not_allowed(client: AsyncClient):
-    """Test health check rejects invalid HTTP methods"""
-    response = await client.post("/health")
-
-    assert response.status_code == 405  # Method Not Allowed
+@pytest.mark.django_db
+def test_custom_user_model():
+    User = get_user_model()
+    user = User.objects.create_user(username="demo", email="demo@example.com", password="pass1234")
+    assert user.email == "demo@example.com"

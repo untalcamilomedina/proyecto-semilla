@@ -1,0 +1,98 @@
+{% load static %}
+<!doctype html>
+<html lang="en" x-data="{ sidebarOpen: false }">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ tenant.name|default:"Acme SaaS" }}{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: "var(--color-brand)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        --color-brand: {{ branding.primary_color|default:"#4f46e5" }};
+      }
+    </style>
+
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+
+    <script defer src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </head>
+  <body
+    class="min-h-screen bg-gray-50 text-gray-900"
+    hx-boost="true"
+    hx-indicator="#global-indicator"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  >
+    <div class="flex min-h-screen">
+      <aside
+        class="w-64 bg-white border-r border-gray-200 hidden md:flex md:flex-col"
+      >
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+          {% if branding.logo_url %}
+            <img src="{{ branding.logo_url }}" alt="{{ tenant.name }}" class="h-8 w-8 rounded" />
+          {% else %}
+            <div class="h-8 w-8 rounded bg-brand/10 text-brand flex items-center justify-center font-bold">
+              {{ tenant.slug|default:"A"|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <div class="font-semibold truncate">{{ tenant.name|default:"Acme SaaS" }}</div>
+        </div>
+        <nav class="px-4 py-4 space-y-1 text-sm">
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="{% url 'core:dashboard' %}">Dashboard</a>
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="{% url 'core:member_list' %}">Members</a>
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="{% url 'core:role_list' %}">Roles</a>
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="{% url 'billing:dashboard' %}">Billing</a>
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="/api/docs/">API Docs</a>
+        </nav>
+      </aside>
+
+      <main class="flex-1">
+        <header class="px-6 py-4 bg-white border-b border-gray-200 flex items-center justify-between">
+          <div class="md:hidden">
+            <button
+              class="px-2 py-1 rounded border"
+              @click="sidebarOpen = !sidebarOpen"
+            >
+              Menu
+            </button>
+          </div>
+          <div class="text-sm text-gray-600">
+            {% if tenant %}Tenant: <span class="font-medium text-gray-900">{{ tenant.slug }}</span>{% endif %}
+          </div>
+          <div class="text-sm">
+            {% if user.is_authenticated %}
+              {{ user.email }}
+              <a href="/accounts/logout/" class="ml-3 text-brand hover:underline">Logout</a>
+            {% else %}
+              <a href="/accounts/login/" class="text-brand hover:underline">Login</a>
+            {% endif %}
+          </div>
+        </header>
+
+        <div class="px-6 py-6">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+    </div>
+
+    {% include "components/toasts.html" %}
+
+    <div id="global-indicator" class="htmx-indicator fixed inset-0 bg-black/5 hidden">
+      <div class="absolute top-4 right-4 bg-white shadow rounded px-3 py-2 text-sm">
+        Loading…
+      </div>
+    </div>
+  </body>
+</html>
