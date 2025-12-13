@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.contrib.auth import get_user_model
+from allauth.account.models import EmailAddress
 from multitenant.models import Tenant, Domain
 from core.models import Membership, Role
 from multitenant.schema import schema_context
@@ -23,7 +24,6 @@ class Command(BaseCommand):
             tenant = Tenant.objects.get(slug="demo")
 
         # 2. Seed RBAC and Billing (globally)
-        # Note: seed_rbac iterates all tenants, so it will cover 'demo'.
         self.stdout.write("Seeding RBAC...")
         call_command("seed_rbac")
         
@@ -36,10 +36,15 @@ class Command(BaseCommand):
             password = "password"
             
             # Check/Create User in Tenant Schema
-            # We create user here so it exists in 'demo.core_user' to satisfy FK from Membership
             if not User.objects.filter(email=email).exists():
                 self.stdout.write(f"Creating user {email} in schema {tenant.schema_name}...")
                 user = User.objects.create_user(username=email, email=email, password=password)
+                # Create verified EmailAddress for Allauth
+                EmailAddress.objects.get_or_create(
+                    user=user,
+                    email=email,
+                    defaults={"verified": True, "primary": True}
+                )
             else:
                 user = User.objects.get(email=email)
                 self.stdout.write(f"User {email} already exists in schema {tenant.schema_name}.")
@@ -48,7 +53,6 @@ class Command(BaseCommand):
             try:
                 owner_role = Role.objects.get(slug="owner")
                 
-                # Check existance
                 if not Membership.objects.filter(user=user, organization=tenant).exists():
                      Membership.objects.create(user=user, organization=tenant, role=owner_role)
                      self.stdout.write(f"Assigned {email} as Owner of {tenant.name}")
@@ -58,3 +62,4 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("Owner role not found! Run seed_rbac first."))
 
         self.stdout.write(self.style.SUCCESS("Seed demo completed successfully."))
+
