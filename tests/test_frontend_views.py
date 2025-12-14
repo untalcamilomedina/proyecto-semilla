@@ -1,4 +1,6 @@
 import pytest
+import uuid
+
 from django.db import connection
 
 from core.models import Membership, Role, User
@@ -13,16 +15,19 @@ def test_dashboard_and_members_views_render(client):
         pytest.skip("Schema multitenancy requires Postgres")
 
     with schema_context(PUBLIC_SCHEMA_NAME):
-        tenant_public = Tenant.objects.create(name="Org FE", slug="orgfe", schema_name="orgfe")
-        create_schema("orgfe")
-        Domain.objects.create(tenant=tenant_public, domain="orgfe.acme.dev", is_primary=True)
+        slug = f"orgfe-{uuid.uuid4().hex[:8]}"
+        tenant_public = Tenant.objects.create(name="Org FE", slug=slug, schema_name=slug)
+        create_schema(slug)
+        Domain.objects.create(tenant=tenant_public, domain=f"{slug}.acme.dev", is_primary=True)
 
-    with schema_context("orgfe"):
-        tenant_local = Tenant.objects.create(
+    with schema_context(slug):
+        tenant_local, _ = Tenant.objects.get_or_create(
             id=tenant_public.id,
-            name=tenant_public.name,
-            slug=tenant_public.slug,
-            schema_name=tenant_public.schema_name,
+            defaults={
+                "name": tenant_public.name,
+                "slug": tenant_public.slug,
+                "schema_name": tenant_public.schema_name,
+            }
         )
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
@@ -32,8 +37,8 @@ def test_dashboard_and_members_views_render(client):
         Membership.objects.create(user=user, organization=tenant_local, role=owner_role)
 
     client.login(username="ownerfe", password="pass1234")
-    res = client.get("/", HTTP_HOST="orgfe.acme.dev")
+    res = client.get("/", HTTP_HOST=f"{slug}.acme.dev")
     assert res.status_code == 200
-    res = client.get("/members/", HTTP_HOST="orgfe.acme.dev")
+    res = client.get("/members/", HTTP_HOST=f"{slug}.acme.dev")
     assert res.status_code == 200
 

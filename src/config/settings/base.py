@@ -218,7 +218,8 @@ CONTENT_SECURITY_POLICY_DIRECTIVES = {
         "https://unpkg.com",
         "https://js.stripe.com",
     ),
-    "style-src": ("'self'", "'unsafe-inline'"),
+    "style-src": ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com"),
+    "font-src": ("'self'", "https://fonts.gstatic.com"),
     "img-src": ("'self'", "data:"),
     "connect-src": (
         "'self'",

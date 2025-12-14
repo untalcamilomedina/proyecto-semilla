@@ -1,4 +1,6 @@
 import pytest
+import uuid
+
 from django.db import connection
 from rest_framework.test import APIClient
 
@@ -15,16 +17,19 @@ def test_api_key_auth_can_access_tenant_endpoint():
         pytest.skip("Schema multitenancy requires Postgres")
 
     with schema_context(PUBLIC_SCHEMA_NAME):
-        tenant_public = Tenant.objects.create(name="Org API", slug="orgapi", schema_name="orgapi")
-        create_schema("orgapi")
-        Domain.objects.create(tenant=tenant_public, domain="orgapi.acme.dev", is_primary=True)
+        slug = f"orgapi-{uuid.uuid4().hex[:8]}"
+        tenant_public = Tenant.objects.create(name="Org API", slug=slug, schema_name=slug)
+        create_schema(slug)
+        Domain.objects.create(tenant=tenant_public, domain=f"{slug}.acme.dev", is_primary=True)
 
-    with schema_context("orgapi"):
-        tenant_local = Tenant.objects.create(
+    with schema_context(slug):
+        tenant_local, _ = Tenant.objects.get_or_create(
             id=tenant_public.id,
-            name=tenant_public.name,
-            slug=tenant_public.slug,
-            schema_name=tenant_public.schema_name,
+            defaults={
+                "name": tenant_public.name,
+                "slug": tenant_public.slug,
+                "schema_name": tenant_public.schema_name,
+            }
         )
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
@@ -37,11 +42,11 @@ def test_api_key_auth_can_access_tenant_endpoint():
     client = APIClient()
     res = client.get(
         "/api/v1/tenant/",
-        HTTP_HOST="orgapi.acme.dev",
+        HTTP_HOST=f"{slug}.acme.dev",
         HTTP_AUTHORIZATION=f"Bearer {plain}",
     )
     assert res.status_code == 200
-    assert res.data["slug"] == "orgapi"
+    assert res.data["slug"] == slug
 
 
 @pytest.mark.django_db(transaction=True)
@@ -50,16 +55,19 @@ def test_roles_endpoint_requires_manage_roles_permission():
         pytest.skip("Schema multitenancy requires Postgres")
 
     with schema_context(PUBLIC_SCHEMA_NAME):
-        tenant_public = Tenant.objects.create(name="Org API2", slug="orgapi2", schema_name="orgapi2")
-        create_schema("orgapi2")
-        Domain.objects.create(tenant=tenant_public, domain="orgapi2.acme.dev", is_primary=True)
+        slug = f"orgapi2-{uuid.uuid4().hex[:8]}"
+        tenant_public = Tenant.objects.create(name="Org API2", slug=slug, schema_name=slug)
+        create_schema(slug)
+        Domain.objects.create(tenant=tenant_public, domain=f"{slug}.acme.dev", is_primary=True)
 
-    with schema_context("orgapi2"):
-        tenant_local = Tenant.objects.create(
+    with schema_context(slug):
+        tenant_local, _ = Tenant.objects.get_or_create(
             id=tenant_public.id,
-            name=tenant_public.name,
-            slug=tenant_public.slug,
-            schema_name=tenant_public.schema_name,
+            defaults={
+                "name": tenant_public.name,
+                "slug": tenant_public.slug,
+                "schema_name": tenant_public.schema_name,
+            }
         )
         seed_default_roles(tenant_local)
         viewer_role = Role.objects.get(organization=tenant_local, slug="viewer")
@@ -79,12 +87,12 @@ def test_roles_endpoint_requires_manage_roles_permission():
         "/api/v1/roles/",
         payload,
         format="json",
-        HTTP_HOST="orgapi2.acme.dev",
+        HTTP_HOST=f"{slug}.acme.dev",
         HTTP_AUTHORIZATION=f"Bearer {plain}",
     )
     assert res.status_code == 403
 
-    with schema_context("orgapi2"):
+    with schema_context(slug):
         membership.role = owner_role
         membership.save(update_fields=["role"])
 
@@ -92,7 +100,7 @@ def test_roles_endpoint_requires_manage_roles_permission():
         "/api/v1/roles/",
         payload,
         format="json",
-        HTTP_HOST="orgapi2.acme.dev",
+        HTTP_HOST=f"{slug}.acme.dev",
         HTTP_AUTHORIZATION=f"Bearer {plain}",
     )
     assert res.status_code == 201

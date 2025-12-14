@@ -23,8 +23,10 @@ media/
 node_modules/
 dist/
 build/
+.next/
+out/
+.turbo/
 
 # IDEs
 .idea/
 .vscode/
-

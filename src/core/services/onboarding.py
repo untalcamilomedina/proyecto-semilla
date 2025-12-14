@@ -10,6 +10,7 @@ from django.utils import timezone
 from common.email import send_welcome_email
 from core.models import Membership, OnboardingState, Role, User
 from core.services.seed import seed_default_roles
+from core.services.usernames import username_from_email
 from multitenant.models import Domain, Tenant, validate_subdomain
 from multitenant.schema import PUBLIC_SCHEMA_NAME, create_schema, schema_context
 
@@ -75,9 +76,8 @@ def start_onboarding(
     with schema_context(tenant_public.schema_name):
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
-        username = admin_email.split("@")[0]
         user = User.objects.create_user(
-            username=username,
+            username=username_from_email(admin_email),
             email=admin_email,
             password=password,
             is_staff=True,
@@ -147,10 +147,9 @@ def invite_members(
             emails = emails[:0]
         role = Role.objects.get(organization=tenant_local, slug=role_slug)
         for email in emails:
-            username = email.split("@")[0]
             user, _ = User.objects.get_or_create(
                 email=email,
-                defaults={"username": username},
+                defaults={"username": username_from_email(email)},
             )
             Membership.objects.get_or_create(user=user, organization=tenant_local, defaults={"role": role})
             invited += 1

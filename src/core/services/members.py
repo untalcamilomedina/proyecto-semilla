@@ -4,6 +4,7 @@ from django.db import transaction
 
 from common.email import send_welcome_email
 from core.models import Membership, Role, User
+from core.services.usernames import username_from_email
 
 
 @transaction.atomic
@@ -22,8 +23,10 @@ def invite_members_to_org(organization, emails: list[str], role_slug: str = "mem
     role = Role.objects.get(organization=organization, slug=role_slug)
     invited = 0
     for email in emails:
-        username = email.split("@")[0]
-        user, _ = User.objects.get_or_create(email=email, defaults={"username": username})
+        user, _ = User.objects.get_or_create(
+            email=email,
+            defaults={"username": username_from_email(email)},
+        )
         Membership.objects.get_or_create(
             user=user, organization=organization, defaults={"role": role}
         )

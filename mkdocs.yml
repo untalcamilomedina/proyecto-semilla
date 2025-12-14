@@ -31,7 +31,8 @@ nav:
       - adr/0010-api.md
       - adr/0011-frontend.md
       - adr/0012-observability.md
+      - adr/0013-frontend-nextjs.md
   - Runbooks:
       - runbooks/local-dev.md
       - runbooks/flyio.md
-
+      - runbooks/migracion-frontend-nextjs.md

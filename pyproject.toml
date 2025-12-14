@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "acme_saas"
-version = "0.1.0"
+version = "0.9.1"
 description = "Seed SaaS boilerplate for Django 5+"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -100,4 +100,3 @@ profile = "django"
 blank_line_after_tag = "load,extends,include"
 max_line_length = 100
 ignore = "H006,H030,H031"
-

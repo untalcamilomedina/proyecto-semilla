@@ -3,7 +3,7 @@ PYTHON ?= python3
 MANAGE ?= $(PYTHON) manage.py
 COMPOSE ?= docker compose -f compose/docker-compose.yml
 
-.PHONY: dev lint fmt typecheck test build migrate seed deploy audit
+.PHONY: dev lint fmt typecheck test build migrate seed deploy audit frontend-install frontend-dev
 
 dev:
 	$(COMPOSE) up --build
@@ -32,10 +32,10 @@ build:
 	docker build -t $(PROJECT_SLUG):latest .
 
 migrate:
-	$(MANAGE) migrate
+	$(COMPOSE) exec web python manage.py migrate
 
 seed:
-	$(MANAGE) seed_demo
+	$(COMPOSE) exec web python manage.py seed_demo
 
 audit:
 	pip-audit -r requirements/dev.txt
@@ -43,3 +43,9 @@ audit:
 
 deploy:
 	bash ./deploy/flyio/deploy.sh
+
+frontend-install:
+	cd frontend && npm install
+
+frontend-dev:
+	cd frontend && npm run dev

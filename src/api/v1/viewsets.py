@@ -9,12 +9,14 @@ from api.models import ApiKey
 from api.permissions import PolicyPermission
 from billing.models import Invoice, Plan, Subscription
 from core.models import Membership, Permission, Role
+from core.services.members import invite_members_to_org
 
 from .serializers import (
     ApiKeyCreateSerializer,
     ApiKeySerializer,
     InvoiceSerializer,
     MembershipSerializer,
+    MembershipInviteSerializer,
     PermissionSerializer,
     PlanSerializer,
     RoleSerializer,
@@ -23,11 +25,12 @@ from .serializers import (
 )
 
 
-class TenantViewSet(viewsets.ViewSet):
+class TenantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [PolicyPermission]
+    serializer_class = TenantSerializer
 
-    def list(self, request):
-        serializer = TenantSerializer(request.tenant)
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.tenant)
         return Response(serializer.data)
 
 
@@ -59,6 +62,17 @@ class MembershipViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(organization=request_tenant(self.request))
+
+    @action(detail=False, methods=["post"])
+    def invite(self, request, *args, **kwargs):
+        serializer = MembershipInviteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        invited = invite_members_to_org(
+            request_tenant(request),
+            serializer.validated_data["emails"],
+            role_slug=serializer.validated_data.get("role_slug") or "member",
+        )
+        return Response({"invited": invited}, status=status.HTTP_200_OK)
 
 
 class PlanViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

@@ -22,12 +22,18 @@ class ApiKeyAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(_("Invalid API key format."))
 
         try:
-            key = ApiKey.objects.select_related("user").get(prefix=prefix)
+            key = ApiKey.objects.select_related("user", "organization").get(prefix=prefix)
         except ApiKey.DoesNotExist:
             raise exceptions.AuthenticationFailed(_("Invalid API key."))
 
         if not key.check_secret(secret):
             raise exceptions.AuthenticationFailed(_("Invalid API key."))
+
+        organization = getattr(request, "tenant", None)
+        if organization is None:
+            raise exceptions.AuthenticationFailed(_("Tenant required for API key authentication."))
+        if key.organization_id != organization.id:
+            raise exceptions.AuthenticationFailed(_("API key does not belong to this tenant."))
 
         key.mark_used()
         user = key.user
@@ -53,3 +59,20 @@ class ApiKeyAuthentication(authentication.BaseAuthentication):
         _, prefix, secret = raw.split("_", 2)
         return prefix, secret
 
+
+try:  # pragma: no cover
+    from drf_spectacular.extensions import OpenApiAuthenticationExtension
+
+    class ApiKeyAuthenticationScheme(OpenApiAuthenticationExtension):
+        target_class = "api.authentication.ApiKeyAuthentication"
+        name = "ApiKeyAuth"
+
+        def get_security_definition(self, auto_schema):
+            return {
+                "type": "apiKey",
+                "in": "header",
+                "name": ApiKeyAuthentication.header,
+                "description": "Use header `X-Api-Key: ak_<prefix>_<secret>` (or `Authorization: Bearer ak_<prefix>_<secret>`).",
+            }
+except Exception:  # pragma: no cover
+    pass

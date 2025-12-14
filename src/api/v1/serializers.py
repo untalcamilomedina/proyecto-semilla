@@ -9,9 +9,25 @@ from multitenant.models import Tenant
 
 
 class TenantSerializer(serializers.ModelSerializer):
+    domain_base = serializers.SerializerMethodField()
+
     class Meta:
         model = Tenant
-        fields = ["id", "name", "slug", "schema_name", "plan_code", "enabled_modules"]
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "schema_name",
+            "plan_code",
+            "enabled_modules",
+            "branding",
+            "domain_base",
+        ]
+
+    def get_domain_base(self, _obj: Tenant) -> str:
+        from django.conf import settings
+
+        return getattr(settings, "DOMAIN_BASE", "acme.dev")
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -33,13 +49,14 @@ class RoleSerializer(serializers.ModelSerializer):
 
 class MembershipSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source="user.email", read_only=True)
+    role_name = serializers.CharField(source="role.name", read_only=True)
     role_slug = serializers.SlugRelatedField(
         source="role", slug_field="slug", queryset=Role.objects.all()
     )
 
     class Meta:
         model = Membership
-        fields = ["id", "user", "user_email", "role_slug", "is_active", "joined_at"]
+        fields = ["id", "user", "user_email", "role_slug", "role_name", "is_active", "joined_at"]
         read_only_fields = ["joined_at"]
 
 
@@ -91,3 +108,7 @@ class ApiKeyCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=120)
     scopes = serializers.ListField(child=serializers.CharField(), required=False)
 
+
+class MembershipInviteSerializer(serializers.Serializer):
+    emails = serializers.ListField(child=serializers.EmailField(), allow_empty=False)
+    role_slug = serializers.SlugField(required=False)
