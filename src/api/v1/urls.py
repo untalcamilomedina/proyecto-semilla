@@ -3,6 +3,8 @@ from __future__ import annotations
 from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
+from config.settings.plugins import optional_api_urls
+
 from .views import csrf
 from .viewsets import (
     ApiKeyViewSet,
@@ -30,3 +32,11 @@ urlpatterns = [
     re_path(r"^csrf/?$", csrf, name="csrf"),
     path("", include(router.urls)),
 ]
+
+for prefix, module in optional_api_urls():
+    try:
+        urlpatterns.append(path(prefix, include(module)))
+    except ImportError as exc:
+        if getattr(exc, "name", None) in {module.split(".")[0], module}:
+            continue
+        raise

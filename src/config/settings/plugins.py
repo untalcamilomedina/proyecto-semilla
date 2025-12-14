@@ -25,3 +25,13 @@ def optional_apps() -> list[str]:
         apps.append("mcp")
     return apps
 
+
+def optional_api_urls() -> list[tuple[str, str]]:
+    urls: list[tuple[str, str]] = []
+    if ENABLE_LMS:
+        urls.append(("lms/", "lms.urls"))
+    if ENABLE_COMMUNITY:
+        urls.append(("community/", "community.urls"))
+    if ENABLE_MCP:
+        urls.append(("mcp/", "mcp.urls"))
+    return urls
