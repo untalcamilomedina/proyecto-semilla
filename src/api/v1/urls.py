@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from config.settings.plugins import optional_api_urls
 
-from .views import csrf
+from .views import csrf, me, login_view, logout_view, signup_view
 from .viewsets import (
     ApiKeyViewSet,
     InvoiceViewSet,
@@ -30,6 +30,10 @@ router.register("api-keys", ApiKeyViewSet, basename="api-keys")
 
 urlpatterns = [
     re_path(r"^csrf/?$", csrf, name="csrf"),
+    re_path(r"^me/?$", me, name="me"),
+    re_path(r"^login/?$", login_view, name="login"),
+    re_path(r"^logout/?$", logout_view, name="logout"),
+    re_path(r"^signup/?$", signup_view, name="signup"),
     path("", include(router.urls)),
 ]
 
