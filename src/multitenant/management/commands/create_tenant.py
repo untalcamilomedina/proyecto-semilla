@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.db import transaction, connection
 
 from multitenant.models import Domain, Tenant
-from multitenant.schema import PUBLIC_SCHEMA_NAME, create_schema, schema_context
+from multitenant.schema import PUBLIC_SCHEMA_NAME, create_schema, drop_schema, schema_context
 
 
 class Command(BaseCommand):
@@ -37,26 +37,36 @@ class Command(BaseCommand):
         )
         tenant.full_clean()
 
+        # Phase 1: Create tenant, schema, and domain in public (atomic DML)
         with transaction.atomic():
             with schema_context(PUBLIC_SCHEMA_NAME):
                 tenant.save()
                 create_schema(schema_name)
                 Domain.objects.create(tenant=tenant, domain=domain, is_primary=True)
 
+        # Phase 2: Run migrations in new schema (DDL - must be outside transaction)
+        # PostgreSQL cannot run ALTER TABLE with pending trigger events in same transaction
+        try:
             with schema_context(schema_name):
-                 # Force search path to strictly tenant to ensure migrations table is created locally
-                 # and not found in public. This works around migration seeing 'public.django_migrations'.
+                # Force search path to strictly tenant schema
                 with connection.cursor() as cursor:
-                     cursor.execute(f'SET search_path TO "{schema_name}"')
-                
-                # Run migrations for the new tenant
-                call_command("migrate", interactive=False)
-                
-                # Restore search path to include public for the rest of the block (e.g. data insertion)
-                # Note: We rely on PUBLIC_SCHEMA_NAME constant (usually "public")
-                with connection.cursor() as cursor:
-                     cursor.execute(f'SET search_path TO "{schema_name}", {PUBLIC_SCHEMA_NAME}')
+                    cursor.execute(f'SET search_path TO "{schema_name}"')
+                call_command("migrate", interactive=False, verbosity=0)
+        except Exception as e:
+            # Rollback phase 1 if migrations fail
+            self.stderr.write(self.style.ERROR(f"Migration failed: {e}"))
+            with schema_context(PUBLIC_SCHEMA_NAME):
+                Domain.objects.filter(tenant=tenant).delete()
+                tenant.delete()
+            drop_schema(schema_name)
+            raise CommandError(f"Migration failed, tenant rolled back: {e}") from e
 
+        # Phase 3: Create tenant copy in new schema (atomic DML)
+        with transaction.atomic():
+            with schema_context(schema_name):
+                # Restore search path to include public
+                with connection.cursor() as cursor:
+                    cursor.execute(f'SET search_path TO "{schema_name}", {PUBLIC_SCHEMA_NAME}')
                 Tenant.objects.create(
                     id=tenant.id,
                     name=tenant.name,

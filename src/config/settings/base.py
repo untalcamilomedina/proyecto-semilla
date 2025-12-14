@@ -6,7 +6,7 @@ from pathlib import Path
 import dj_database_url
 from environs import Env
 
-from .plugins import MULTITENANT_MODE, optional_apps
+from .plugins import ENABLE_CMS, MULTITENANT_MODE, optional_apps
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
 SRC_DIR = ROOT_DIR / "src"
@@ -20,6 +20,24 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 DOMAIN_BASE = env.str("DOMAIN_BASE", default="acme.dev")
+
+WAGTAIL_APPS: list[str] = []
+if ENABLE_CMS:
+    WAGTAIL_APPS = [
+        "wagtail.contrib.forms",
+        "wagtail.contrib.redirects",
+        "wagtail.embeds",
+        "wagtail.sites",
+        "wagtail.users",
+        "wagtail.snippets",
+        "wagtail.documents",
+        "wagtail.images",
+        "wagtail.search",
+        "wagtail.admin",
+        "wagtail",
+        "modelcluster",
+        "taggit",
+    ]
 
 INSTALLED_APPS = [
     # Django
@@ -42,6 +60,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "axes",
     "csp",
+    # Wagtail (optional)
+] + WAGTAIL_APPS + [
     # First-party
     "common",
     "core",
@@ -217,10 +237,11 @@ CONTENT_SECURITY_POLICY_DIRECTIVES = {
         "https://cdn.tailwindcss.com",
         "https://unpkg.com",
         "https://js.stripe.com",
+        "https://cdn.jsdelivr.net",
     ),
-    "style-src": ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com"),
+    "style-src": ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"),
     "font-src": ("'self'", "https://fonts.gstatic.com"),
-    "img-src": ("'self'", "data:"),
+    "img-src": ("'self'", "data:", "https://cdn.jsdelivr.net"),
     "connect-src": (
         "'self'",
         "https://sentry.io",

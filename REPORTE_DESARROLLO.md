@@ -1,7 +1,7 @@
 # Reporte de Desarrollo — Proyecto Semilla
-**Fecha:** 13 de diciembre de 2025  
-**Versión:** v0.9.1  
-**Estado:** Docker levantado y operativo
+**Fecha:** 14 de diciembre de 2025  
+**Versión:** v0.9.2  
+**Estado:** Docker levantado y operativo, módulos opcionales implementados
 
 ## 📊 Resumen Ejecutivo
 
@@ -35,6 +35,38 @@ URLs:
 ✅ **Django 5.2.9** (dentro del rango `>=5.0,<6.0`)
 - Resuelve el reto #1 del RESUMEN_PROYECTO.md
 - Fijado correctamente en `requirements/base.txt` como `Django>=5.0,<6.0`
+
+---
+
+## 🧭 Actualización v0.9.2 — Módulos Opcionales + Fix Wagtail/Multitenancy
+
+### Módulos Implementados (con Codex CLI)
+
+| Módulo | Modelos | Estado |
+|--------|---------|--------|
+| **CMS** (Wagtail) | HomePage, ArticleIndexPage, ArticlePage | ✅ Migrado |
+| **LMS** | Course, Lesson, Enrollment, LessonProgress | ✅ Migrado |
+| **Community** | Forum, Topic, Post | ✅ Migrado |
+| **MCP** | McpServer, McpTool, McpResource, McpUsageLog | ✅ Migrado |
+
+Todos los modelos son **tenant-aware** con `ForeignKey` a `multitenant.Tenant`.
+
+### Fix: Wagtail + PostgreSQL Transactional Conflict
+
+**Problema resuelto:** El comando `create_tenant` ejecutaba migraciones DDL dentro de `transaction.atomic()`, causando error "cannot ALTER TABLE because it has pending trigger events" en PostgreSQL.
+
+**Solución implementada:**
+1. Separar creación de tenant (DML) de migraciones (DDL)
+2. Las migraciones ahora se ejecutan **fuera** de la transacción atómica
+3. Agregado `drop_schema()` en `schema.py` para rollback si falla migración
+
+**Archivos modificados:**
+- `src/multitenant/management/commands/create_tenant.py` - Refactorizado en 3 fases
+- `src/multitenant/schema.py` - Agregado `drop_schema()`
+- `src/cms/models.py` - Corregido `on_delete=models.PROTECT` para Wagtail
+
+### Tests
+✅ **20/20 tests pasan** (incluyendo `test_create_tenant_command`)
 
 ---
 
@@ -158,12 +190,12 @@ URLs:
 - `api` - DRF versionado `/api/v1`, auth por API key, OpenAPI
 - `oauth` - django-allauth con rate-limit
 
-### Módulos Apagados (Feature Flags)
-✅ **Scaffolding presente pero deshabilitado:**
-- `cms` (Wagtail) - `ENABLE_CMS=False`
-- `lms` - `ENABLE_LMS=False`
-- `community` - `ENABLE_COMMUNITY=False`
-- `mcp` - `ENABLE_MCP=False`
+### Módulos Opcionales (Feature Flags) — v0.9.2
+✅ **Implementados y habilitados en desarrollo:**
+- `cms` (Wagtail) - `ENABLE_CMS=1` - HomePage, ArticleIndexPage, ArticlePage
+- `lms` - `ENABLE_LMS=1` - Course, Lesson, Enrollment, LessonProgress
+- `community` - `ENABLE_COMMUNITY=1` - Forum, Topic, Post
+- `mcp` - `ENABLE_MCP=1` - McpServer, McpTool, McpResource, McpUsageLog
 
 ### Configuración
 ✅ **Settings bien estructurados:**

@@ -30,6 +30,14 @@ def create_schema(schema_name: str) -> None:
         cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {_quote(schema_name)}")
 
 
+def drop_schema(schema_name: str) -> None:
+    """Drop a schema (for rollback scenarios)."""
+    if connection.vendor != "postgresql":  # pragma: no cover
+        return
+    with connection.cursor() as cursor:
+        cursor.execute(f"DROP SCHEMA IF EXISTS {_quote(schema_name)} CASCADE")
+
+
 @contextmanager
 def schema_context(schema_name: str):
     previous = get_current_schema()
