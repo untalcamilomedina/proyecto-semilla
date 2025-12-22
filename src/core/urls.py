@@ -16,7 +16,6 @@ from .views.roles import (
 app_name = "core"
 
 urlpatterns = [
-    path("onboarding/", include("core.onboarding.urls")),
     path("", DashboardView.as_view(), name="dashboard"),
     path("members/", MemberListView.as_view(), name="member_list"),
     path("members/invite/", MemberInviteView.as_view(), name="member_invite"),

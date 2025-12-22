@@ -1,0 +1,236 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "create": "Create",
+        "back": "Back",
+        "next": "Next",
+        "continue": "Continue",
+        "submit": "Submit",
+        "close": "Close",
+        "confirm": "Confirm",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "import": "Import",
+        "actions": "Actions",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "auth": {
+        "login": "Log in",
+        "logout": "Log out",
+        "signup": "Sign up",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "forgotPassword": "Forgot your password?",
+        "rememberMe": "Remember me"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "members": "Members",
+        "roles": "Roles",
+        "billing": "Billing",
+        "settings": "Settings"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome, {name}",
+        "organization": "Organization",
+        "name": "Name",
+        "slug": "Slug",
+        "plan": "Plan",
+        "modules": "Modules",
+        "modulesActive": "{count} active",
+        "quickActions": "Quick actions",
+        "inviteMembers": "Invite members",
+        "manageRoles": "Manage roles",
+        "viewBilling": "View billing",
+        "stats": {
+            "members": "Members",
+            "roles": "Roles",
+            "billing": "Billing",
+            "usage": "Usage"
+        }
+    },
+    "members": {
+        "title": "Members",
+        "description": "Manage your organization's members",
+        "count": "{count} members",
+        "invite": "Invite",
+        "inviteTitle": "Invite members",
+        "inviteDescription": "Enter the emails of people to invite (one per line)",
+        "emails": "Emails",
+        "emailsPlaceholder": "email1@example.com\nemail2@example.com",
+        "role": "Role",
+        "sendInvitations": "Send invitations",
+        "noMembers": "No members yet",
+        "errorInviting": "Error inviting"
+    },
+    "roles": {
+        "title": "Roles",
+        "description": "Manage roles and permissions for your organization",
+        "newRole": "New Role",
+        "editRole": "Edit role",
+        "createRole": "Create new role",
+        "createDescription": "Create a new role for your organization",
+        "editDescription": "Modify role details",
+        "name": "Name",
+        "namePlaceholder": "Role name",
+        "roleDescription": "Description",
+        "descriptionPlaceholder": "Role description...",
+        "permissions": "Permissions",
+        "permissionsSelected": "{count} selected",
+        "saveChanges": "Save changes",
+        "noRoles": "No roles yet. Create the first one.",
+        "noDescription": "No description",
+        "system": "System",
+        "errorCreating": "Error creating role",
+        "errorUpdating": "Error updating role"
+    },
+    "billing": {
+        "title": "Billing",
+        "description": "Manage your subscription, plans and invoices",
+        "currentSubscription": "Current subscription",
+        "noSubscription": "No active subscription",
+        "plan": "Plan",
+        "nextInvoice": "Next invoice",
+        "users": "Users",
+        "cancelSubscription": "Cancel subscription",
+        "willCancelAtEnd": "Will cancel at end of period",
+        "availablePlans": "Available plans",
+        "noPlans": "No plans available.",
+        "current": "Current",
+        "currentPlan": "Current plan",
+        "changePlan": "Change plan",
+        "select": "Select",
+        "upToUsers": "Up to {count} users",
+        "trialDays": "{count} day trial",
+        "free": "Free",
+        "perMonth": "/month",
+        "perYear": "/year",
+        "confirmCancel": "Cancel subscription?",
+        "cancelDescription": "Your subscription will remain active until the end of the current period. No further charges will be made.",
+        "keepSubscription": "Keep subscription",
+        "confirmCancellation": "Confirm cancellation",
+        "changeTo": "Change to {name}",
+        "changeDescription": "Your subscription will be updated immediately.",
+        "newPlanDescription": "You will start with the new selected plan.",
+        "confirmChange": "Confirm change",
+        "invoiceHistory": "Invoice history",
+        "noInvoices": "No invoices yet",
+        "paid": "Paid",
+        "status": {
+            "active": "Active",
+            "trialing": "Trial",
+            "past_due": "Past due",
+            "canceled": "Canceled",
+            "incomplete": "Incomplete"
+        }
+    },
+    "onboarding": {
+        "step1": {
+            "title": "Create your organization",
+            "description": "Step 1 of 6 — Set up your workspace",
+            "orgName": "Organization name",
+            "orgNamePlaceholder": "My Company",
+            "subdomain": "Subdomain",
+            "subdomainPlaceholder": "my-company",
+            "adminEmail": "Admin email",
+            "adminEmailPlaceholder": "admin@example.com",
+            "password": "Password",
+            "passwordPlaceholder": "Minimum 8 characters",
+            "confirmPassword": "Confirm password",
+            "confirmPasswordPlaceholder": "Repeat your password"
+        },
+        "step2": {
+            "title": "Select modules",
+            "description": "Step 2 of 6 — Choose the features you need",
+            "changeLater": "You can change this later from settings",
+            "modules": {
+                "cms": {
+                    "label": "CMS (Wagtail)",
+                    "description": "Content management system"
+                },
+                "lms": {
+                    "label": "LMS (Courses)",
+                    "description": "Learning and course platform"
+                },
+                "community": {
+                    "label": "Community",
+                    "description": "Forums and user community"
+                },
+                "mcp": {
+                    "label": "MCP Server",
+                    "description": "AI tools integration"
+                }
+            }
+        },
+        "step3": {
+            "title": "Connect Stripe",
+            "description": "Step 3 of 6 — Set up payments for your organization",
+            "connected": "Stripe connected",
+            "connectedDescription": "Your Stripe account is ready to receive payments",
+            "connectDescription": "Connect your Stripe account to receive payments and manage subscriptions.",
+            "connect": "Connect Stripe",
+            "skipForNow": "Skip for now",
+            "configLater": "You can configure this later if you prefer"
+        },
+        "step4": {
+            "title": "Custom domain",
+            "description": "Step 4 of 6 — Optional: use your own domain",
+            "customDomain": "Custom domain (optional)",
+            "customDomainPlaceholder": "app.yourdomain.com",
+            "dnsConfig": "DNS Configuration",
+            "dnsDescription": "If you configure a custom domain, you'll need to add a CNAME record pointing to",
+            "leaveEmpty": "You can leave this empty and use the assigned subdomain"
+        },
+        "step5": {
+            "title": "Invite your team",
+            "description": "Step 5 of 6 — Add members to your organization",
+            "memberEmails": "Member emails",
+            "emailsPlaceholder": "email1@example.com\nemail2@example.com\nemail3@example.com",
+            "emailsHint": "One email per line or separated by commas",
+            "invitationNotice": "An invitation email will be sent to each address",
+            "sending": "Sending..."
+        },
+        "step6": {
+            "title": "All set!",
+            "description": "Your organization is configured and ready to use",
+            "nextSteps": "Suggested next steps",
+            "exploreDashboard": "Explore the dashboard",
+            "configureRoles": "Configure roles and permissions",
+            "inviteMore": "Invite more team members",
+            "customizePlan": "Customize your subscription plan",
+            "stepCompleted": "Step completed",
+            "orgCreated": "Organization created",
+            "modulesConfigured": "Modules configured",
+            "domainAssigned": "Domain assigned",
+            "teamInvited": "Team invited",
+            "goToDashboard": "Go to Dashboard",
+            "accessSettings": "You can access this configuration from Settings at any time"
+        },
+        "errors": {
+            "startError": "Error starting",
+            "modulesError": "Error saving modules",
+            "stripeError": "Error saving configuration",
+            "domainError": "Error saving domain",
+            "inviteError": "Error sending invitations",
+            "connectionError": "Connection error"
+        },
+        "validation": {
+            "minChars": "Minimum {count} characters",
+            "maxChars": "Maximum {count} characters",
+            "invalidEmail": "Invalid email",
+            "invalidSubdomain": "Only lowercase letters, numbers and hyphens",
+            "passwordsMatch": "Passwords don't match",
+            "invalidDomain": "Invalid domain (e.g. app.example.com)"
+        }
+    }
+}

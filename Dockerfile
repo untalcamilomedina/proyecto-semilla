@@ -1,13 +1,13 @@
-FROM python:3.12-slim AS builder
+FROM python:3.12 AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+  PYTHONUNBUFFERED=1
 
 WORKDIR /build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
+  build-essential \
+  libpq-dev \
   && rm -rf /var/lib/apt/lists/*
 
 COPY requirements/ /build/requirements/
@@ -16,17 +16,17 @@ RUN pip install --upgrade pip wheel \
   && pip wheel --wheel-dir /build/wheels -r /build/requirements/prod.txt
 
 
-FROM python:3.12-slim AS runtime
+FROM python:3.12 AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app/src \
-    DJANGO_SETTINGS_MODULE=config.settings.prod
+  PYTHONUNBUFFERED=1 \
+  PYTHONPATH=/app/src \
+  DJANGO_SETTINGS_MODULE=config.settings.prod
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
+  libpq5 \
   && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /build/wheels /wheels

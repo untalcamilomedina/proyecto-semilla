@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 import withPWA from "@ducanh2912/next-pwa";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -17,4 +20,4 @@ export default withPWA({
   register: true,
   scope: "/",
   sw: "service-worker.js",
-})(nextConfig);
+})(withNextIntl(nextConfig));

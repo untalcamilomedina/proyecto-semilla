@@ -52,6 +52,7 @@ export default function OnboardingStartPage() {
                 subdomain: data.subdomain,
                 admin_email: data.admin_email,
                 password: data.password,
+                confirm_password: data.password_confirm,
             });
             router.push("/onboarding/modules");
         } catch (err) {

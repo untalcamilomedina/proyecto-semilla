@@ -49,6 +49,20 @@ export default function OnboardingInvitePage() {
         }
     };
 
+    const onSkip = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            // Send empty list to mark step as completed without invites
+            await apiPost("/api/v1/onboarding/invite/", { emails: [] });
+            router.push("/onboarding/done");
+        } catch (err) {
+            // Even if API fails, we can probably proceed to done in this specific skipping case
+            // But let's try to be consistent
+            router.push("/onboarding/done");
+        }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 px-4 py-12">
             <Card className="w-full max-w-lg">
@@ -101,6 +115,14 @@ export default function OnboardingInvitePage() {
                         >
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Atrás
+                        </Button>
+                        <Button 
+                            type="button" 
+                            variant="ghost" 
+                            onClick={onSkip} 
+                            disabled={isLoading}
+                        >
+                            Saltar
                         </Button>
                         <Button type="submit" className="flex-1" isLoading={isLoading}>
                             {isLoading ? "Enviando..." : "Enviar invitaciones"}

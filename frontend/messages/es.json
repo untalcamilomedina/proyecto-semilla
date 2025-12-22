@@ -1,0 +1,236 @@
+{
+    "common": {
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "create": "Crear",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "continue": "Continuar",
+        "submit": "Enviar",
+        "close": "Cerrar",
+        "confirm": "Confirmar",
+        "search": "Buscar",
+        "filter": "Filtrar",
+        "export": "Exportar",
+        "import": "Importar",
+        "actions": "Acciones",
+        "yes": "Sí",
+        "no": "No"
+    },
+    "auth": {
+        "login": "Iniciar sesión",
+        "logout": "Cerrar sesión",
+        "signup": "Registrarse",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "rememberMe": "Recordarme"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "members": "Miembros",
+        "roles": "Roles",
+        "billing": "Facturación",
+        "settings": "Configuración"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Bienvenido, {name}",
+        "organization": "Organización",
+        "name": "Nombre",
+        "slug": "Slug",
+        "plan": "Plan",
+        "modules": "Módulos",
+        "modulesActive": "{count} activos",
+        "quickActions": "Acciones rápidas",
+        "inviteMembers": "Invitar miembros",
+        "manageRoles": "Gestionar roles",
+        "viewBilling": "Ver facturación",
+        "stats": {
+            "members": "Miembros",
+            "roles": "Roles",
+            "billing": "Facturación",
+            "usage": "Uso"
+        }
+    },
+    "members": {
+        "title": "Miembros",
+        "description": "Gestiona los miembros de tu organización",
+        "count": "{count} miembros",
+        "invite": "Invitar",
+        "inviteTitle": "Invitar miembros",
+        "inviteDescription": "Ingresa los emails de las personas a invitar (uno por línea)",
+        "emails": "Emails",
+        "emailsPlaceholder": "email1@example.com\nemail2@example.com",
+        "role": "Rol",
+        "sendInvitations": "Enviar invitaciones",
+        "noMembers": "No hay miembros todavía",
+        "errorInviting": "Error al invitar"
+    },
+    "roles": {
+        "title": "Roles",
+        "description": "Gestiona los roles y permisos de tu organización",
+        "newRole": "Nuevo Rol",
+        "editRole": "Editar rol",
+        "createRole": "Crear nuevo rol",
+        "createDescription": "Crea un nuevo rol para tu organización",
+        "editDescription": "Modifica los detalles del rol",
+        "name": "Nombre",
+        "namePlaceholder": "Nombre del rol",
+        "roleDescription": "Descripción",
+        "descriptionPlaceholder": "Descripción del rol...",
+        "permissions": "Permisos",
+        "permissionsSelected": "{count} seleccionados",
+        "saveChanges": "Guardar cambios",
+        "noRoles": "No hay roles todavía. Crea el primero.",
+        "noDescription": "Sin descripción",
+        "system": "Sistema",
+        "errorCreating": "Error al crear rol",
+        "errorUpdating": "Error al actualizar rol"
+    },
+    "billing": {
+        "title": "Facturación",
+        "description": "Gestiona tu suscripción, planes y facturas",
+        "currentSubscription": "Suscripción actual",
+        "noSubscription": "Sin suscripción activa",
+        "plan": "Plan",
+        "nextInvoice": "Próxima factura",
+        "users": "Usuarios",
+        "cancelSubscription": "Cancelar suscripción",
+        "willCancelAtEnd": "Se cancelará al final del período",
+        "availablePlans": "Planes disponibles",
+        "noPlans": "No hay planes disponibles.",
+        "current": "Actual",
+        "currentPlan": "Plan actual",
+        "changePlan": "Cambiar plan",
+        "select": "Seleccionar",
+        "upToUsers": "Hasta {count} usuarios",
+        "trialDays": "{count} días de prueba",
+        "free": "Gratis",
+        "perMonth": "/mes",
+        "perYear": "/año",
+        "confirmCancel": "¿Cancelar suscripción?",
+        "cancelDescription": "Tu suscripción permanecerá activa hasta el final del período actual. No se realizarán más cobros.",
+        "keepSubscription": "Mantener suscripción",
+        "confirmCancellation": "Confirmar cancelación",
+        "changeTo": "Cambiar a {name}",
+        "changeDescription": "Tu suscripción se actualizará inmediatamente.",
+        "newPlanDescription": "Comenzarás con el nuevo plan seleccionado.",
+        "confirmChange": "Confirmar cambio",
+        "invoiceHistory": "Historial de facturas",
+        "noInvoices": "No hay facturas todavía",
+        "paid": "Pagada",
+        "status": {
+            "active": "Activa",
+            "trialing": "Prueba",
+            "past_due": "Pago pendiente",
+            "canceled": "Cancelada",
+            "incomplete": "Incompleta"
+        }
+    },
+    "onboarding": {
+        "step1": {
+            "title": "Crea tu organización",
+            "description": "Paso 1 de 6 — Configura tu espacio de trabajo",
+            "orgName": "Nombre de la organización",
+            "orgNamePlaceholder": "Mi Empresa",
+            "subdomain": "Subdominio",
+            "subdomainPlaceholder": "mi-empresa",
+            "adminEmail": "Email del administrador",
+            "adminEmailPlaceholder": "admin@ejemplo.com",
+            "password": "Contraseña",
+            "passwordPlaceholder": "Mínimo 8 caracteres",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Repite tu contraseña"
+        },
+        "step2": {
+            "title": "Selecciona módulos",
+            "description": "Paso 2 de 6 — Elige las funcionalidades que necesitas",
+            "changeLater": "Puedes cambiar esto más tarde desde la configuración",
+            "modules": {
+                "cms": {
+                    "label": "CMS (Wagtail)",
+                    "description": "Sistema de gestión de contenido"
+                },
+                "lms": {
+                    "label": "LMS (Courses)",
+                    "description": "Plataforma de cursos y aprendizaje"
+                },
+                "community": {
+                    "label": "Community",
+                    "description": "Foros y comunidad de usuarios"
+                },
+                "mcp": {
+                    "label": "MCP Server",
+                    "description": "Integración con herramientas IA"
+                }
+            }
+        },
+        "step3": {
+            "title": "Conecta Stripe",
+            "description": "Paso 3 de 6 — Configura pagos para tu organización",
+            "connected": "Stripe conectado",
+            "connectedDescription": "Tu cuenta de Stripe está lista para recibir pagos",
+            "connectDescription": "Conecta tu cuenta de Stripe para poder recibir pagos y gestionar suscripciones.",
+            "connect": "Conectar Stripe",
+            "skipForNow": "Omitir por ahora",
+            "configLater": "Puedes configurar esto más tarde si lo prefieres"
+        },
+        "step4": {
+            "title": "Dominio personalizado",
+            "description": "Paso 4 de 6 — Opcional: usa tu propio dominio",
+            "customDomain": "Dominio personalizado (opcional)",
+            "customDomainPlaceholder": "app.tudominio.com",
+            "dnsConfig": "Configuración DNS",
+            "dnsDescription": "Si configuras un dominio personalizado, deberás agregar un registro CNAME apuntando a",
+            "leaveEmpty": "Puedes dejar esto vacío y usar el subdominio asignado"
+        },
+        "step5": {
+            "title": "Invita a tu equipo",
+            "description": "Paso 5 de 6 — Agrega miembros a tu organización",
+            "memberEmails": "Emails de los miembros",
+            "emailsPlaceholder": "email1@ejemplo.com\nemail2@ejemplo.com\nemail3@ejemplo.com",
+            "emailsHint": "Un email por línea o separados por comas",
+            "invitationNotice": "Se enviará un email de invitación a cada dirección",
+            "sending": "Enviando..."
+        },
+        "step6": {
+            "title": "¡Todo listo!",
+            "description": "Tu organización está configurada y lista para usar",
+            "nextSteps": "Próximos pasos sugeridos",
+            "exploreDashboard": "Explora el dashboard",
+            "configureRoles": "Configura roles y permisos",
+            "inviteMore": "Invita más miembros al equipo",
+            "customizePlan": "Personaliza tu plan de suscripción",
+            "stepCompleted": "Paso completado",
+            "orgCreated": "Organización creada",
+            "modulesConfigured": "Módulos configurados",
+            "domainAssigned": "Dominio asignado",
+            "teamInvited": "Equipo invitado",
+            "goToDashboard": "Ir al Dashboard",
+            "accessSettings": "Puedes acceder a esta configuración desde Ajustes en cualquier momento"
+        },
+        "errors": {
+            "startError": "Error al iniciar",
+            "modulesError": "Error al guardar módulos",
+            "stripeError": "Error al guardar configuración",
+            "domainError": "Error al guardar dominio",
+            "inviteError": "Error al enviar invitaciones",
+            "connectionError": "Error de conexión"
+        },
+        "validation": {
+            "minChars": "Mínimo {count} caracteres",
+            "maxChars": "Máximo {count} caracteres",
+            "invalidEmail": "Email inválido",
+            "invalidSubdomain": "Solo letras minúsculas, números y guiones",
+            "passwordsMatch": "Las contraseñas no coinciden",
+            "invalidDomain": "Dominio inválido (ej: app.ejemplo.com)"
+        }
+    }
+}
