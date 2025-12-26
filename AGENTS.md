@@ -1,42 +1,64 @@
 # AGENTS.md
 
-## Project Context
-**Proyecto Semilla** is a SaaS boilerplate using a hybrid architecture:
-- **Backend**: Django REST Framework (Python 3.12+).
-- **Frontend**: Next.js (Headless UI) consuming the API.
-- **Database**: PostgreSQL (Multi-tenant with `django-tenant-schemas`).
-- **Infra**: Docker Compose for local development.
+> [!IMPORTANT]
+> This file is the **PRIMARY SOURCE OF TRUTH** for any AI agent working on this project. Read it completely before starting any task.
+
+## Context
+**Proyecto Semilla** is a SaaS boilerplate built for scalability, security, and offline-first usage.
+- **Architecture**: Hybrid (Django REST Backend + Next.js Frontend).
+- **Core Principles**:
+  - **Stateless**: The backend must remain stateless.
+  - **PWA OfflineFirst**: The frontend must work offline using encrypted IndexedDB.
+  - **Secure by Default**: No hardcoded secrets. strict CSP/CORS.
+
+## Tech Stack
+### Backend
+- **Framework**: Django 5.x (DRF)
+- **Database**: PostgreSQL (Multi-tenant via `django-tenant-schemas`)
+- **Async**: Celery + Redis
+
+### Frontend
+- **Framework**: Next.js 16.1.1 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4 + Radix UI + Lucide React
+- **State**: TanStack Query v5 (Server) + Context (Client)
+- **Storage**: IndexedDB (`dexie` + `crypto-js` for AES encryption)
+- **i18n**: `next-intl`
 
 ## Setup Commands
-The project runs fully in Docker. Do not run services on the host machine directly.
+> [!WARNING]
+> ALWAYS run commands inside Docker containers. DO NOT run on host.
 
-- **Start Services**: `make dev` (or `docker compose up -d`).
-- **Backend Shell**: `docker exec -it compose-web-1 python manage.py shell`.
-- **Run Tests**: `docker exec compose-web-1 pytest`.
-- **Frontend Logs**: `docker logs -f compose-frontend-1`.
+- **Start API & Frontend**: `make dev` (or `docker compose up -d`)
+- **Backend Shell**: `docker exec -it compose-web-1 python manage.py shell`
+- **Run Tests**: `docker exec compose-web-1 pytest`
+- **Frontend Build**: `cd frontend && npm run build`
 
-## Code Style & Conventions
-### Backend (Python/Django)
-- Follow **PEP 8**.
-- Use **Type Hints** everywhere.
-- **Serializers**: Use for all API validation (replaces Django Forms).
-- **ViewSets**: Prefer `ModelViewSet` or `ViewSet` over function-based views.
-- **Tests**: Use `pytest` with fixtures (see `tests/conftest.py`).
+## Design System
+The system implements **Two Distinct Styles** that coexist:
 
-### Frontend (TypeScript/Next.js)
-- **Framework**: Next.js 14+ (App Router).
-- **Styling**: Tailwind CSS + shadcn/ui.
-- **State**: Use React Hooks + Context. Avoid Redux unless necessary.
-- **i18n**: Use `next-intl`.
-- **API**: Use typed `apiPost`, `apiGet` helpers in `src/lib/api.ts`.
-- **Components**: Functional components only.
+### 1. Glass/Dark (Premium/Feature)
+Used for: *Cards, Modals, High-impact UI.*
+- **Primary**: Neon Green `#0df20d` (`emerald-500`)
+- **Background**: `bg-black/40`, `bg-white/5` (Backdrop Blur XL)
+- **Borders**: `border-white/10`
+- **Shadows**: `.shadow-neon` (Glow effect)
 
-## Architecture Notes
-- **Authentication**: JWT/Session handled by Django. Frontend proxies requests via Rewrites (`next.config.ts`).
-- **Onboarding**: Flows via `/api/v1/onboarding/` endpoints.
-- **Tenancy**: Identified by Header `X-Tenant-ID` or Subdomain.
+### 2. Clean/Minimal (Structure/Dashboard)
+Used for: *Layouts, Forms, Data Tables.*
+- **Palette**: Zinc 900 (Text), Zinc 100/White (Bg)
+- **Style**: Solid backgrounds, thin borders (`zinc-200`), no blur.
 
-## Critical Rules
-- **Docker First**: Always assume code runs in containers. File paths in tests/commands must match container paths.
-- **No HTML Views**: All new "views" must be React pages. Django only serves API JSON.
-- **Testing**: Tests must pass inside the container before committing.
+## Architecture & Security Rules
+1.  **Environment Variables**: usage of `os.environ` or `django-environ` is MANDATORY. Never hardcode URLs like `localhost:3000`.
+2.  **Statelessness**: No state in memory. Use Redis for temporary data.
+3.  **Offline**: Critical user data must be syncable. Read from Local DB -> Background Sync to API.
+4.  **Security**:
+    - All IndexedDB data MUST be encrypted (AES).
+    - API keys and secrets in `.env` only.
+
+## Directory Structure
+- `src/`: Django Backend Source
+- `frontend/`: Next.js Frontend Source
+  - `src/components/ui/glass/`: Specific Glassmorphism components.
+  - `src/lib/storage.ts`: Encrypted Storage Logic.

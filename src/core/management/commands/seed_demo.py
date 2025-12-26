@@ -25,14 +25,21 @@ class Command(BaseCommand):
                 call_command("create_tenant", "Demo Corp", "demo", plan="premium")
                 tenant = Tenant.objects.get(slug="demo")
 
-            Domain.objects.get_or_create(
-                domain="localhost",
-                defaults={"tenant": tenant, "is_primary": False},
-            )
-            Domain.objects.get_or_create(
-                domain="127.0.0.1",
-                defaults={"tenant": tenant, "is_primary": False},
-            )
+            # Create domains based on ALLOWED_HOSTS or defaults to ensure accessibility
+            from django.conf import settings
+            
+            domains_to_create = getattr(settings, "ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
+            # Filter out wildcard or special hosts if necessary, or just create them
+            # For a demo seed, we usually want localhost availability.
+            
+            for domain_name in domains_to_create:
+                if domain_name in ["web", "frontend", ".acme.dev", "*"]:
+                   continue 
+                   
+                Domain.objects.get_or_create(
+                    domain=domain_name,
+                    defaults={"tenant": tenant, "is_primary": False},
+                )
 
         self.stdout.write("Seeding RBAC...")
         call_command("seed_rbac")
