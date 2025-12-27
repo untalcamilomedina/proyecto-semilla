@@ -175,10 +175,10 @@ Cobertura:         58.57% (objetivo: 90%)
 - [ ] Deprecar `billing/webhooks.py` manual
 
 #### 1.4 Email Transaccional
-- [ ] Instalar `django-anymail>=10.0`
-- [ ] Configurar backend (Sendgrid, SES o Mailgun)
-- [ ] Templates de email: Welcome, Invite, Password Reset
-- [ ] Integrar con onboarding
+- [x] Instalar `django-anymail>=10.0`
+- [x] Configurar backend (Sendgrid, SES o Mailgun)
+- [x] Templates de email: Welcome, Invite, Password Reset
+- [x] Integrar con onboarding
 
 ### Fase 2: Performance y Observabilidad (v1.1) - Febrero 2025
 

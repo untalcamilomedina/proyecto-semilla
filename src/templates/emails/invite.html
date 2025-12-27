@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .button { background-color: #4F46E5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .footer { margin-top: 30px; font-size: 0.8em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>You've been invited!</h1>
+        <p>Hi,</p>
+        <p><strong>{{ inviter.email }}</strong> has invited you to join the workspace <strong>{{ organization.name }}</strong> on {{ site_name }}.</p>
+        <p>
+            <a href="{{ invite_url }}" class="button">Accept Invitation</a>
+        </p>
+        <div class="footer">
+            <p>If you were not expecting this invitation, you can safely ignore this email.</p>
+        </div>
+    </div>
+</body>
+</html>

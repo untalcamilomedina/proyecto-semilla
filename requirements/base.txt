@@ -26,3 +26,4 @@ stripe>=11.0
 gunicorn>=21.2
 uvicorn>=0.30
 dj-stripe
+django-anymail[sendgrid]

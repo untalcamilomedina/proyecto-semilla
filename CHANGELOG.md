@@ -5,6 +5,16 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.9.4 - (2025-12-27)
+
+### Added
+- **Email Transactional**: Integration with `django-anymail` for robust email delivery.
+- **EmailService**: Abstraction layer for sending emails (`src/core/services/email.py`).
+- **Templates**: HTML and TXT templates for Welcome and Invite emails.
+- **Integration**:
+    - Automatic welcome email upon Onboarding completion.
+    - Invitation emails sent via `MembershipViewSet`.
+
 ## v0.9.3 - (2025-12-27)
 
 ### Added

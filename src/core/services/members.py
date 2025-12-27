@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.db import transaction
 
-from common.email import send_welcome_email
+from core.services.email import EmailService
 from core.models import Membership, Role, User
 from core.services.usernames import username_from_email
 
@@ -27,15 +27,11 @@ def invite_members_to_org(organization, emails: list[str], role_slug: str = "mem
             email=email,
             defaults={"username": username_from_email(email)},
         )
-        Membership.objects.get_or_create(
+        membership, _ = Membership.objects.get_or_create(
             user=user, organization=organization, defaults={"role": role}
         )
         from django.conf import settings
-
-        send_welcome_email(
-            email,
-            subject=f"You've been invited to {organization.name}",
-            body=f"Join your organization at https://{organization.slug}.{getattr(settings, 'DOMAIN_BASE', 'acme.dev')}",
-        )
+        invite_url = f"https://{organization.slug}.{getattr(settings, 'DOMAIN_BASE', 'acme.dev')}/join"
+        EmailService.send_invite_email(membership, invite_url)
         invited += 1
     return invited

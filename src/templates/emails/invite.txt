@@ -1,0 +1,9 @@
+You've been invited!
+
+Hi,
+
+{{ inviter.email }} has invited you to join the workspace {{ organization.name }} on {{ site_name }}.
+
+Accept Invitation: {{ invite_url }}
+
+If you were not expecting this invitation, you can safely ignore this email.
