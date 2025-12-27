@@ -360,3 +360,39 @@ El proyecto está en un **estado estable y funcional**. Los principales retos id
 
 El proyecto está listo para continuar el desarrollo y para un handoff estable.
 
+
+***
+
+## 📆 Actualización: 22 de diciembre de 2025 (Sprint 3)
+
+### Estado del Sprint
+- **Backend:** Permisos de `MembershipViewSet` refactorizados y endpoint `/memberships/invite/` operativo.
+- **Frontend:** Implementada página de gestión de miembros con tabla y modal de invitación.
+- **Infra:** Solucionados conflictos de puertos y seguridad CSRF locales.
+
+### Logros Técnicos
+1.  **Frontend Member Management (`/members`):**
+    - Implementada `MembersTable` usando `@tanstack/react-table` y componentes `shadcn/ui`.
+    - Implementado `InviteMemberModal` con validación de emails y feedback visual (`sonner`).
+    - Solucionado conflicto de routing quitando `app/page.tsx` legacy.
+
+2.  **Seguridad y Permisos (Backend):**
+    - **Fix Error 403:** Refactorizado `MembershipViewSet` para separar permisos:
+        - `list`: Acceso a cualquier miembro activo del tenant.
+        - `invite`: Requiere `core.invite_members` (Owner/Admin).
+        - `update/destroy`: Requiere `core.manage_roles`.
+    - **Fix CSRF/CORS:** Configurado `CSRF_TRUSTED_ORIGINS` y `CORS_ALLOWED_ORIGINS` en `config/settings/dev.py` para permitir peticiones desde `http://localhost:3001` (Next.js).
+
+3.  **Multitenancy Local:**
+    - Solucionado problema de "Ghost User" mediante recreación de datos de prueba (`subagenttest` -> `Owner` -> `Demo Corp`).
+    - **Crucial:** Configurado `localhost` como Dominio Principal de `Demo Corp` para asegurar la resolución correcta del tenant en desarrollo.
+
+### Incidencias Resueltas
+- **Conflicto de Puertos:** Detectado conflicto en puerto 3000 (ocupado por otro proyecto). Frontend redirigido a puerto **3001**.
+- **Build Frontend:** Solucionados errores de dependencias (`sonner`, `label`).
+- **Import Error:** Recuperado crash del backend por error de sintaxis en `policies.py`.
+
+### Próximos Pasos (Sprint 3 - Hitos Restantes)
+- [ ] Implementar actualización de roles en línea (Optimistic UI).
+- [ ] Implementar eliminación de miembros (con confirmación destructiva).
+- [ ] Verificación final E2E de todo el flujo (Invitar -> Registrarse -> Acceder).

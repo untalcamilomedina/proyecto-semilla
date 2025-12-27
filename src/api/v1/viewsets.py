@@ -55,7 +55,18 @@ class RoleViewSet(viewsets.ModelViewSet):
 class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
     permission_classes = [PolicyPermission]
-    permission_codenames = ["core.invite_members"]
+
+    def get_permissions(self):
+        permission_classes = super().get_permissions()
+        if self.action == "invite":
+            # Assign explicitly to the instance for PolicyPermission to pick up
+            self.permission_codenames = ["core.invite_members"]
+        elif self.action in ["update", "partial_update", "destroy"]:
+            self.permission_codenames = ["core.manage_roles"]
+        else:
+            # list, retrieve: No specific codename required, just membership (handled by PolicyPermission base check)
+            self.permission_codenames = []
+        return permission_classes
 
     def get_queryset(self):
         return Membership.objects.filter(organization=request_tenant(self.request)).select_related("role", "user")

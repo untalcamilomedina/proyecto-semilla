@@ -25,6 +25,7 @@ def get_membership(user, organization):
         return None
 
 
+
 def has_permission(user, organization, codename: str) -> bool:
     if user is not None and getattr(user, "is_superuser", False):
         return True

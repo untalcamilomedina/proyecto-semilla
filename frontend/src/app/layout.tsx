@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getLocale, getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default async function RootLayout({
       <body className="antialiased">
         <Providers locale={locale} messages={messages}>
           {children}
+          <Toaster />
         </Providers>
       </body>
     </html>

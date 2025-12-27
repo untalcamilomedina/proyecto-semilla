@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 from config.settings.plugins import optional_api_urls
 
 from core.api.onboarding import OnboardingViewSet
+from core.api.dashboard import DashboardViewSet
 from .views import csrf, me, login_view, logout_view, signup_view
 from .viewsets import (
     ApiKeyViewSet,
@@ -21,6 +22,7 @@ from .viewsets import (
 router = DefaultRouter()
 router.trailing_slash = "/?"
 router.register("onboarding", OnboardingViewSet, basename="onboarding")
+router.register("dashboard", DashboardViewSet, basename="dashboard")
 router.register("tenant", TenantViewSet, basename="tenant")
 router.register("permissions", PermissionViewSet, basename="permissions")
 router.register("roles", RoleViewSet, basename="roles")

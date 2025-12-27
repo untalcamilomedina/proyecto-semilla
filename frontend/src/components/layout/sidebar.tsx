@@ -57,7 +57,7 @@ export function Sidebar() {
             <aside
                 className={cn(
                     "fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r border-zinc-200 transition-transform duration-300 ease-in-out",
-                    "lg:translate-x-0 lg:static lg:inset-auto",
+                    "lg:translate-x-0",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >

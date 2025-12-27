@@ -58,3 +58,30 @@ Este documento registra cambios recientes, hallazgos y pendientes del boilerplat
   - Si usas multitenancy schema: `docker compose -f compose/docker-compose.yml exec web python manage.py migrate_tenants`
   - Seed demo: `docker compose -f compose/docker-compose.yml exec web python manage.py seed_demo`
 
+
+## Sprint 3: Gestión de Miembros y Estabilización API (22/12/2025)
+
+### Objetivo
+- Implementar gestión de miembros completa en Frontend.
+- Resolver problemas de permisos y seguridad CORS/CSRF.
+
+### Cambios realizados
+- **Frontend** (`src/app/(dashboard)/members/`)
+  - Página completa con Tabla (Search/Filter/Paginate) y Modal de Invitación.
+  - Fix de dependencias: instalado `sonner` para Toasts.
+- **Backend**
+  - `MembershipViewSet`: Refactorizado para permisos granulares (List vs Invite).
+  - `Policies`: Instrumentado con logs de debug (y corregido error de import).
+  - `Settings`: Fix CSRF/CORS para `localhost:3001`.
+- **Datos**
+  - Fix de datos inconsistentes ("Ghost User") en BD local.
+
+### Estado Actual
+- ✅ Listado de miembros operativo (conectado a BD real).
+- ✅ Invitación de miembros operativa (validada con CSRF).
+- ✅ Autenticación y Tenant Resolution estables.
+
+### Pendientes
+- ⏳ Edición de Rol (UI Optimista).
+- ⏳ Eliminación de Miembro.
+- ⏳ Tests E2E del flujo completo.

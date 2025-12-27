@@ -3,19 +3,71 @@
 // Skip static generation - requires auth
 export const dynamic = "force-dynamic";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Users, Shield, CreditCard, BarChart3 } from "lucide-react";
+import { apiGet } from "@/lib/api";
 
-const stats = [
-    { name: "Miembros", value: "—", icon: Users, color: "bg-blue-500" },
-    { name: "Roles", value: "—", icon: Shield, color: "bg-purple-500" },
-    { name: "Facturación", value: "—", icon: CreditCard, color: "bg-green-500" },
-    { name: "Uso", value: "—", icon: BarChart3, color: "bg-orange-500" },
-];
+interface DashboardData {
+    stats: {
+        total_members: number;
+        active_members: number;
+        pending_invites: number;
+        mrr: number;
+    };
+    recent_activity: any[];
+    modules_status: Record<string, string>;
+}
 
 export default function DashboardPage() {
     const { tenant, user } = useAuth();
+    const [data, setData] = useState<DashboardData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await apiGet<DashboardData>("/api/v1/dashboard/");
+                setData(response);
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (tenant) {
+            fetchData();
+        }
+    }, [tenant]);
+
+    const stats = [
+        { 
+            name: "Miembros", 
+            value: isLoading ? "..." : data?.stats.total_members.toString() || "0", 
+            icon: Users, 
+            color: "bg-blue-500" 
+        },
+        { 
+            name: "Roles", 
+            value: "3", // Hardcoded per backend mock (Roles not in mock stats yet)
+            icon: Shield, 
+            color: "bg-purple-500" 
+        },
+        { 
+            name: "Facturación", 
+            value: isLoading ? "..." : `$${data?.stats.mrr || 0}`, 
+            icon: CreditCard, 
+            color: "bg-green-500" 
+        },
+        { 
+            name: "Uso", 
+            value: "12%", 
+            icon: BarChart3, 
+            color: "bg-orange-500" 
+        },
+    ];
 
     return (
         <div className="space-y-8">
