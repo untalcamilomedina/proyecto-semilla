@@ -27,3 +27,4 @@ gunicorn>=21.2
 uvicorn>=0.30
 dj-stripe
 django-anymail[sendgrid]
+django-silk>=5.0

@@ -26,6 +26,7 @@ urlpatterns = [
     path("metrics", metrics_view),
     path("api/", include("api.urls")),
     path("stripe/", include("djstripe.urls", namespace="djstripe")),
+    path("silk/", include("silk.urls", namespace="silk")),
     path("billing/", include("billing.urls")),
     path("", include("core.urls")),
 ]

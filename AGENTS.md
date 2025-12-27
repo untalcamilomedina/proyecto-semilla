@@ -57,6 +57,11 @@ Used for: *Layouts, Forms, Data Tables.*
     - All IndexedDB data MUST be encrypted (AES).
     - API keys and secrets in `.env` only.
 
+## Performance Standards
+1.  **Observability**: Use `django-silk` to profile slow endpoints.
+2.  **Database**: No N+1 queries. Use `select_related` and `prefetch_related`.
+3.  **Caching**: Use Redis for expensive computations.
+
 ## Directory Structure
 - `src/`: Django Backend Source
 - `frontend/`: Next.js Frontend Source

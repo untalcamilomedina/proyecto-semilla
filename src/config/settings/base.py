@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "csp",
     "djstripe",
     "anymail",
+    "silk",
     # Wagtail (optional)
 ] + WAGTAIL_APPS + [
     # First-party
@@ -83,6 +84,8 @@ if MULTITENANT_MODE == "schema":
     MIDDLEWARE.append("multitenant.middleware.TenantMiddleware")
 MIDDLEWARE += [
     "common.middleware.MetricsMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
+    "silk.middleware.SilkyMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -139,6 +142,9 @@ AUTHENTICATION_BACKENDS = [
     "guardian.backends.ObjectPermissionBackend",
 ]
 
+SITE_ID = 1
+
+
 
 # Email Configuration
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
@@ -154,6 +160,11 @@ ANYMAIL = {
     "SENDGRID_API_KEY": env.str("ANYMAIL_API_KEY", default=""),
     "WEBHOOK_SECRET": env.str("ANYMAIL_WEBHOOK_SECRET", default=""),
 }
+
+# Silk Profiling
+SILKY_PYTHON_PROFILER = True
+SILKY_AUTHENTICATION = True  # User must be logged in
+SILKY_AUTHORISATION = True  # User must be staff
 
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_LOGIN_METHODS = {"email"}

@@ -5,6 +5,13 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.10.0 - (In Progress)
+
+### Added
+- **Performance**: Integrated `django-silk` for request profiling and query optimization.
+- **Monitoring**: Enabled `SILKY_PYTHON_PROFILER` to track execution time and DB queries.
+- **Docs**: Updated `AGENTS.md` with performance standards.
+
 ## v0.9.4 - (2025-12-27)
 
 ### Added
