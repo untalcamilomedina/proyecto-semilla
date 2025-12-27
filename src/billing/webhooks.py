@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from datetime import timezone as dt_timezone
 from typing import Any, Mapping
 
 from django.conf import settings
@@ -71,7 +72,7 @@ def _get_metadata(obj: Mapping[str, Any]) -> dict[str, str]:
 def _epoch_to_dt(epoch: int | None) -> datetime | None:
     if not epoch:
         return None
-    return datetime.fromtimestamp(epoch, tz=timezone.utc)
+    return datetime.fromtimestamp(epoch, tz=dt_timezone.utc)
 
 
 def _handle_checkout_completed(tenant: Tenant, session_obj: Mapping[str, Any]) -> None:

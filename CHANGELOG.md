@@ -5,6 +5,15 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.9.1-mk2] - 2025-12-27
+
+### Agregado
+- **Aumento de Cobertura de Tests**: Se añadieron tests unitarios e integración para áreas críticas.
+    - `tests/test_billing_webhooks.py`: Cobertura completa de webhooks de Stripe (Checkout, Suscripciones, Facturas).
+    - `tests/test_multitenant_middleware.py`: Validación de la resolución de tenants por dominio y headers.
+- **Correcciones**: Fix de compatibilidad `django.utils.timezone` en `src/billing/webhooks.py`.
+- **Estado**: 45/45 tests pasando (100%).
+
 ## [0.9.1-mk1] - 2025-12-27
 
 ### Corregido
