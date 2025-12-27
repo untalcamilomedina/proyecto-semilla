@@ -5,6 +5,12 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.9.1-mk1] - 2025-12-27
+
+### Corregido
+- **Tests Obsoletos Eliminados**: Se eliminaron `tests/test_onboarding_extended.py` y `tests/test_frontend_views.py` que probaban vistas de Django Template reemplazadas por Next.js.
+- **Estabilidad**: Suite de tests pasando al 100% (35/35 tests).
+
 ## [0.9.1] - 2025-12-27
 
 ### Agregado
