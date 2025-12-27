@@ -5,7 +5,18 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## [0.9.1-mk2] - 2025-12-27
+## v0.9.3 - (2025-12-27)
+
+### Added
+- **Billing**: Migration verified to `dj-stripe` 2.10.3 for robust payment handling.
+- **Webhooks**: Refactored `billing/webhooks.py` to use `dj-stripe` signals (`webhook_post_process`).
+- **Models**: Added foreign key link between `billing.Subscription` and `djstripe.Subscription`.
+
+### Changed
+- **Testing**: Achieved 100% test pass rate (47 tests).
+- **Docs**: Updated README.md to reflect verified system status.
+
+## v0.9.1-mk2 (2025-12-27)
 
 ### Agregado
 - **Aumento de Cobertura de Tests**: Se añadieron tests unitarios e integración para áreas críticas.

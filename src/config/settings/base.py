@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "axes",
     "csp",
+    "djstripe",
     # Wagtail (optional)
 ] + WAGTAIL_APPS + [
     # First-party
@@ -221,6 +222,10 @@ SENTRY_DSN = env.str("SENTRY_DSN", default="")
 STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY", default="")
 STRIPE_WEBHOOK_SECRET = env.str("STRIPE_WEBHOOK_SECRET", default="")
 STRIPE_DEFAULT_CURRENCY = env.str("STRIPE_DEFAULT_CURRENCY", default="usd")
+STRIPE_LIVE_MODE = env.bool("STRIPE_LIVE_MODE", default=False)
+DJSTRIPE_WEBHOOK_SECRET = env.str("DJSTRIPE_WEBHOOK_SECRET", default=STRIPE_WEBHOOK_SECRET)
+DJSTRIPE_USE_NATIVE_JSONFIELD = True
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 
 AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
 AXES_COOLOFF_TIME = env.int("AXES_COOLOFF_TIME", default=1)  # hours

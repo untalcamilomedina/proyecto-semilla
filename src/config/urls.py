@@ -25,6 +25,7 @@ urlpatterns = [
     path("readyz", readyz),
     path("metrics", metrics_view),
     path("api/", include("api.urls")),
+    path("stripe/", include("djstripe.urls", namespace="djstripe")),
     path("billing/", include("billing.urls")),
     path("", include("core.urls")),
 ]

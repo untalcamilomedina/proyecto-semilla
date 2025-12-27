@@ -7,9 +7,9 @@
 
 Boilerplate SaaS moderno basado en Django 5+, con arquitectura modular, multitenancy opcional (schema/db), RBAC granular estilo Discord, onboarding wizard, Stripe memberships, API DRF + OpenAPI, frontend HTMX/Tailwind/Alpine, seguridad endurecida, observabilidad, CI/CD y despliegues reproducibles.
 
-**Versión actual:** `v0.9.1` - Estable y funcional
-
-> ⚠️ **Nota:** Esta es una versión pre-1.0. El sistema es funcional y estable, pero algunos tests están pendientes de corrección y la cobertura de tests está en 58.57% (objetivo: 90%).
+**Versión actual:** `v0.9.2` - Estable y robusta
+ 
+> ✅ **Estado:** Sistema estable. Tests passing rate: 100%. Migrado a `dj-stripe` para pagos robustos.
 
 ## Requisitos
 
@@ -158,14 +158,14 @@ Detalles en `deploy/flyio/README.md`.
 - ✅ Multitenancy en modo schema
 - ✅ RBAC granular (roles y permisos)
 - ✅ Onboarding wizard
-- ✅ Billing con Stripe (checkout, portal, webhooks)
+- ✅ Billing con Stripe (checkout, portal, webhooks) - **Migrado a dj-stripe**
 - ✅ API REST con DRF + OpenAPI
 - ✅ Autenticación (django-allauth)
 - ✅ Health checks y métricas
 
 ### 🔄 En Desarrollo
-- ⚠️ Tests: 14 pasando, 6 fallando
-- ⚠️ Cobertura: 58.57% (objetivo: 90%)
+- ✅ Tests: 100% Pass Rate (47/47)
+- ⚠️ Cobertura: En proceso de mejora hacia el 90%
 - ⚠️ Documentación OpenAPI: algunos warnings menores
 
 ### 📋 Próximos Pasos

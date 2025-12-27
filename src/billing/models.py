@@ -69,6 +69,13 @@ class Subscription(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="subscriptions")
     stripe_customer_id = models.CharField(max_length=120, blank=True, default="")
     stripe_subscription_id = models.CharField(max_length=120, blank=True, default="")
+    djstripe_subscription = models.ForeignKey(
+        "djstripe.Subscription",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tenant_subscriptions",
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
     quantity = models.PositiveIntegerField(default=1)
     cancel_at_period_end = models.BooleanField(default=False)
