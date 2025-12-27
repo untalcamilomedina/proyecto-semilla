@@ -63,6 +63,11 @@ INSTALLED_APPS = [
     "djstripe",
     "anymail",
     "silk",
+    "health_check",
+    "health_check.db",
+    "health_check.cache",
+    "health_check.storage",
+    "health_check.contrib.migrations",
     # Wagtail (optional)
 ] + WAGTAIL_APPS + [
     # First-party

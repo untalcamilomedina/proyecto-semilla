@@ -29,3 +29,4 @@ dj-stripe
 django-anymail[sendgrid]
 django-silk>=5.0
 django-redis>=5.4
+django-health-check>=3.18

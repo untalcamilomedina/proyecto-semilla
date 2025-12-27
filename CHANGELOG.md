@@ -5,6 +5,13 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.10.3 - (2025-12-27)
+
+### Added
+- **Observability**: Added `django-health-check` endpoint at `/ht/`.
+- **Infrastructure**: Health checks valid for DB, Redis Cache, Storage (S3/MinIO), and Migrations.
+- **Compliance**: "Enterprise Readiness" achieved via standard health probes.
+
 ## v0.10.2 - (2025-12-27)
 
 ### Added

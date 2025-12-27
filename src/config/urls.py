@@ -24,6 +24,7 @@ urlpatterns = [
     path("healthz", healthz),
     path("readyz", readyz),
     path("metrics", metrics_view),
+    path("ht/", include("health_check.urls")),
     path("api/", include("api.urls")),
     path("stripe/", include("djstripe.urls", namespace="djstripe")),
     path("silk/", include("silk.urls", namespace="silk")),
