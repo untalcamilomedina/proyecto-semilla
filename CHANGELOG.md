@@ -5,6 +5,14 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.10.2 - (2025-12-27)
+
+### Added
+- **Infrastructure**: Switched cache backend to `django-redis` for production-grade caching.
+- **Session**: Configured `SESSION_ENGINE` to use Redis (Stateless backend).
+- **Performance**: Implemented 5-minute caching for `DashboardViewSet` stats.
+- **Security**: Configured `Axes` to use Redis for rate limiting storage.
+
 ## v0.10.1 - (2025-12-27)
 
 ### Fixed

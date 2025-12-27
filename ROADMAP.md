@@ -191,10 +191,10 @@ Cobertura:         58.57% (objetivo: 90%)
 - [x] Optimizar viewsets con `select_related`/`prefetch_related`
 
 #### 2.2 Caching Avanzado
-- [ ] Instalar `django-redis>=5.4`
-- [ ] Configurar cache de sesiones
-- [ ] Cache de queries frecuentes (tenant, roles)
-- [ ] Invalidación automática
+- [x] Instalar `django-redis>=5.4`
+- [x] Configurar cache de sesiones
+- [x] Cache de queries frecuentes (Dashboard)
+- [x] Invalidación automática (TTL)
 
 #### 2.3 Health Checks
 - [ ] Instalar `django-health-check>=3.18`

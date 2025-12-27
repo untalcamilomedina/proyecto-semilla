@@ -127,8 +127,12 @@ DATABASES = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": env.str("REDIS_URL", default="redis://localhost:6379/0"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
     }
 }
 
@@ -257,7 +261,9 @@ DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
 AXES_COOLOFF_TIME = env.int("AXES_COOLOFF_TIME", default=1)  # hours
 AXES_LOCK_OUT_AT_FAILURE = True
+AXES_LOCK_OUT_AT_FAILURE = True
 AXES_RESET_ON_SUCCESS = True
+AXES_CACHE = "default"
 
 CONTENT_SECURITY_POLICY_REPORT_ONLY_ENABLED = env.bool("CSP_REPORT_ONLY", default=DEBUG)
 
