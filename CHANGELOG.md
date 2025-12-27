@@ -5,7 +5,49 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## [0.9.1] - 2025-12-13
+## [0.9.1] - 2025-12-27
+
+### Agregado
+- **AGENTS.md Estándar**: Documento principal para agentes AI siguiendo [agent.md](https://agent.md)
+  - Sistema de diseño dual documentado (Glass/Dark + Clean/Minimal)
+  - Principios arquitectónicos: Stateless, PWA OfflineFirst, Secure by Default
+- **PWA OfflineFirst**: Almacenamiento local encriptado
+  - `frontend/src/lib/storage.ts`: Clase `OfflineStorage` con Dexie + crypto-js (AES)
+  - Dependencias: `dexie@4.2.1`, `crypto-js@4.2.0`
+- **Sistema de Diseño Glass UI**:
+  - `frontend/src/components/ui/glass/GlassCard.tsx`: Tarjetas con glassmorphism
+  - `frontend/src/components/ui/glass/GlassButton.tsx`: Botones con efecto neon
+  - `frontend/src/components/ui/glass/GlassModal.tsx`: Modales con backdrop blur
+  - `frontend/tailwind.config.ts`: Tokens personalizados (shadow-glass, shadow-neon)
+- **Configuración Docker flexible**:
+  - Puertos configurables vía `.env` (FRONTEND_PORT, DJANGO_PORT, POSTGRES_PORT, REDIS_PORT)
+  - Rango 9xxx por defecto para evitar conflictos
+
+### Cambiado
+- **Backend Security Refactor**:
+  - `src/config/settings/dev.py`: CORS/CSRF origins ahora usan `env.list()` en lugar de listas hardcodeadas
+  - `src/core/management/commands/seed_demo.py`: Dominios dinámicos desde `ALLOWED_HOSTS`
+- **Frontend Dockerfile**: Cambiado `npm ci` → `npm install --legacy-peer-deps` para mayor tolerancia
+- **docker-compose.yml**: Todos los puertos usan variables de entorno con defaults seguros
+
+### Corregido
+- Sincronización de `package-lock.json` (89 paquetes agregados)
+- Conflictos de puertos con otros proyectos Docker (mayordomos, rag-google)
+- Migraciones de base de datos aplicadas (`axes.0010_accessattemptexpiration`)
+
+### Estado del Sistema
+- **Frontend**: http://localhost:9000 (Next.js 16.0.10)
+- **Backend API**: http://localhost:9001 (Django 5.x)
+- **PostgreSQL**: localhost:9432
+- **Redis**: localhost:9379
+- **MinIO**: localhost:9002 (Console), 9003 (API)
+- **Mailpit**: localhost:8025
+
+### Credenciales de Desarrollo
+- Email: `admin@demo.com`
+- Password: `password`
+
+## [0.9.1-pre] - 2025-12-13
 
 ### Agregado
 - Runbook de migración HTMX → React + Next.js (`docs/runbooks/migracion-frontend-nextjs.md`)
