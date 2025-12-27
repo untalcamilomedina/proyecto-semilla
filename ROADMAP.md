@@ -185,10 +185,10 @@ Cobertura:         58.57% (objetivo: 90%)
 **Objetivo**: Optimizar queries y mejorar monitoreo.
 
 #### 2.1 Profiling
-- [ ] Instalar `django-silk>=5.0`
-- [ ] Configurar middleware de profiling
-- [ ] Identificar queries N+1
-- [ ] Optimizar viewsets con `select_related`/`prefetch_related`
+- [x] Instalar `django-silk>=5.0`
+- [x] Configurar middleware de profiling
+- [x] Identificar queries N+1
+- [x] Optimizar viewsets con `select_related`/`prefetch_related`
 
 #### 2.2 Caching Avanzado
 - [ ] Instalar `django-redis>=5.4`

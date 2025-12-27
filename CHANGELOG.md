@@ -5,7 +5,15 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## v0.10.0 - (In Progress)
+## v0.10.1 - (2025-12-27)
+
+### Fixed
+- **Performance**: Optimized `DashboardViewSet` to use real, efficient queries.
+    - Replaced hardcoded data with `Membership` counts.
+    - Added `select_related` to `RoleAuditLog` queries to prevent N+1 issues.
+- **API**: `MembershipViewSet` verified to use `select_related("user", "role")`.
+
+## v0.10.0 - (2025-12-27)
 
 ### Added
 - **Performance**: Integrated `django-silk` for request profiling and query optimization.
