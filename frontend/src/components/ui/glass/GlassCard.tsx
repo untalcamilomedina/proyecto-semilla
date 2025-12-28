@@ -6,6 +6,15 @@ interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "neon";
 }
 
+/**
+ * GlassCard Component
+ * Renders a container with glassmorphism effects (backdrop blur, border).
+ * 
+ * @param {ReactNode} children - Card content.
+ * @param {string} className - Additional classes.
+ * @param {"default" | "neon"} variant - Visual style variant.
+ * @param {HTMLAttributes} props - Standard HTML div attributes.
+ */
 export function GlassCard({ children, className, variant = "default", ...props }: GlassCardProps) {
   return (
     <div

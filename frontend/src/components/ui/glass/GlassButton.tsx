@@ -6,6 +6,15 @@ interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
   variant?: "primary" | "secondary" | "danger";
 }
 
+/**
+ * GlassButton Component
+ * Renders a button with glassmorphism styling and neon glow effects.
+ * 
+ * @param {ReactNode} children - Button content.
+ * @param {string} className - Additional classes.
+ * @param {"primary" | "secondary" | "danger"} variant - Visual style variant.
+ * @param {ButtonHTMLAttributes} props - Standard HTML button attributes.
+ */
 export function GlassButton({ children, className, variant = "primary", ...props }: GlassButtonProps) {
   return (
     <button
@@ -15,7 +24,7 @@ export function GlassButton({ children, className, variant = "primary", ...props
         
         // Primary (Neon Green)
         variant === "primary" && 
-          "bg-primary/20 text-emerald-100 border border-primary/50 hover:bg-primary/30 shadow-neon",
+          "bg-neon/20 text-neon border border-neon/50 hover:bg-neon/30 shadow-[0_0_15px_rgba(13,242,13,0.3)]",
         
         // Secondary
         variant === "secondary" && 

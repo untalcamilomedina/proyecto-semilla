@@ -229,7 +229,7 @@ Cobertura:         58.57% (objetivo: 90%)
 **Objetivo**: Features para clientes enterprise.
 
 #### 4.1 Import/Export
-- [ ] Instalar `django-import-export>=4.0`
+- [x] Instalar `django-import-export>=4.0`
 - [ ] Exportar: Miembros, Roles, Facturas
 - [ ] Importar: Usuarios bulk
 - [ ] Formatos: Excel, CSV, JSON

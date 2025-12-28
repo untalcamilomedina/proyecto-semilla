@@ -15,6 +15,18 @@ def healthz(_request):
 def readyz(_request):
     return JsonResponse({"status": "ready"})
 
+def trigger_error(request):
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.error("Test JSON Logging Error")
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        logger.exception("Test Exception Capture")
+        if request.GET.get("raise"):
+            raise
+    return JsonResponse({"status": "error_logged"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -23,6 +35,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("healthz", healthz),
     path("readyz", readyz),
+    path("debug/error/", trigger_error),
     path("metrics", metrics_view),
     path("ht/", include("health_check.urls")),
     path("api/", include("api.urls")),

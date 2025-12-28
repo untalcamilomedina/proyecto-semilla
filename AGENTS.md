@@ -67,3 +67,20 @@ Used for: *Layouts, Forms, Data Tables.*
 - `frontend/`: Next.js Frontend Source
   - `src/components/ui/glass/`: Specific Glassmorphism components.
   - `src/lib/storage.ts`: Encrypted Storage Logic.
+
+## Coding Standards (Vibe Coding)
+1.  **Philosophy**: Code must be "Aesthetic & Robust". It's not just about functioning; it must be readable, well-structured, and delightful.
+2.  **Documentation (JSDoc)**:
+    - ALL JavaScript/TypeScript functions, components, and hooks MUST have JSDoc.
+    - Example:
+      ```typescript
+      /**
+       * Renders a glassmorphic card component.
+       * @param {string} title - The title of the card.
+       * @param {ReactNode} children - The content of the card.
+       * @returns {JSX.Element} The rendered card.
+       */
+      ```
+3.  **Python Docstrings**: Use Google Style docstrings for all Python methods.
+4.  **No Placeholders**: Never leave `// TODO: Implement later` without a valid reason or fallback. Build complete features.
+

@@ -3,8 +3,16 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * GlassModal Root
+ * Wraps the dialog content and manages state.
+ */
 const GlassModal = DialogPrimitive.Root;
 
+/**
+ * GlassModal Trigger
+ * The element that opens the modal.
+ */
 const GlassModalTrigger = DialogPrimitive.Trigger;
 
 const GlassModalPortal = DialogPrimitive.Portal;
@@ -24,6 +32,10 @@ const GlassModalOverlay = React.forwardRef<
 ));
 GlassModalOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+/**
+ * GlassModal Content
+ * The modal container with glassmorphism styling and animations.
+ */
 const GlassModalContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>

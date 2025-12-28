@@ -319,7 +319,7 @@ LOGGING = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": env.str("LOG_FORMAT", default="verbose"),
+            "formatter": env.str("LOG_FORMAT", default="json"),
         }
     },
     "root": {"handlers": ["console"], "level": env.str("LOG_LEVEL", default="INFO")},
