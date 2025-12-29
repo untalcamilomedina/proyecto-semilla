@@ -5,7 +5,13 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
-## v0.10.4 - (2025-12-28)
+## v0.12.0 - (2025-12-28) - Onboarding Wizard
+- **Frontend**: Implemented 5-step Onboarding Wizard (Profile, Organization, Plan, Payment, Review).
+- **State**: `useOnboardingStore` (Zustand) with localStorage persistence for offline-first.
+- **UI**: Glass UI components (`WizardLayout`, `GlassInput`) with Neon stepper.
+- **Pending**: Full build verification, Backend API protocol alignment.
+
+## v0.11.0 - (2025-12-28)
 
 ### Added
 - **Observability**: Enabled JSON Logging by default (via `python-json-logger`).

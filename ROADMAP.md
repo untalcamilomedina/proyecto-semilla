@@ -202,7 +202,16 @@ Cobertura:         58.57% (objetivo: 90%)
 - [ ] Integrar con `/readyz` existente
 - [ ] Configurar alertas
 
-### Fase 3: Seguridad Enterprise (v1.2) - Marzo 2025
+### Fase 3: Frontend Moderno (v0.11.0) - Diciembre 2025
+**Objetivo**: Implementar UI moderna con Next.js y Glass System.
+
+#### 3.1 Setup & Design System
+- [x] Inicializar Next.js 16 (App Router)
+- [x] Configurar Tailwind 4 + Neon Theme
+- [x] Implementar componentes Glass (Card, Button, Modal)
+- [x] Configurar PWA OfflineFirst (Dexie)
+
+### Fase 4: Seguridad Enterprise (v1.2) - Marzo 2025
 
 **Objetivo**: Implementar 2FA y auditoría avanzada.
 
@@ -224,7 +233,7 @@ Cobertura:         58.57% (objetivo: 90%)
 - [ ] Rotación automática de API keys
 - [ ] Política de contraseñas configurable
 
-### Fase 4: Funcionalidades Enterprise (v1.3) - Abril 2025
+### Fase 5: Funcionalidades Enterprise (v1.3) - Abril 2025
 
 **Objetivo**: Features para clientes enterprise.
 
@@ -246,7 +255,7 @@ Cobertura:         58.57% (objetivo: 90%)
 - [ ] Autocompletado
 - [ ] Filtros avanzados
 
-### Fase 5: Módulos Opcionales (v2.0) - Q2 2025
+### Fase 6: Módulos Opcionales (v2.0) - Q2 2025
 
 **Objetivo**: Activar y completar módulos feature-flagged.
 
