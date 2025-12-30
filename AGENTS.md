@@ -3,6 +3,16 @@
 > [!IMPORTANT]
 > This file is the **PRIMARY SOURCE OF TRUTH** for any AI agent working on this project. Read it completely before starting any task.
 
+## Table of Contents
+1. [Context](#context)
+2. [Tech Stack](#tech-stack)
+3. [Setup Commands](#setup-commands)
+4. [Design System](#design-system)
+5. [Architecture & Security Rules](#architecture--security-rules)
+6. [Performance Standards](#performance-standards)
+7. [Directory Structure](#directory-structure)
+8. [Coding Standards (Vibe Coding)](#coding-standards-vibe-coding)
+
 ## Context
 **Proyecto Semilla** is a SaaS boilerplate built for scalability, security, and offline-first usage.
 - **Architecture**: Hybrid (Django REST Backend + Next.js Frontend).

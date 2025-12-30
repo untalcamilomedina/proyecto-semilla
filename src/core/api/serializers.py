@@ -9,9 +9,9 @@ from multitenant.models import validate_subdomain
 class StartOnboardingSerializer(serializers.Serializer):
     org_name = serializers.CharField(max_length=150)
     subdomain = serializers.CharField(max_length=63)
-    admin_email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, min_length=8)
-    confirm_password = serializers.CharField(write_only=True, min_length=8)
+    admin_email = serializers.EmailField(required=False)
+    password = serializers.CharField(write_only=True, min_length=8, required=False)
+    confirm_password = serializers.CharField(write_only=True, min_length=8, required=False)
 
     def validate_subdomain(self, value):
         value = value.lower().strip()
@@ -19,8 +19,17 @@ class StartOnboardingSerializer(serializers.Serializer):
         return value
 
     def validate(self, data):
-        if data.get("password") != data.get("confirm_password"):
-            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+        request = self.context.get("request")
+        user = request.user if request and request.user.is_authenticated else None
+
+        if not user:
+            if not data.get("admin_email"):
+                raise serializers.ValidationError({"admin_email": "This field is required."})
+            if not data.get("password"):
+                raise serializers.ValidationError({"password": "This field is required."})
+            if data.get("password") != data.get("confirm_password"):
+                raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+        
         return data
 
 

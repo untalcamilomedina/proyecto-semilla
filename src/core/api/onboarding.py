@@ -62,11 +62,15 @@ class OnboardingViewSet(viewsets.ViewSet):
         data = serializer.validated_data
 
         try:
+            # Check if user is authenticated (post-signup flow)
+            source_user = request.user if request.user.is_authenticated else None
+            
             result = start_onboarding(
                 org_name=data["org_name"],
                 subdomain=data["subdomain"],
-                admin_email=data["admin_email"],
-                password=data["password"],
+                admin_email=data.get("admin_email"),
+                password=data.get("password"),
+                source_user=source_user,
             )
             
             # Log the user in immediately so they can proceed to next steps

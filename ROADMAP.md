@@ -1,7 +1,7 @@
 # Roadmap - Proyecto Semilla v0.9.1
 
-> Documento actualizado: 27 de diciembre de 2025
-> Versión actual: **v0.9.1**
+> Documento actualizado: 30 de diciembre de 2025
+> Versión actual: **v0.12.0**
 > Estado: **Estable, en desarrollo activo**
 
 ---

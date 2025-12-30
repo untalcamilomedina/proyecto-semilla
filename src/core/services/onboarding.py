@@ -61,8 +61,9 @@ def _ensure_local_tenant(tenant_public: Tenant) -> Tenant:
 def start_onboarding(
     org_name: str,
     subdomain: str,
-    admin_email: str,
-    password: str,
+    admin_email: str | None = None,
+    password: str | None = None,
+    source_user: User | None = None,
 ) -> OnboardingResult:
     slug = subdomain.lower().strip()
     validate_subdomain(slug)
@@ -91,16 +92,30 @@ def start_onboarding(
 
     tenant_local = _ensure_local_tenant(tenant_public)
 
+    email = admin_email or (source_user.email if source_user else None)
+    if not email:
+        raise ValueError("Email required")
+
     with schema_context(tenant_public.schema_name):
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
-        user = User.objects.create_user(
-            username=username_from_email(admin_email),
-            email=admin_email,
-            password=password,
+        
+        # Create user in tenant schema
+        # If source_user exists, we copy the password hash directly to avoid re-hashing or requiring text password
+        user = User(
+            username=username_from_email(email),
+            email=email,
             is_staff=True,
             is_superuser=True,
         )
+        if source_user:
+            user.password = source_user.password
+        elif password:
+            user.set_password(password)
+        else:
+            raise ValueError("Password or source user required")
+        
+        user.save()
         Membership.objects.create(user=user, organization=tenant_local, role=owner_role)
 
     EmailService.send_welcome_email(user)
