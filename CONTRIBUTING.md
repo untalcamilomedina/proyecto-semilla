@@ -2,6 +2,10 @@
 
 Gracias por contribuir al proyecto-semilla.
 
+## Table of Contents
+1. [Flujo recomendado](#flujo-recomendado)
+2. [Estándares](#estándares)
+
 ## Flujo recomendado
 
 1. Crea una rama desde `main`.

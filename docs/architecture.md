@@ -1,5 +1,8 @@
 # Arquitectura
-
+## Table of Contents
+1. [Layout](#layout)
+2. [Principios](#principios)
+3. [Multitenancy](#multitenancy)
 ## Layout
 
 El código vive en `src/`:

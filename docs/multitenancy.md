@@ -1,5 +1,11 @@
 # Multitenancy (Schema Mode)
-
+## Table of Contents
+1. [Modelo y dominios](#modelo-y-dominios)
+2. [Resolución de tenant por host](#resolución-de-tenant-por-host)
+3. [Cambio de schema](#cambio-de-schema)
+4. [Migraciones por schema](#migraciones-por-schema)
+5. [Tests de regresión](#tests-de-regresión)
+6. [Preset enterprise (database-per-tenant)](#preset-enterprise-database-per-tenant)
 V1 usa multitenancy por **schemas de Postgres** con un `public` schema compartido y un schema por tenant.
 
 ## Modelo y dominios

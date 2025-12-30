@@ -1,5 +1,7 @@
 # Billing (Stripe)
-
+## Table of Contents
+1. [Modelo](#modelo)
+2. [Webhooks](#webhooks)
 ## Modelo
 
 - `Plan`, `Price`, `Subscription`, `Invoice`.

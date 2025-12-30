@@ -6,7 +6,13 @@ export interface GlassInputProps
 
 /**
  * GlassInput Component
- * Transparent input with neon focus state.
+ * Renders an input field with glassmorphism styling and neon focus effects.
+ * 
+ * @param {GlassInputProps} props - Standard HTML input attributes.
+ * @param {string} props.className - Additional CSS classes.
+ * @param {string} props.type - Input type (text, password, etc).
+ * @param {React.Ref<HTMLInputElement>} ref - Forwarded ref.
+ * @returns {JSX.Element} The rendered input component.
  */
 export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
   ({ className, type, ...props }, ref) => {

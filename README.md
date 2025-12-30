@@ -11,6 +11,23 @@ Boilerplate SaaS moderno basado en Django 5+, con arquitectura modular, multiten
  
 > ✅ **Estado:** Sistema estable. Tests passing rate: 100%. Migrado a `dj-stripe` para pagos robustos.
 
+## Table of Contents
+1. [Requisitos](#requisitos)
+2. [Inicio rápido (dev)](#inicio-rápido-dev)
+3. [Frontend (migración a Next.js)](#frontend-migración-a-nextjs)
+4. [Salud y métricas](#salud-y-métricas)
+5. [Variables de entorno](#variables-de-entorno)
+6. [Módulos V1](#módulos-v1)
+7. [Theming por tenant](#theming-por-tenant)
+8. [Estructura del Proyecto](#estructura-del-proyecto)
+9. [Documentación (MkDocs)](#documentación-mkdocs)
+10. [Deploy (Fly.io)](#deploy-flyio)
+11. [Estado del Proyecto](#estado-del-proyecto)
+12. [Comandos Útiles](#comandos-útiles)
+13. [Documentación](#documentación)
+14. [Contribuir](#contribuir)
+15. [Licencia](#licencia)
+
 ## Requisitos
 
 - Python 3.12+

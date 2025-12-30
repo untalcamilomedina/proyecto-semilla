@@ -35,6 +35,10 @@ class McpServerViewSet(
     mixins.DestroyModelMixin,
     TenantScopedViewSet,
 ):
+    """
+    ViewSet for managing MCP Servers within a tenant.
+    Allows CRUD operations on McpServer instances.
+    """
     serializer_class = McpServerSerializer
 
     def get_queryset(self):
@@ -54,6 +58,9 @@ class McpToolViewSet(
     mixins.UpdateModelMixin,
     TenantScopedViewSet,
 ):
+    """
+    ViewSet for managing Tools associated with an MCP Server.
+    """
     serializer_class = McpToolSerializer
 
     def get_queryset(self):
@@ -73,6 +80,9 @@ class McpResourceViewSet(
     mixins.UpdateModelMixin,
     TenantScopedViewSet,
 ):
+    """
+    ViewSet for managing Resources exposed by an MCP Server.
+    """
     serializer_class = McpResourceSerializer
 
     def get_queryset(self):
@@ -91,6 +101,10 @@ class McpUsageLogViewSet(
     mixins.CreateModelMixin,
     TenantScopedViewSet,
 ):
+    """
+    ViewSet for tracking usage logs of MCP Tools.
+    ReadOnly for most users, but allows creation for logging purposes.
+    """
     serializer_class = McpUsageLogSerializer
 
     def get_queryset(self):
