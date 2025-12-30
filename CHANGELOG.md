@@ -5,6 +5,12 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.13.0 - (2025-12-30) - Docs & MCP Systematization
+- **Documentation**: Added Table of Contents (ToC) to all core Markdown files to facilitate AI navigation.
+- **Standards**: Enforced JSDoc/Docstrings on programmatic files.
+- **MCP**: Systematized `mcp` module with proper documentation and structure for "Vibe Coding".
+- **Chore**: Updated `README.md` and `CONTRIBUTING.md` standards.
+
 ## v0.12.0 - (2025-12-28) - Onboarding Wizard
 - **Frontend**: Implemented 5-step Onboarding Wizard (Profile, Organization, Plan, Payment, Review).
 - **State**: `useOnboardingStore` (Zustand) with localStorage persistence for offline-first.
