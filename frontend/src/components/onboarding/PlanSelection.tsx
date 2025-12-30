@@ -3,114 +3,124 @@
 import React, { useState } from "react";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
+import { Check, CreditCard, Lock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const PLANS = [
-  {
-    id: "starter",
-    name: "Starter",
-    price: { monthly: 0, yearly: 0 },
-    features: ["Up to 5 members", "Basic Support", "1GB Storage"],
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: { monthly: 29, yearly: 290 },
-    features: ["Unlimited members", "Priority Support", "100GB Storage", "Analytics"],
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    price: { monthly: 99, yearly: 990 },
-    features: ["Custom SLA", "Dedicated Account Manager", "Unlimited Storage", "SSO"],
-  },
-];
+import { Label } from "@/components/ui/label";
 
 export default function PlanSelection() {
-  const { planId, billingPeriod, setPlan, nextStep } = useOnboardingStore();
+  const { stripe, setStripe, nextStep } = useOnboardingStore();
   const router = useRouter();
-  const [period, setPeriod] = useState<'monthly' | 'yearly'>(billingPeriod);
-
-  const handleSelect = (id: string) => {
-    setPlan(id, period);
-  };
+  
+  // Local state for the toggle before saving to store
+  const [enabled, setEnabled] = useState(stripe.enabled);
+  const [publicKey, setPublicKey] = useState(stripe.publicKey || "");
+  const [secretKey, setSecretKey] = useState(stripe.secretKey || "");
+  const [webhookSecret, setWebhookSecret] = useState(stripe.webhookSecret || "");
 
   const handleContinue = () => {
-    if (planId) {
-      nextStep();
-      router.push("/onboarding/payment");
-    }
+    setStripe({ enabled, publicKey, secretKey, webhookSecret });
+    nextStep();
+    router.push("/onboarding/review");
   };
+  
+  // Note: effectively skipping Payment Method step if we are the OWNER setting up Stripe.
+  // The original "Payment" step was for US to pay for the SaaS.
+  // If we are self-hosting, we don't pay. So we should probably skip /payment too?
+  // User said "allows them to connect their stripe".
+  // Let's assume step 4 (Payment) is now redundant or can be used for something else.
+  // For now, I will redirect to /payment but maybe /payment should be a "Summary" or "Review"?
+  // Actually, let's keep it simple: Update Store -> Next.
 
   return (
     <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-      {/* Toggle */}
-      <div className="flex justify-center">
-        <div className="bg-white/5 p-1 rounded-xl flex">
-          <button
-            onClick={() => setPeriod('monthly')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-              period === 'monthly' ? "bg-white/10 text-white shadow-sm" : "text-white/50 hover:text-white"
-            )}
-          >
-            Monthly
-          </button>
-          <button
-            onClick={() => setPeriod('yearly')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-              period === 'yearly' ? "bg-white/10 text-white shadow-sm" : "text-white/50 hover:text-white"
-            )}
-          >
-            Yearly <span className="text-neon text-xs ml-1">-20%</span>
-          </button>
-        </div>
+      
+      {/* Option Cards */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <GlassCard
+          variant={!enabled ? "neon" : "default"}
+          className={cn(
+            "p-6 cursor-pointer hover:border-white/20 transition-all",
+            !enabled ? "border-neon/50 bg-neon/10" : "opacity-70"
+          )}
+          onClick={() => setEnabled(false)}
+        >
+          <div className="flex items-center gap-3 mb-2">
+             <Ban className={cn("w-6 h-6", !enabled ? "text-neon" : "text-white/50")} />
+             <h3 className="text-lg font-bold text-white">No Payments</h3>
+          </div>
+          <p className="text-sm text-white/60">
+            I don't need to charge users right now. I will manually manage access or use this for internal tools.
+          </p>
+        </GlassCard>
+
+        <GlassCard
+          variant={enabled ? "neon" : "default"}
+          className={cn(
+            "p-6 cursor-pointer hover:border-white/20 transition-all",
+            enabled ? "border-neon/50 bg-neon/10" : "opacity-70"
+          )}
+          onClick={() => setEnabled(true)}
+        >
+          <div className="flex items-center gap-3 mb-2">
+             <CreditCard className={cn("w-6 h-6", enabled ? "text-neon" : "text-white/50")} />
+             <h3 className="text-lg font-bold text-white">Enable Monetization</h3>
+          </div>
+          <p className="text-sm text-white/60">
+            I want to sell subscriptions or products. I will connect my Stripe account.
+          </p>
+        </GlassCard>
       </div>
 
-      {/* Plans Grid */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {PLANS.map((plan) => {
-          const isSelected = planId === plan.id;
-          return (
-            <GlassCard
-              key={plan.id}
-              variant={isSelected ? "neon" : "default"}
-              className={cn(
-                "p-6 cursor-pointer relative transition-all hover:scale-[1.02]",
-                isSelected ? "border-neon/50 bg-neon/5" : "hover:border-white/20"
-              )}
-              onClick={() => handleSelect(plan.id)}
-            >
-              {isSelected && (
-                <div className="absolute top-4 right-4 text-neon">
-                  <Check className="w-5 h-5" />
-                </div>
-              )}
-              <h3 className="text-lg font-bold text-white mb-2">{plan.name}</h3>
-              <div className="text-3xl font-bold text-white mb-4">
-                ${period === 'monthly' ? plan.price.monthly : Math.round(plan.price.yearly / 12)}
-                <span className="text-sm text-white/40 font-normal">/mo</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {plan.features.map((f, i) => (
-                  <li key={i} className="text-sm text-white/70 flex items-center gap-2">
-                    <Check className="w-3 h-3 text-neon" /> {f}
-                  </li>
-                ))}
-              </ul>
-            </GlassCard>
-          );
-        })}
-      </div>
+      {/* Stripe Form (Conditional) */}
+      {enabled && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
+            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-200 text-sm flex gap-2">
+                <Lock className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>Your API keys will be stored securely in your Tenant configuration. You can find these in your Stripe Dashboard under Developers &gt; API keys.</p>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="pk" className="text-white">Stripe Publishable Key</Label>
+                <GlassInput 
+                    id="pk" 
+                    placeholder="pk_live_..." 
+                    value={publicKey} 
+                    onChange={(e) => setPublicKey(e.target.value)}
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="sk" className="text-white">Stripe Secret Key</Label>
+                <GlassInput 
+                    id="sk" 
+                    type="password" 
+                    placeholder="sk_live_..." 
+                    value={secretKey} 
+                    onChange={(e) => setSecretKey(e.target.value)}
+                />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="wh" className="text-white">Stripe Webhook Secret</Label>
+                <GlassInput 
+                    id="wh" 
+                    type="password" 
+                    placeholder="whsec_..." 
+                    value={webhookSecret} 
+                    onChange={(e) => setWebhookSecret(e.target.value)}
+                />
+                <p className="text-xs text-white/40">Used to verify events from Stripe.</p>
+            </div>
+        </div>
+      )}
 
       <GlassButton 
         onClick={handleContinue} 
-        disabled={!planId} 
-        className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={enabled && (!publicKey || !secretKey || !webhookSecret)}
+        className="w-full"
       >
         Continue
       </GlassButton>

@@ -70,6 +70,11 @@ class OnboardingViewSet(viewsets.ViewSet):
                 subdomain=data["subdomain"],
                 admin_email=data.get("admin_email"),
                 password=data.get("password"),
+                language=data.get("language", "es"),
+                stripe_connected=data.get("stripe_connected", False),
+                stripe_public_key=data.get("stripe_public_key", ""),
+                stripe_secret_key=data.get("stripe_secret_key", ""),
+                stripe_webhook_secret=data.get("stripe_webhook_secret", ""),
                 source_user=source_user,
             )
             

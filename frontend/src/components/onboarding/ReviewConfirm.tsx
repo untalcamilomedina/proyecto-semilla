@@ -48,19 +48,18 @@ export default function ReviewConfirm() {
           <Check className="w-5 h-5 text-neon" />
         </div>
 
-        {/* Plan */}
+        {/* Billing */}
         <div className="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-neon/30">
           <div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">Selected Plan</div>
-            <div className="text-neon font-bold text-lg capitalize">{store.planId} <span className="text-sm font-normal text-white/50">({store.billingPeriod})</span></div>
-          </div>
-          <div className="text-right">
-             {/* Mock price calc */}
-             <div className="text-xl font-bold text-white">
-               ${store.planId === 'pro' ? (store.billingPeriod === 'monthly' ? '29' : '290') : (store.planId === 'enterprise' ? '99' : '0')}
+             <div className="text-xs text-white/50 uppercase tracking-wider">Billing Setup</div>
+             <div className="text-white font-medium">
+                {store.stripe.enabled ? "Monetization Enabled" : "No Monetization"}
              </div>
-             <div className="text-xs text-white/30">Total due today</div>
+             {store.stripe.enabled && (
+                <div className="text-xs text-neon mt-1">Stripe Keys Configured</div>
+             )}
           </div>
+          <Check className="w-5 h-5 text-neon" />
         </div>
       </div>
 

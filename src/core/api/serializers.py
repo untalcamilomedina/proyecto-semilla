@@ -12,6 +12,11 @@ class StartOnboardingSerializer(serializers.Serializer):
     admin_email = serializers.EmailField(required=False)
     password = serializers.CharField(write_only=True, min_length=8, required=False)
     confirm_password = serializers.CharField(write_only=True, min_length=8, required=False)
+    language = serializers.CharField(max_length=10, required=False, default="es")
+    stripe_connected = serializers.BooleanField(required=False, default=False)
+    stripe_public_key = serializers.CharField(required=False, allow_blank=True)
+    stripe_secret_key = serializers.CharField(required=False, allow_blank=True)
+    stripe_webhook_secret = serializers.CharField(required=False, allow_blank=True)
 
     def validate_subdomain(self, value):
         value = value.lower().strip()

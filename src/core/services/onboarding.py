@@ -63,6 +63,11 @@ def start_onboarding(
     subdomain: str,
     admin_email: str | None = None,
     password: str | None = None,
+    language: str = "es",
+    stripe_connected: bool = False,
+    stripe_public_key: str = "",
+    stripe_secret_key: str = "",
+    stripe_webhook_secret: str = "",
     source_user: User | None = None,
 ) -> OnboardingResult:
     slug = subdomain.lower().strip()
@@ -87,7 +92,17 @@ def start_onboarding(
             owner_email=admin_email,
             current_step=2,
             completed_steps=[1],
-            data={"modules": [], "stripe_connected": False, "resume_token": uuid4().hex},
+            data={
+                "modules": [], 
+                "stripe_connected": stripe_connected, 
+                "stripe_config": {
+                    "public_key": stripe_public_key,
+                    "secret_key": stripe_secret_key,
+                    "webhook_secret": stripe_webhook_secret,
+                },
+                "language": language,
+                "resume_token": uuid4().hex
+            },
         )
 
     tenant_local = _ensure_local_tenant(tenant_public)

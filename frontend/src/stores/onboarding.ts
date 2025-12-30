@@ -5,14 +5,21 @@ export interface OnboardingData {
   user: {
     firstName: string;
     lastName: string;
+    email: string;
+    password?: string;
     role: string;
   };
   organization: {
     name: string;
     slug: string;
   };
-  planId: string | null;
-  billingPeriod: 'monthly' | 'yearly';
+  language: 'es' | 'en';
+  stripe: {
+    enabled: boolean;
+    publicKey: string;
+    secretKey: string;
+    webhookSecret: string;
+  };
 }
 
 interface OnboardingState extends OnboardingData {
@@ -25,7 +32,8 @@ interface OnboardingState extends OnboardingData {
   prevStep: () => void;
   updateUser: (data: Partial<OnboardingData['user']>) => void;
   updateOrganization: (data: Partial<OnboardingData['organization']>) => void;
-  setPlan: (planId: string, period: 'monthly' | 'yearly') => void;
+  setLanguage: (lang: 'es' | 'en') => void;
+  setStripe: (data: Partial<OnboardingData['stripe']>) => void;
   reset: () => void;
 }
 
@@ -33,14 +41,21 @@ const INITIAL_STATE: OnboardingData = {
   user: {
     firstName: '',
     lastName: '',
+    email: '',
+    password: '',
     role: 'owner',
   },
   organization: {
     name: '',
     slug: '',
   },
-  planId: null,
-  billingPeriod: 'monthly',
+  language: 'es',
+  stripe: {
+    enabled: false,
+    publicKey: '',
+    secretKey: '',
+    webhookSecret: '',
+  },
 };
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -66,8 +81,12 @@ export const useOnboardingStore = create<OnboardingState>()(
           organization: { ...state.organization, ...orgData } 
         })),
 
-      setPlan: (planId, billingPeriod) => 
-        set({ planId, billingPeriod }),
+      setLanguage: (language) => set({ language }),
+
+      setStripe: (stripeData) => 
+        set((state) => ({ 
+          stripe: { ...state.stripe, ...stripeData } 
+        })),
 
       reset: () => set({ ...INITIAL_STATE, step: 1 }),
     }),
@@ -77,8 +96,8 @@ export const useOnboardingStore = create<OnboardingState>()(
       partialize: (state) => ({ 
         user: state.user,
         organization: state.organization,
-        planId: state.planId,
-        billingPeriod: state.billingPeriod,
+        language: state.language,
+        stripe: state.stripe,
         step: state.step
       }),
     }

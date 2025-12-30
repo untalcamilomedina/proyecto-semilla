@@ -14,8 +14,14 @@ export async function submitOnboarding(data: OnboardingData): Promise<void> {
   await apiPost('/api/v1/onboarding/start/', {
     org_name: data.organization.name,
     subdomain: data.organization.slug,
-    // We can also send plan_id if we add support to backend, 
-    // but for now let's just establish the workspace.
+    admin_email: data.user.email,
+    password: data.user.password,
+    confirm_password: data.user.password,
+    language: data.language,
+    stripe_connected: data.stripe.enabled,
+    stripe_public_key: data.stripe.publicKey,
+    stripe_secret_key: data.stripe.secretKey,
+    stripe_webhook_secret: data.stripe.webhookSecret,
   });
 
   // TODO: Send Plan/Payment info to a separate endpoint or update 'start' to accept it.

@@ -15,9 +15,8 @@ interface WizardLayoutProps {
 const STEPS = [
   { number: 1, label: "Profile" },
   { number: 2, label: "Organization" },
-  { number: 3, label: "Plan" },
-  { number: 4, label: "Payment" },
-  { number: 5, label: "Review" },
+  { number: 3, label: "Billing" },
+  { number: 4, label: "Review" },
 ];
 
 /**
@@ -29,7 +28,8 @@ const STEPS = [
  * @param {string} description - Step description.
  */
 export function WizardLayout({ children, title, description }: WizardLayoutProps) {
-  const { step } = useOnboardingStore();
+  const store = useOnboardingStore();
+  const step = store.step;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-zinc-950 p-4 relative overflow-hidden">
@@ -37,6 +37,30 @@ export function WizardLayout({ children, title, description }: WizardLayoutProps
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-neon/5 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl animate-pulse" />
+      </div>
+
+      {/* Language Selector */}
+      <div className="absolute top-6 right-6 z-50">
+         <GlassCard className="p-1 flex gap-1 rounded-lg bg-black/40 backdrop-blur-md border-white/10">
+            <button 
+              onClick={() => store.setLanguage('es')}
+              className={cn(
+                "px-3 py-1.5 rounded-md text-xs font-medium transition-all", 
+                store.language === 'es' ? "bg-neon text-black shadow-lg shadow-neon/20" : "text-white/50 hover:text-white"
+              )}
+            >
+              ES
+            </button>
+            <button 
+              onClick={() => store.setLanguage('en')}
+              className={cn(
+                "px-3 py-1.5 rounded-md text-xs font-medium transition-all", 
+                store.language === 'en' ? "bg-neon text-black shadow-lg shadow-neon/20" : "text-white/50 hover:text-white"
+              )}
+            >
+              EN
+            </button>
+         </GlassCard>
       </div>
 
       <div className="w-full max-w-4xl z-10 space-y-8">
