@@ -12,6 +12,7 @@ import {
     useReactTable,
     ColumnFiltersState,
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 import {
     Table,
@@ -21,18 +22,24 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
 }
 
+/**
+ * DataTable Component
+ * Premium table implementation with glassmorphism and i18n.
+ */
 export function DataTable<TData, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
+    const t = useTranslations("common");
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
@@ -52,25 +59,29 @@ export function DataTable<TData, TValue>({
     });
 
     return (
-        <div>
-            <div className="flex items-center py-4">
-                <Input
-                    placeholder="Filtrar por email..."
-                    value={(table.getColumn("user_email")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("user_email")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
+        <div className="space-y-4">
+            <div className="flex items-center gap-4 py-2">
+                <div className="relative w-full max-w-sm group">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-neon transition-colors" />
+                    <GlassInput
+                        placeholder={t("table.searchPlaceholder")}
+                        value={(table.getColumn("user_email")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("user_email")?.setFilterValue(event.target.value)
+                        }
+                        className="pl-10 h-10 bg-white/5 border-white/5 focus:border-neon/30"
+                    />
+                </div>
             </div>
-            <div className="rounded-md border">
+            
+            <div className="rounded-xl border border-white/5 overflow-hidden">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-white/[0.02]">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className="text-white/40 font-bold text-xs uppercase tracking-wider h-12">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -89,9 +100,10 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className="border-white/5 hover:bg-white/[0.03] transition-colors"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="py-4 text-sm text-white/70">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -104,32 +116,41 @@ export function DataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-32 text-center text-white/30 font-medium"
                                 >
-                                    No results.
+                                    {t("table.noResults")}
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Anterior
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Siguiente
-                </Button>
+
+            <div className="flex items-center justify-between py-2">
+                <p className="text-xs text-white/30 font-medium">
+                    {t("table.paginationInfo", {
+                        current: table.getState().pagination.pageIndex + 1,
+                        total: table.getPageCount()
+                    })}
+                </p>
+                <div className="flex items-center gap-2">
+                    <GlassButton
+                        variant="secondary"
+                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-white/5"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                    </GlassButton>
+                    <GlassButton
+                        variant="secondary"
+                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-white/5"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <ChevronRight className="h-4 w-4" />
+                    </GlassButton>
+                </div>
             </div>
         </div>
     );

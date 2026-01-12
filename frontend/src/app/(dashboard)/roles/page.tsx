@@ -8,12 +8,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Edit2, Trash2, Loader2, Download, Upload, Shield } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Plus, Edit2, Trash2, Loader2, Download, Shield, AlertCircle } from "lucide-react";
 
 import { apiGet, apiPost, apiPatch, apiDelete, ApiError } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
+import { GlassCard } from "@/components/ui/glass/GlassCard";
 import {
     Dialog,
     DialogContent,
@@ -23,6 +24,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import type { Role, Permission, PaginatedResponse } from "@/types";
+import { cn } from "@/lib/utils";
 
 const roleSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
@@ -32,7 +34,13 @@ const roleSchema = z.object({
 
 type RoleForm = z.infer<typeof roleSchema>;
 
+/**
+ * RolesPage
+ * Elite role management interface.
+ */
 export default function RolesPage() {
+    const t = useTranslations("roles");
+    const tc = useTranslations("common");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -61,7 +69,7 @@ export default function RolesPage() {
         },
         onError: (err: ApiError) => {
             const body = err.body as { detail?: string };
-            setError(body?.detail || "Error al crear rol");
+            setError(body?.detail || t("errorCreating"));
         },
     });
 
@@ -77,7 +85,7 @@ export default function RolesPage() {
         },
         onError: (err: ApiError) => {
             const body = err.body as { detail?: string };
-            setError(body?.detail || "Error al actualizar rol");
+            setError(body?.detail || t("errorUpdating"));
         },
     });
 
@@ -142,25 +150,30 @@ export default function RolesPage() {
     const isPending = createMutation.isPending || updateMutation.isPending;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-zinc-900">Roles</h1>
-                    <p className="mt-1 text-sm text-zinc-500">
-                        Gestiona los roles y permisos de tu organización
-                    </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                        <Shield className="h-6 w-6 text-indigo-400" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-white/90">{t("title")}</h1>
+                        <p className="text-sm text-white/40">
+                            {t("description")}
+                        </p>
+                    </div>
                 </div>
 
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={exportRoles}>
-                        <Download className="h-4 w-4" />
-                        Exportar
-                    </Button>
-                    <Button onClick={openCreate}>
-                        <Plus className="h-4 w-4" />
-                        Nuevo Rol
-                    </Button>
+                <div className="flex gap-3">
+                    <GlassButton variant="secondary" onClick={exportRoles} className="h-11">
+                        <Download className="mr-2 h-4 w-4" />
+                        {tc("export")}
+                    </GlassButton>
+                    <GlassButton onClick={openCreate} className="h-11">
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t("newRole")}
+                    </GlassButton>
                 </div>
             </div>
 
@@ -174,54 +187,58 @@ export default function RolesPage() {
                     }
                 }}
             >
-                <DialogContent>
+                <DialogContent className="bg-zinc-900/90 border-white/10 backdrop-blur-xl text-white">
                     <DialogHeader>
-                        <DialogTitle>
-                            {editingRole ? "Editar rol" : "Crear nuevo rol"}
+                        <DialogTitle className="text-xl font-bold">
+                            {editingRole ? t("editRole") : t("createRole")}
                         </DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className="text-white/50">
                             {editingRole
-                                ? "Modifica los detalles del rol"
-                                : "Crea un nuevo rol para tu organización"}
+                                ? t("editDescription")
+                                : t("createDescription")}
                         </DialogDescription>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-4">
                         {error && (
-                            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-3 text-sm text-red-400">
+                                <AlertCircle className="h-4 w-4 shrink-0" />
                                 {error}
                             </div>
                         )}
 
-                        <Input
-                            label="Nombre"
-                            placeholder="Nombre del rol"
+                        <GlassInput
+                            label={t("name")}
+                            placeholder={t("namePlaceholder")}
                             error={errors.name?.message}
                             {...register("name")}
                         />
 
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-zinc-700">
-                                Descripción
+                            <label className="text-xs font-medium text-white/50 ml-1">
+                                {t("roleDescription")}
                             </label>
                             <textarea
                                 {...register("description")}
                                 rows={3}
-                                className="flex w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-                                placeholder="Descripción del rol..."
+                                className={cn(
+                                    "flex w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/20 transition-all duration-300",
+                                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon/50 shadow-sm"
+                                )}
+                                placeholder={t("descriptionPlaceholder")}
                             />
                         </div>
 
                         {permissions && permissions.results.length > 0 && (
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-700">
-                                    Permisos ({selectedPermissions.length} seleccionados)
+                            <div className="space-y-3">
+                                <label className="text-xs font-medium text-white/50 ml-1">
+                                    {t("permissions")} ({selectedPermissions.length} {tc("confirm")})
                                 </label>
-                                <div className="max-h-48 overflow-y-auto border border-zinc-200 rounded-md p-2 space-y-1">
+                                <div className="max-h-48 overflow-y-auto border border-white/5 bg-white/[0.02] rounded-xl p-2 space-y-1 custom-scrollbar">
                                     {permissions.results.map((perm) => (
                                         <label
                                             key={perm.id}
-                                            className="flex items-center gap-2 p-1.5 rounded hover:bg-zinc-50 cursor-pointer"
+                                            className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
                                         >
                                             <input
                                                 type="checkbox"
@@ -238,29 +255,30 @@ export default function RolesPage() {
                                                         );
                                                     }
                                                 }}
-                                                className="rounded border-zinc-300"
+                                                className="rounded border-white/10 bg-white/5 text-neon focus:ring-neon accent-neon"
                                             />
-                                            <span className="text-sm text-zinc-700">{perm.name}</span>
+                                            <span className="text-sm text-white/70">{perm.name}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        <DialogFooter>
-                            <Button
+                        <DialogFooter className="gap-3 sm:gap-0">
+                            <GlassButton
                                 type="button"
-                                variant="outline"
+                                variant="secondary"
+                                className="sm:mr-3"
                                 onClick={() => {
                                     setIsCreateOpen(false);
                                     setEditingRole(null);
                                 }}
                             >
-                                Cancelar
-                            </Button>
-                            <Button type="submit" isLoading={isPending}>
-                                {editingRole ? "Guardar cambios" : "Crear rol"}
-                            </Button>
+                                {tc("cancel")}
+                            </GlassButton>
+                            <GlassButton type="submit" disabled={isPending}>
+                                {isPending ? tc("loading") : (editingRole ? t("saveChanges") : tc("create"))}
+                            </GlassButton>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -268,65 +286,100 @@ export default function RolesPage() {
 
             {/* Roles Grid */}
             {isLoading ? (
-                <div className="flex justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+                <div className="flex justify-center py-20">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-neon/20 blur-xl rounded-full" />
+                        <Loader2 className="h-10 w-10 animate-spin text-neon relative z-10" />
+                    </div>
                 </div>
             ) : roles?.results.length === 0 ? (
-                <Card>
-                    <CardContent className="py-12">
-                        <div className="text-center">
-                            <Shield className="mx-auto h-12 w-12 text-zinc-300" />
-                            <p className="mt-4 text-sm text-zinc-500">
-                                No hay roles todavía. Crea el primero.
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <GlassCard className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-dashed border-white/10">
+                    <div className="p-6 rounded-full bg-white/5">
+                        <Shield className="h-12 w-12 text-white/10" />
+                    </div>
+                    <div>
+                        <p className="text-white/40 font-medium">
+                            {t("noRoles")}
+                        </p>
+                    </div>
+                    <GlassButton onClick={openCreate} variant="secondary">
+                        {t("createRole")}
+                    </GlassButton>
+                </GlassCard>
             ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {roles?.results.map((role) => (
-                        <Card key={role.id}>
-                            <CardHeader className="pb-3">
+                        <GlassCard 
+                            key={role.id} 
+                            className="group hover:border-indigo-500/30 transition-all duration-500 bg-white/[0.01] hover:bg-white/[0.03]"
+                        >
+                            <div className="p-6 space-y-4">
                                 <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-8 w-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                            <Shield className="h-4 w-4 text-indigo-600" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                            <Shield className="h-5 w-5 text-indigo-400" />
                                         </div>
-                                        <CardTitle className="text-base">{role.name}</CardTitle>
+                                        <h3 className="text-lg font-bold text-white/90 group-hover:text-white transition-colors">
+                                            {role.name}
+                                        </h3>
                                     </div>
                                     {!role.is_system && (
-                                        <div className="flex gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <button
+                                                className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all transform hover:scale-110"
                                                 onClick={() => openEdit(role)}
                                             >
-                                                <Edit2 className="h-4 w-4 text-zinc-500" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
+                                                <Edit2 className="h-4 w-4" />
+                                            </button>
+                                            <button
+                                                className="p-2 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all transform hover:scale-110"
                                                 onClick={() => deleteMutation.mutate(role.id)}
                                                 disabled={deleteMutation.isPending}
                                             >
-                                                <Trash2 className="h-4 w-4 text-red-500" />
-                                            </Button>
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
                                         </div>
                                     )}
                                 </div>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-zinc-500">
-                                    {role.description || "Sin descripción"}
-                                </p>
-                                {role.is_system && (
-                                    <span className="mt-2 inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
-                                        Sistema
-                                    </span>
-                                )}
-                            </CardContent>
-                        </Card>
+                                <div className="space-y-4">
+                                    <p className="text-sm text-white/40 line-clamp-2 leading-relaxed h-10">
+                                        {role.description || t("noDescription")}
+                                    </p>
+                                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                        {role.is_system ? (
+                                            <span className="inline-flex items-center rounded-lg bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400 border border-indigo-500/20">
+                                                {t("system")}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/20">
+                                                Custom Role
+                                            </span>
+                                        )}
+                                        <button 
+                                            onClick={() => openEdit(role)}
+                                            className="text-xs font-semibold text-neon/50 hover:text-neon transition-colors"
+                                        >
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </GlassCard>
                     ))}
+                    
+                    {/* Empty "New Role" skeleton-style card for better UX */}
+                    <button 
+                        onClick={openCreate}
+                        className="group relative rounded-2xl border-2 border-dashed border-white/5 hover:border-white/10 transition-all duration-500 min-h-[180px] flex items-center justify-center overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-white/[0.01] group-hover:bg-white/[0.03] transition-colors" />
+                        <div className="relative text-center space-y-2">
+                            <Plus className="h-8 w-8 text-white/10 group-hover:text-neon/50 mx-auto transition-all transform group-hover:rotate-90 group-hover:scale-125" />
+                            <p className="text-sm font-medium text-white/20 group-hover:text-white/40 transition-colors">
+                                {t("newRole")}
+                            </p>
+                        </div>
+                    </button>
                 </div>
             )}
         </div>

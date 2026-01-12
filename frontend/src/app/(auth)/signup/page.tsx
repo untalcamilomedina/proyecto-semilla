@@ -6,26 +6,34 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { apiPost, ApiError } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
-const signupSchema = z.object({
-    email: z.string().email("Email inválido"),
-    password1: z.string().min(8, "Mínimo 8 caracteres"),
-    password2: z.string(),
-}).refine((data) => data.password1 === data.password2, {
-    message: "Las contraseñas no coinciden",
-    path: ["password2"],
-});
-
-type SignupForm = z.infer<typeof signupSchema>;
-
+/**
+ * SignupPage
+ * Provides a premium registration experience using Glassmorphism.
+ * 
+ * @vibe Elite - Cyber-Premium aesthetic with neon glow and full i18n.
+ */
 export default function SignupPage() {
+    const t = useTranslations("auth");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+
+    const signupSchema = z.object({
+        email: z.string().email(t("validation.invalidEmail" as any) || "Email inválido"),
+        password1: z.string().min(8, t("validation.minChars" as any, { count: 8 }) || "Mínimo 8 caracteres"),
+        password2: z.string(),
+    }).refine((data) => data.password1 === data.password2, {
+        message: t("validation.passwordsMatch" as any) || "Las contraseñas no coinciden",
+        path: ["password2"],
+    });
+
+    type SignupForm = z.infer<typeof signupSchema>;
 
     const {
         register,
@@ -50,9 +58,9 @@ export default function SignupPage() {
             if (err instanceof ApiError) {
                 const body = err.body as Record<string, string[]>;
                 const firstError = Object.values(body).flat()[0];
-                setError(firstError || "Error al registrar");
+                setError(firstError || t("errors.startError" as any) || "Error al registrar");
             } else {
-                setError("Error de conexión");
+                setError(t("connectionError"));
             }
         } finally {
             setIsLoading(false);
@@ -60,62 +68,60 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
-            <Card className="w-full max-w-md">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-                    <CardDescription>
-                        Regístrate para comenzar a usar la plataforma
-                    </CardDescription>
-                </CardHeader>
+        <AuthLayout 
+            title={t("signup")} 
+            description={t("signupDescription")}
+        >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {error && (
+                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 animate-in fade-in slide-in-from-top-1 duration-300">
+                        {error}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <CardContent className="space-y-4">
-                        {error && (
-                            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-                                {error}
-                            </div>
-                        )}
+                <div className="space-y-4">
+                    <GlassInput
+                        label={t("email")}
+                        type="email"
+                        placeholder={t("emailPlaceholder")}
+                        error={errors.email?.message}
+                        {...register("email")}
+                    />
 
-                        <Input
-                            label="Email"
-                            type="email"
-                            placeholder="tu@email.com"
-                            error={errors.email?.message}
-                            {...register("email")}
-                        />
+                    <GlassInput
+                        label={t("password")}
+                        type="password"
+                        placeholder={t("signupPasswordPlaceholder")}
+                        error={errors.password1?.message}
+                        {...register("password1")}
+                    />
 
-                        <Input
-                            label="Contraseña"
-                            type="password"
-                            placeholder="Mínimo 8 caracteres"
-                            error={errors.password1?.message}
-                            {...register("password1")}
-                        />
+                    <GlassInput
+                        label={t("confirmPassword")}
+                        type="password"
+                        placeholder={t("confirmPasswordPlaceholder")}
+                        error={errors.password2?.message}
+                        {...register("password2")}
+                    />
+                </div>
 
-                        <Input
-                            label="Confirmar contraseña"
-                            type="password"
-                            placeholder="Repite tu contraseña"
-                            error={errors.password2?.message}
-                            {...register("password2")}
-                        />
-                    </CardContent>
+                <div className="pt-2 space-y-6">
+                    <GlassButton 
+                        type="submit" 
+                        className="w-full h-12 text-base" 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "..." : t("createAccount")}
+                    </GlassButton>
 
-                    <CardFooter className="flex flex-col gap-4">
-                        <Button type="submit" className="w-full" isLoading={isLoading}>
-                            Crear cuenta
-                        </Button>
-
-                        <p className="text-sm text-zinc-500 text-center">
-                            ¿Ya tienes cuenta?{" "}
-                            <Link href="/login" className="text-indigo-600 hover:underline">
-                                Iniciar sesión
-                            </Link>
-                        </p>
-                    </CardFooter>
-                </form>
-            </Card>
-        </div>
+                    <p className="text-sm text-white/40 text-center">
+                        {t("haveAccount")}{" "}
+                        <Link href="/login" className="text-neon hover:text-neon/80 font-medium transition-colors">
+                            {t("login")}
+                        </Link>
+                    </p>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }

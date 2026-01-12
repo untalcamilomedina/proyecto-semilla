@@ -2,30 +2,38 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface GlassInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+    label?: string;
+    error?: string;
+}
 
 /**
- * GlassInput Component
- * Renders an input field with glassmorphism styling and neon focus effects.
+ * GlassInput
+ * Campo de entrada de datos con estilo glassmorphism y enfoque neón.
  * 
- * @param {GlassInputProps} props - Standard HTML input attributes.
- * @param {string} props.className - Additional CSS classes.
- * @param {string} props.type - Input type (text, password, etc).
- * @param {React.Ref<HTMLInputElement>} ref - Forwarded ref.
- * @returns {JSX.Element} The rendered input component.
+ * @vibe Elite - High-end form elements with subtle transparency.
+ * @param {string} [props.label] - Etiqueta opcional.
+ * @param {string} [props.error] - Mensaje de error opcional.
  */
 export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, label, error, ...props }, ref) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon/50 disabled:cursor-not-allowed disabled:opacity-50 text-white transition-all duration-300",
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
+      <div className="space-y-1.5 w-full">
+        {label && <label className="text-xs font-medium text-white/50 ml-1">{label}</label>}
+        <input
+          type={type}
+          className={cn(
+            "flex h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/20 transition-all duration-300",
+            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon/50",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            error && "border-red-500/50 focus-visible:ring-red-500 focus-visible:border-red-500/50",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {error && <p className="text-[10px] text-red-400 ml-1 font-medium anonymous-fade-in">{error}</p>}
+      </div>
     )
   }
 )

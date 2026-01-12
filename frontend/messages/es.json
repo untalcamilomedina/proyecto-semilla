@@ -20,24 +20,43 @@
         "import": "Importar",
         "actions": "Acciones",
         "yes": "Sí",
-        "no": "No"
+        "no": "No",
+        "table": {
+            "searchPlaceholder": "Buscar...",
+            "noResults": "No se encontraron resultados.",
+            "paginationInfo": "Página {current} de {total}"
+        }
     },
     "auth": {
         "login": "Iniciar sesión",
         "logout": "Cerrar sesión",
         "signup": "Registrarse",
+        "register": "Registrarse",
+        "createAccount": "Crear cuenta",
         "email": "Correo electrónico",
         "password": "Contraseña",
         "confirmPassword": "Confirmar contraseña",
         "forgotPassword": "¿Olvidaste tu contraseña?",
-        "rememberMe": "Recordarme"
+        "rememberMe": "Recordarme",
+        "loginDescription": "Ingresa tus credenciales para acceder al sistema",
+        "signupDescription": "Regístrate para comenzar a usar la plataforma",
+        "noAccount": "¿No tienes cuenta?",
+        "haveAccount": "¿Ya tienes cuenta?",
+        "emailPlaceholder": "tu@email.com",
+        "passwordPlaceholder": "••••••••",
+        "signupPasswordPlaceholder": "Mínimo 8 caracteres",
+        "confirmPasswordPlaceholder": "Repite tu contraseña",
+        "invalidCredentials": "Credenciales inválidas",
+        "connectionError": "Error de conexión"
     },
     "nav": {
         "dashboard": "Dashboard",
         "members": "Miembros",
         "roles": "Roles",
         "billing": "Facturación",
-        "settings": "Configuración"
+        "settings": "Configuración",
+        "auditLogs": "Auditoría",
+        "apiKeys": "API Keys"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -232,5 +251,50 @@
             "passwordsMatch": "Las contraseñas no coinciden",
             "invalidDomain": "Dominio inválido (ej: app.ejemplo.com)"
         }
+    },
+    "settings": {
+        "title": "Configuración",
+        "description": "Gestiona las preferencias de tu organización",
+        "profile": "Perfil",
+        "organization": "Organización",
+        "saveChanges": "Guardar cambios",
+        "language": "Idioma",
+        "theme": "Tema",
+        "notifications": "Notificaciones",
+        "security": "Seguridad",
+        "changePassword": "Cambiar contraseña",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmNewPassword": "Confirmar nueva contraseña",
+        "profileUpdated": "Perfil actualizado correctamente",
+        "passwordChanged": "Contraseña cambiada correctamente",
+        "orgUpdated": "Organización actualizada correctamente",
+        "personalInfo": "Información Personal",
+        "firstName": "Nombre",
+        "lastName": "Apellido"
+    },
+    "audit": {
+        "title": "Logs de Auditoría",
+        "description": "Cronología de acciones realizadas en la organización.",
+        "actor": "Actor",
+        "action": "Acción",
+        "target": "Objetivo",
+        "date": "Fecha",
+        "details": "Detalles",
+        "noLogs": "No se encontraron registros."
+    },
+    "keys": {
+        "title": "Llaves de API",
+        "description": "Gestiona llaves para integraciones externas.",
+        "createButton": "Nueva Llave",
+        "revoked": "Revocada",
+        "active": "Activa",
+        "prefix": "Prefijo",
+        "lastUsed": "Último uso",
+        "keyWarning": "Guarda esta llave en un lugar seguro. No se volverá a mostrar.",
+        "namePlaceholder": "Nombre de la llave",
+        "created": "Llave creada",
+        "revocationSuccess": "Llave revocada",
+        "copy": "Copiar"
     }
 }

@@ -6,24 +6,32 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { apiPost, ApiError } from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
-const loginSchema = z.object({
-    email: z.string().email("Email inválido"),
-    password: z.string().min(1, "La contraseña es requerida"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-
+/**
+ * LoginPage
+ * Provides a premium authentication experience using Glassmorphism.
+ * 
+ * @vibe Elite - Deep blur, neon accents, and full i18n support.
+ */
 export default function LoginPage() {
+    const t = useTranslations("auth");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const { checkAuth } = useAuth();
+
+    const loginSchema = z.object({
+        email: z.string().email(t("validation.invalidEmail" as any) || "Email inválido"),
+        password: z.string().min(1, t("validation.passwordRequired" as any) || "La contraseña es requerida"),
+    });
+
+    type LoginForm = z.infer<typeof loginSchema>;
 
     const {
         register,
@@ -50,10 +58,10 @@ export default function LoginPage() {
                 setError(
                     body?.detail ||
                     body?.non_field_errors?.[0] ||
-                    "Credenciales inválidas"
+                    t("invalidCredentials")
                 );
             } else {
-                setError("Error de conexión");
+                setError(t("connectionError"));
             }
         } finally {
             setIsLoading(false);
@@ -61,54 +69,62 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
-            <Card className="w-full max-w-md">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-                    <CardDescription>
-                        Ingresa tus credenciales para acceder al sistema
-                    </CardDescription>
-                </CardHeader>
+        <AuthLayout 
+            title={t("login")} 
+            description={t("loginDescription")}
+        >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {error && (
+                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 animate-in fade-in slide-in-from-top-1 duration-300">
+                        {error}
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <CardContent className="space-y-4">
-                        {error && (
-                            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-                                {error}
-                            </div>
-                        )}
+                <div className="space-y-4">
+                    <GlassInput
+                        label={t("email")}
+                        type="email"
+                        placeholder={t("emailPlaceholder")}
+                        error={errors.email?.message}
+                        {...register("email")}
+                    />
 
-                        <Input
-                            label="Email"
-                            type="email"
-                            placeholder="tu@email.com"
-                            error={errors.email?.message}
-                            {...register("email")}
-                        />
-
-                        <Input
-                            label="Contraseña"
+                    <div className="space-y-1">
+                        <GlassInput
+                            label={t("password")}
                             type="password"
-                            placeholder="••••••••"
+                            placeholder={t("passwordPlaceholder")}
                             error={errors.password?.message}
                             {...register("password")}
                         />
-                    </CardContent>
-
-                    <CardFooter className="flex flex-col gap-4">
-                        <Button type="submit" className="w-full" isLoading={isLoading}>
-                            Iniciar sesión
-                        </Button>
-
-                        <p className="text-sm text-zinc-500 text-center">
-                            ¿No tienes cuenta?{" "}
-                            <Link href="/signup" className="text-indigo-600 hover:underline">
-                                Registrarse
+                        <div className="flex justify-end px-1">
+                            <Link 
+                                href="/forgot-password" 
+                                className="text-[11px] text-neon/70 hover:text-neon transition-colors"
+                            >
+                                {t("forgotPassword")}
                             </Link>
-                        </p>
-                    </CardFooter>
-                </form>
-            </Card>
-        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-2 space-y-6">
+                    <GlassButton 
+                        type="submit" 
+                        className="w-full h-12 text-base" 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "..." : t("login")}
+                    </GlassButton>
+
+                    <p className="text-sm text-white/40 text-center">
+                        {t("noAccount")}{" "}
+                        <Link href="/signup" className="text-neon hover:text-neon/80 font-medium transition-colors">
+                            {t("register")}
+                        </Link>
+                    </p>
+                </div>
+            </form>
+        </AuthLayout>
     );
 }

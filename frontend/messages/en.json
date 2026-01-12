@@ -20,24 +20,43 @@
         "import": "Import",
         "actions": "Actions",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "table": {
+            "searchPlaceholder": "Search...",
+            "noResults": "No results found.",
+            "paginationInfo": "Page {current} of {total}"
+        }
     },
     "auth": {
         "login": "Log in",
         "logout": "Log out",
         "signup": "Sign up",
+        "register": "Register",
+        "createAccount": "Create account",
         "email": "Email",
         "password": "Password",
         "confirmPassword": "Confirm password",
         "forgotPassword": "Forgot your password?",
-        "rememberMe": "Remember me"
+        "rememberMe": "Remember me",
+        "loginDescription": "Enter your credentials to access the system",
+        "signupDescription": "Sign up to start using the platform",
+        "noAccount": "Don't have an account?",
+        "haveAccount": "Already have an account?",
+        "emailPlaceholder": "your@email.com",
+        "passwordPlaceholder": "••••••••",
+        "signupPasswordPlaceholder": "Minimum 8 characters",
+        "confirmPasswordPlaceholder": "Repeat your password",
+        "invalidCredentials": "Invalid credentials",
+        "connectionError": "Connection error"
     },
     "nav": {
         "dashboard": "Dashboard",
         "members": "Members",
         "roles": "Roles",
         "billing": "Billing",
-        "settings": "Settings"
+        "settings": "Settings",
+        "auditLogs": "Audit Logs",
+        "apiKeys": "API Keys"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -232,5 +251,50 @@
             "passwordsMatch": "Passwords don't match",
             "invalidDomain": "Invalid domain (e.g. app.example.com)"
         }
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage your organization preferences",
+        "profile": "Profile",
+        "organization": "Organization",
+        "saveChanges": "Save changes",
+        "language": "Language",
+        "theme": "Theme",
+        "notifications": "Notifications",
+        "security": "Security",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "profileUpdated": "Profile updated successfully",
+        "passwordChanged": "Password changed successfully",
+        "orgUpdated": "Organization updated successfully",
+        "personalInfo": "Personal Information",
+        "firstName": "First Name",
+        "lastName": "Last Name"
+    },
+    "audit": {
+        "title": "Audit Logs",
+        "description": "Timeline of actions performed in the organization.",
+        "actor": "Actor",
+        "action": "Action",
+        "target": "Target",
+        "date": "Date",
+        "details": "Details",
+        "noLogs": "No records found."
+    },
+    "keys": {
+        "title": "API Keys",
+        "description": "Manage keys for external integrations.",
+        "createButton": "New Key",
+        "revoked": "Revoked",
+        "active": "Active",
+        "prefix": "Prefix",
+        "lastUsed": "Last used",
+        "keyWarning": "Save this key in a safe place. It will not be shown again.",
+        "namePlaceholder": "Key name",
+        "created": "Key created",
+        "revocationSuccess": "Key revoked",
+        "copy": "Copy"
     }
 }

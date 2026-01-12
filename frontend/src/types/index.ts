@@ -113,8 +113,31 @@ export interface ValidationError {
     [field: string]: string[];
 }
 
-export interface ApiErrorResponse {
-    detail?: string;
-    non_field_errors?: string[];
-    [field: string]: unknown;
+// Enterprise
+export interface ActivityLog {
+    id: number;
+    actor: User;
+    action: string;
+    target: string;
+    description: string;
+    ip_address: string;
+    user_agent: string;
+    created_at: string;
+    context: Record<string, unknown>;
+}
+
+export interface ApiKey {
+    id: number;
+    name: string;
+    key?: string; // Only on creation
+    prefix: string;
+    created_at: string;
+    last_used_at: string | null;
+    revoked_at: string | null;
+    scopes: string[];
+}
+
+export interface ApiKeyCreate {
+    name: string;
+    scopes?: string[];
 }
