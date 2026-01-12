@@ -1,10 +1,21 @@
 import Dexie, { type Table } from 'dexie';
 import CryptoJS from 'crypto-js';
 
-// Secret key should ideally come from env or user input (e.g. password derived), 
-// but for this implementation we use a fixed client-side secret or env if available.
-// WARNING: Storing key in JS is not fully secure against XSS, but sufficient for basic offline encryption requirement.
-const SECRET_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || "default-insecure-key-change-me";
+const DEFAULT_KEY = "seed-insecure-fallback";
+
+/**
+ * Gets the encryption key for the current user.
+ * In a real scenario, this would be derived from the user's login session
+ * or a PBKDF2 derivative of their password stored only in memory.
+ */
+function getEncryptionKey(): string {
+  // Attempt to get user ID from a cookie or session to make the key user-specific
+  if (typeof window !== 'undefined') {
+    const userId = localStorage.getItem('user_id') || 'anonymous';
+    return `${process.env.NEXT_PUBLIC_STORAGE_KEY || DEFAULT_KEY}-${userId}`;
+  }
+  return DEFAULT_KEY;
+}
 
 export interface EncryptedItem {
   id?: number;
@@ -14,7 +25,7 @@ export interface EncryptedItem {
 }
 
 export class OfflineStorage extends Dexie {
-  items!: Table<EncryptedItem>; 
+  items!: Table<EncryptedItem>;
 
   constructor() {
     super('OfflineEncryptedDB');
@@ -24,12 +35,14 @@ export class OfflineStorage extends Dexie {
   }
 
   private encrypt(data: any): string {
-    return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+    const key = getEncryptionKey();
+    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
   }
 
   private decrypt(ciphertext: string): any {
+    const key = getEncryptionKey();
     try {
-      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const bytes = CryptoJS.AES.decrypt(ciphertext, key);
       return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     } catch (e) {
       console.error("Failed to decrypt data", e);
@@ -42,15 +55,15 @@ export class OfflineStorage extends Dexie {
     // Check if exists to update
     const existing = await this.items.where('key').equals(key).first();
     if (existing) {
-      await this.items.update(existing.id!, { 
-        value: encrypted, 
-        timestamp: Date.now() 
+      await this.items.update(existing.id!, {
+        value: encrypted,
+        timestamp: Date.now()
       });
     } else {
-      await this.items.add({ 
-        key, 
-        value: encrypted, 
-        timestamp: Date.now() 
+      await this.items.add({
+        key,
+        value: encrypted,
+        timestamp: Date.now()
       });
     }
   }

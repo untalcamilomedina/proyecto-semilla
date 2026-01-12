@@ -2,7 +2,9 @@
 
 import { NextIntlClientProvider } from "next-intl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { dexiePersister } from "@/lib/persister";
+import { useState, useEffect, type ReactNode } from "react";
 
 interface ProvidersProps {
     children: ReactNode;
@@ -23,6 +25,15 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
                 },
             })
     );
+
+    useEffect(() => {
+        const unsubscribe = persistQueryClient({
+            queryClient,
+            persister: dexiePersister,
+            maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        });
+        return unsubscribe;
+    }, [queryClient]);
 
     return (
         <NextIntlClientProvider locale={locale} messages={messages}>

@@ -8,9 +8,15 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from drf_spectacular.utils import extend_schema
 from core.models import User
 
 
+@extend_schema(
+    summary="Get CSRF Token",
+    description="Returns a CSRF token to be used in subsequent mutating requests.",
+    responses={200: {"type": "object", "properties": {"csrfToken": {"type": "string"}}}}
+)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -19,30 +25,28 @@ def csrf(request):
     return Response({"csrfToken": get_token(request)})
 
 
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def me(request):
-    """Return current authenticated user info"""
-    if request.user.is_authenticated:
-        return Response({
-            "is_authenticated": True,
-            "user": {
-                "id": request.user.id,
-                "email": request.user.email,
-                "username": request.user.username,
-                "first_name": request.user.first_name,
-                "last_name": request.user.last_name,
-                "is_active": request.user.is_active,
-            }
-        })
-    return Response({"is_authenticated": False, "user": None})
 
-
+@extend_schema(
+    summary="Login",
+    description="Authenticates a user with email and password and creates a session.",
+    request={"type": "object", "properties": {
+        "email": {"type": "string"},
+        "password": {"type": "string"}
+    }, "required": ["email", "password"]},
+    responses={200: {"type": "object"}, 401: {"type": "object"}}
+)
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
 def login_view(request):
-    """Login user with email and password"""
+    """Login user with email and password.
+    
+    Args:
+        request: The Django request object containing email and password.
+        
+    Returns:
+        Response: Login success or failure message with user data.
+    """
     email = request.data.get("email")
     password = request.data.get("password")
 

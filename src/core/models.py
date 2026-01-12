@@ -110,3 +110,21 @@ class OnboardingState(models.Model):
         if step not in self.completed_steps:
             self.completed_steps.append(step)
         self.current_step = max(self.current_step, step + 1)
+
+
+class ActivityLog(models.Model):
+    organization = models.ForeignKey(
+        "multitenant.Tenant", on_delete=models.CASCADE, related_name="activity_logs"
+    )
+    actor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    action = models.CharField(max_length=100)
+    object_id = models.CharField(max_length=50, blank=True, null=True)
+    object_repr = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["organization", "-created_at"]),
+        ]

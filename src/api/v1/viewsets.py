@@ -3,12 +3,13 @@ from __future__ import annotations
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.models import ApiKey
 from api.permissions import PolicyPermission
 from billing.models import Invoice, Plan, Subscription
-from core.models import Membership, Permission, Role
+from core.models import Membership, Permission, Role, ActivityLog
 from core.services.members import invite_members_to_org
 
 from .serializers import (
@@ -22,16 +23,66 @@ from .serializers import (
     RoleSerializer,
     SubscriptionSerializer,
     TenantSerializer,
+    UserSerializer,
+    UserUpdateSerializer,
+    PasswordChangeSerializer,
+    ActivityLogSerializer,
 )
 
 
-class TenantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ProfileViewSet(viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def retrieve(self, request, *args, **kwargs):
+        """Get current user profile."""
+        serializer = self.get_serializer(self.get_object())
+        return Response({
+            "is_authenticated": True,
+            "user": serializer.data
+        })
+
+    def partial_update(self, request, *args, **kwargs):
+        """Update current user profile."""
+        instance = self.get_object()
+        serializer = UserUpdateSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserSerializer(instance).data)
+
+    @action(detail=False, methods=["post"])
+    def change_password(self, request):
+        """Change current user password."""
+        instance = self.get_object()
+        serializer = PasswordChangeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if not instance.check_password(serializer.validated_data["current_password"]):
+            return Response({"current_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        instance.set_password(serializer.validated_data["new_password"])
+        instance.save()
+        return Response({"detail": "Password updated successfully."})
+
+
+class TenantViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     permission_classes = [PolicyPermission]
     serializer_class = TenantSerializer
 
-    def list(self, request, *args, **kwargs):
-        serializer = self.get_serializer(request.tenant)
-        return Response(serializer.data)
+    def get_object(self):
+        return self.request.tenant
+
+    def retrieve(self, request, *args, **kwargs):
+        """Get current tenant details."""
+        return super().retrieve(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        """Update current tenant settings."""
+        self.permission_codename = "core.manage_organization" # Requiere permiso para editar
+        return super().partial_update(request, *args, **kwargs)
 
 
 class PermissionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -139,6 +190,15 @@ class ApiKeyViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Gen
         key.revoked_at = timezone.now()
         key.save(update_fields=["revoked_at"])
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ActivityLogViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = ActivityLogSerializer
+    permission_classes = [PolicyPermission]
+    permission_codename = "core.view_audit_logs"
+
+    def get_queryset(self):
+        return ActivityLog.objects.filter(organization=request_tenant(self.request)).select_related("actor")
 
 
 def request_tenant(request):

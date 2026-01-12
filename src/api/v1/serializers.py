@@ -4,8 +4,32 @@ from rest_framework import serializers
 
 from api.models import ApiKey
 from billing.models import Invoice, Plan, Subscription
-from core.models import Membership, Permission, Role
+from core.models import User, Membership, Permission, Role, ActivityLog
 from multitenant.models import Tenant
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "username", "first_name", "last_name", "is_active"]
+        read_only_fields = ["id", "email", "username", "is_active"]
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name"]
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)
+    confirm_password = serializers.CharField(required=True)
+
+    def validate(self, data):
+        if data["new_password"] != data["confirm_password"]:
+            raise serializers.ValidationError({"confirm_password": "New passwords must match."})
+        return data
 
 
 class TenantSerializer(serializers.ModelSerializer):
@@ -23,6 +47,7 @@ class TenantSerializer(serializers.ModelSerializer):
             "branding",
             "domain_base",
         ]
+        read_only_fields = ["id", "slug", "schema_name", "plan_code", "domain_base"]
 
     def get_domain_base(self, _obj: Tenant) -> str:
         from django.conf import settings
@@ -112,3 +137,11 @@ class ApiKeyCreateSerializer(serializers.Serializer):
 class MembershipInviteSerializer(serializers.Serializer):
     emails = serializers.ListField(child=serializers.EmailField(), allow_empty=False)
     role_slug = serializers.SlugField(required=False)
+
+
+class ActivityLogSerializer(serializers.ModelSerializer):
+    actor_email = serializers.EmailField(source="actor.email", read_only=True)
+
+    class Meta:
+        model = ActivityLog
+        fields = ["id", "actor_email", "action", "object_repr", "description", "created_at"]
