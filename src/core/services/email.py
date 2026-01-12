@@ -10,7 +10,11 @@ class EmailService:
         Send a welcome email to a new user.
         """
         subject = "Welcome to Acme SaaS!"
-        context = {"user": user, "site_name": "Acme SaaS"}
+        context = {
+            "user": user, 
+            "site_name": "Acme SaaS",
+            "frontend_url": getattr(settings, "FRONTEND_URL", "http://localhost:3000")
+        }
         html_message = render_to_string("emails/welcome.html", context)
         plain_message = render_to_string("emails/welcome.txt", context)
         

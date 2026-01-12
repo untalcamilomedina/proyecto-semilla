@@ -20,6 +20,7 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 DOMAIN_BASE = env.str("DOMAIN_BASE", default="acme.dev")
+FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:3000")
 
 WAGTAIL_APPS: list[str] = []
 if ENABLE_CMS:
