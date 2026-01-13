@@ -12,7 +12,7 @@ services:
     ports:
       - "${DJANGO_PORT:-8000}:8000"
     env_file:
-      - ../env/.env
+      - ../local.env
     depends_on:
       - postgres
       - redis
@@ -47,7 +47,7 @@ services:
       - ../manage.py:/app/manage.py:delegated
       - ../requirements:/app/requirements:delegated
     env_file:
-      - ../env/.env
+      - ../local.env
     depends_on:
       - postgres
       - redis
@@ -62,7 +62,7 @@ services:
       - ../manage.py:/app/manage.py:delegated
       - ../requirements:/app/requirements:delegated
     env_file:
-      - ../env/.env
+      - ../local.env
     depends_on:
       - postgres
       - redis
