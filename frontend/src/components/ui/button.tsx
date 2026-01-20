@@ -40,6 +40,12 @@ export interface ButtonProps
     isLoading?: boolean;
 }
 
+/**
+ * Primary interactive element for user actions.
+ * 
+ * @vibe Glassmorphism Elite - Use 'default' (Neon Green) for primary actions, 'ghost' for subtle interactions.
+ * supports `isLoading` state for async operations.
+ */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, isLoading, children, disabled, ...props }, ref) => {
         const Comp = asChild ? Slot : "button";

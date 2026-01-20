@@ -7,6 +7,12 @@ export interface InputProps
     error?: string;
 }
 
+/**
+ * Form input field with integrated label and error handling.
+ * 
+ * @vibe Form & Data Integrity - Consistent styling for data entry.
+ * Supports `label` and `error` props for automatic layout.
+ */
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ({ className, type, label, error, id, ...props }, ref) => {
         const inputId = id || React.useId();

@@ -1,6 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Glassmorphic container for content organization.
+ * 
+ * @vibe Glassmorphism Elite - Use for grouping related content.
+ * Should be used with `CardHeader`, `CardContent`, and `CardFooter`.
+ */
 const Card = React.forwardRef<
     HTMLDivElement,
     React.HTMLAttributes<HTMLDivElement>
