@@ -33,7 +33,7 @@ class TestEmailService:
         membership.invited_by = inviter
         invite_url = "http://localhost:3000/invite/accept"
         
-        EmailService.send_invite_email(membership, invite_url)
+        EmailService.send_invite_email(membership, invite_url, inviter=inviter)
         
         assert len(mail.outbox) == 1
         # Check specific message

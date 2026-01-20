@@ -133,6 +133,7 @@ class MembershipViewSet(viewsets.ModelViewSet):
             request_tenant(request),
             serializer.validated_data["emails"],
             role_slug=serializer.validated_data.get("role_slug") or "member",
+            inviter=request.user,
         )
         return Response({"invited": invited}, status=status.HTTP_200_OK)
 

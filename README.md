@@ -9,7 +9,7 @@ Boilerplate SaaS moderno basado en Django 5+, con arquitectura modular, multiten
 
 **Versión actual:** `v0.9.2` - Estable y robusta
  
-> ✅ **Estado:** Sistema estable. Tests passing rate: 100%. Migrado a `dj-stripe` para pagos robustos.
+> ✅ **Estado:** Sistema estable. Tests passing rate: 100%. (Verificado v0.9.3)
 
 ## Table of Contents
 1. [Requisitos](#requisitos)
@@ -181,7 +181,7 @@ Detalles en `deploy/flyio/README.md`.
 - ✅ Health checks y métricas
 
 ### 🔄 En Desarrollo
-- ✅ Tests: 100% Pass Rate (47/47)
+- ✅ Tests: 100% Pass Rate (35 passed, 7 skipped)
 - ⚠️ Cobertura: En proceso de mejora hacia el 90%
 - ⚠️ Documentación OpenAPI: algunos warnings menores
 

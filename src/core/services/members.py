@@ -8,7 +8,7 @@ from core.services.usernames import username_from_email
 
 
 @transaction.atomic
-def invite_members_to_org(organization, emails: list[str], role_slug: str = "member") -> int:
+def invite_members_to_org(organization, emails: list[str], role_slug: str = "member", inviter=None) -> int:
     if not emails:
         return 0
 
@@ -32,6 +32,6 @@ def invite_members_to_org(organization, emails: list[str], role_slug: str = "mem
         )
         from django.conf import settings
         invite_url = f"https://{organization.slug}.{getattr(settings, 'DOMAIN_BASE', 'acme.dev')}/join"
-        EmailService.send_invite_email(membership, invite_url)
+        EmailService.send_invite_email(membership, invite_url, inviter=inviter)
         invited += 1
     return invited

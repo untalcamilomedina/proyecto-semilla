@@ -27,13 +27,13 @@ class EmailService:
         )
 
     @staticmethod
-    def send_invite_email(membership, invite_url):
+    def send_invite_email(membership, invite_url, inviter=None):
         """
         Send an invitation email to join a workspace.
         """
         subject = f"Invitation to join {membership.organization.name} on Acme SaaS"
         context = {
-            "inviter": membership.invited_by,
+            "inviter": inviter,
             "organization": membership.organization,
             "invite_url": invite_url,
             "site_name": "Acme SaaS"

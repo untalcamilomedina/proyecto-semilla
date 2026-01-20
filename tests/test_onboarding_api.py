@@ -62,4 +62,4 @@ class TestOnboardingAPI:
         }
         response = api_client.post("/api/v1/onboarding/start/", payload)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "confirm_password" in response.data
+        assert "confirm_password" in response.data["details"]
