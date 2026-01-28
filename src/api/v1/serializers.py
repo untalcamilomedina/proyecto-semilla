@@ -52,7 +52,7 @@ class TenantSerializer(serializers.ModelSerializer):
     def get_domain_base(self, _obj: Tenant) -> str:
         from django.conf import settings
 
-        return getattr(settings, "DOMAIN_BASE", "acme.dev")
+        return getattr(settings, "DOMAIN_BASE", "notionapps.dev")
 
 
 class PermissionSerializer(serializers.ModelSerializer):

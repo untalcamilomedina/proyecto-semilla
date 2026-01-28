@@ -29,7 +29,7 @@ export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>
           
           // Primary (Neon Green)
           variant === "primary" && 
-            "bg-neon/20 text-neon border border-neon/50 hover:bg-neon/30 shadow-[0_0_15px_rgba(13,242,13,0.3)]",
+            "bg-neon/20 text-white font-bold border border-neon/50 hover:bg-neon/30 shadow-[0_0_15px_rgba(13,242,13,0.3)]",
           
           // Secondary
           variant === "secondary" && 

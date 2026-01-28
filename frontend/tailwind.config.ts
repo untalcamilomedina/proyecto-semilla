@@ -9,32 +9,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "#0df20d", // emerald-500
-          foreground: "#ffffff",
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
         },
-        background: {
-          light: "#f5f8f5",
-          dark: "#102210",
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
         },
-        surface: {
-          glass: "rgba(255, 255, 255, 0.03)",
+        muted: {
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
         },
-        zinc: {
-          100: "#f4f4f5",
-          200: "#e4e4e7",
-          500: "#71717a",
-          600: "#52525b",
-          900: "#18181b",
+        accent: {
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
         },
-      },
-      boxShadow: {
-        glass: "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
-        neon: "0 0 10px rgba(13, 242, 13, 0.15), 0 0 20px rgba(13, 242, 13, 0.05)",
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
+        },
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
+        },
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        neon: "#0df20d",
       },
       borderRadius: {
-        xl: "12px",
-        "2xl": "16px",
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
     },
   },

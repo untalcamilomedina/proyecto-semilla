@@ -19,7 +19,7 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
-DOMAIN_BASE = env.str("DOMAIN_BASE", default="acme.dev")
+DOMAIN_BASE = env.str("DOMAIN_BASE", default="notionapps.dev")
 FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:3000")
 
 WAGTAIL_APPS: list[str] = []
@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.notion",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
     "waffle",
@@ -78,6 +80,7 @@ INSTALLED_APPS = [
     "billing",
     "multitenant",
     "oauth",
+    "integrations",
 ] + optional_apps()
 
 MIDDLEWARE = [
@@ -126,7 +129,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {
     "default": dj_database_url.parse(
-        env.str("DATABASE_URL", default="postgresql://postgres:postgres@localhost:5432/acme_saas"),
+        env.str("DATABASE_URL", default="postgresql://postgres:postgres@localhost:5432/notionapps"),
         conn_max_age=600,
     )
 }
@@ -163,8 +166,8 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
 EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="noreply@acme.dev")
-SERVER_EMAIL = env.str("SERVER_EMAIL", default="server@acme.dev")
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="noreply@notionapps.dev")
+SERVER_EMAIL = env.str("SERVER_EMAIL", default="server@notionapps.dev")
 
 ANYMAIL = {
     "SENDGRID_API_KEY": env.str("ANYMAIL_API_KEY", default=""),
@@ -199,6 +202,24 @@ STATIC_ROOT = ROOT_DIR / "staticfiles"
 STATICFILES_DIRS = [SRC_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Social Account Providers
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+    },
+    "notion": {  # Using generic OpenID/OAuth2 provider if specific notion provider is not available in allauth yet, or custom adapter
+        "SCOPE": ["public"],
+        "VERIFIED_EMAIL": True,
+    }
+}
+SOCIALACCOUNT_ADAPTER = "oauth.adapters.CustomSocialAccountAdapter"
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = ROOT_DIR / "media"
 
@@ -231,8 +252,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Acme SaaS API",
-    "DESCRIPTION": "Versioned DRF API for Acme SaaS.",
+    "TITLE": "NotionApps API",
+    "DESCRIPTION": "Versioned DRF API for NotionApps.",
     "VERSION": "v1",
     "SERVE_INCLUDE_SCHEMA": False,
 }

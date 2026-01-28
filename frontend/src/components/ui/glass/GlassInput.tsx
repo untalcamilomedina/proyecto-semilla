@@ -23,7 +23,7 @@ export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
         <input
           type={type}
           className={cn(
-            "flex h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/20 transition-all duration-300",
+            "flex h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/50 transition-all duration-300",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon/50",
             "disabled:cursor-not-allowed disabled:opacity-50",
             error && "border-red-500/50 focus-visible:ring-red-500 focus-visible:border-red-500/50",

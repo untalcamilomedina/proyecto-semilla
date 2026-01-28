@@ -7,6 +7,7 @@ from config.settings.plugins import optional_api_urls
 
 from core.api.onboarding import OnboardingViewSet
 from core.api.dashboard import DashboardViewSet
+from integrations.api import DiagramViewSet, JobViewSet
 from .views import csrf, login_view, logout_view, signup_view
 from .viewsets import (
     ApiKeyViewSet,
@@ -35,6 +36,8 @@ router.register("plans", PlanViewSet, basename="plans")
 router.register("subscriptions", SubscriptionViewSet, basename="subscriptions")
 router.register("invoices", InvoiceViewSet, basename="invoices")
 router.register("api-keys", ApiKeyViewSet, basename="api-keys")
+router.register("diagrams", DiagramViewSet, basename="diagrams")
+router.register("jobs", JobViewSet, basename="jobs")
 
 urlpatterns = [
     re_path(r"^csrf/?$", csrf, name="csrf"),
