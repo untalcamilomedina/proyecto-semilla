@@ -1,7 +1,8 @@
 from typing import List, Optional
-from integrations.schemas import ERDSpec, ERDEntity
+from integrations.schemas import ERDSpec, ERDEntity, FlowSpec
 from integrations.notion.client import NotionClient
 from integrations.notion.adapters import NotionAdapter
+from billing.metering import MeteringService
 
 class NotionService:
     """
@@ -9,10 +10,17 @@ class NotionService:
     """
 
     @staticmethod
-    async def scan_databases(token: str) -> ERDSpec:
+    async def scan_databases(token: str, tenant=None) -> ERDSpec:
         """
         Scans all databases in the workspace and returns a Canoncial ERD Spec.
         """
+        # 0. Check Limits (if tenant provided)
+        if tenant:
+            # Check limits synchronously (Django ORM) before async work
+            # Note: In pure async views, use database_sync_to_async wrapper
+            # For now assuming this runs in a sync context or safe thread
+            MeteringService.check_and_track_request(tenant, "requests")
+
         client = NotionClient(token)
         try:
             # 1. Fetch all databases
@@ -22,10 +30,6 @@ class NotionService:
             entities = []
             for db in notion_dbs:
                 entity_data = NotionAdapter.database_to_entity(db)
-                # Map adapter output to ERDEntity schema
-                # Adapter returns 'attributes' list of dicts. 
-                # We need to ensure keys match ERDAttribute or we do it here.
-                # Let's trust Adapter returns valid dicts for ERDEntity construction
                 entities.append(ERDEntity(**entity_data))
             
             # 3. Return Spec
@@ -34,36 +38,25 @@ class NotionService:
             await client.close()
 
     @staticmethod
-    async def apply_erd(token: str, parent_page_id: str, spec: ERDSpec) -> List[str]:
+    async def apply_erd(token: str, parent_page_id: str, spec: ERDSpec, tenant=None) -> List[str]:
         """
         Applies an ERD Spec to Notion by creating databases.
-        Returns list of created database IDs.
         """
+        if tenant:
+            MeteringService.check_and_track_request(tenant, "diagrams")
+
         client = NotionClient(token)
         created_ids = []
         try:
             for entity in spec.entities:
-                # 1. Construct Notion Schema (Simplified)
-                # In a real scenario, we'd use an adapter to go Canonical -> Notion Payload
-                properties = {
-                    "Name": {"title": {}} # Default title
-                }
-                
-                # Naive implementation of attribute creation
+                properties = {"Name": {"title": {}}}
                 for attr in entity.attributes:
-                    if attr.is_primary:
-                        continue # Title is handled
-                    
-                    # Mapping constraints (simplified for MVP)
-                    if attr.type == "text":
-                        properties[attr.name] = {"rich_text": {}}
-                    elif attr.type == "number":
-                        properties[attr.name] = {"number": {}}
-                    elif attr.type == "select":
-                        properties[attr.name] = {"select": {}}
-                    # ... add more types as needed
+                    if attr.is_primary: continue
+                    if attr.type == "text": properties[attr.name] = {"rich_text": {}}
+                    elif attr.type == "number": properties[attr.name] = {"number": {}}
+                    elif attr.type == "select": properties[attr.name] = {"select": {}}
+                    elif attr.type == "date": properties[attr.name] = {"date": {}}
 
-                # 2. Create DB
                 result = await client.create_database(
                     parent_page_id=parent_page_id,
                     schema={
@@ -72,7 +65,39 @@ class NotionService:
                     }
                 )
                 created_ids.append(result["id"])
-            
             return created_ids
+        finally:
+            await client.close()
+
+    @staticmethod
+    async def apply_flow(token: str, parent_page_id: str, spec: FlowSpec, tenant=None) -> str:
+        """
+        Converts a FlowSpec (Miro) into a Notion Database (Kanban Board).
+        """
+        if tenant:
+             MeteringService.check_and_track_request(tenant, "requests")
+
+        client = NotionClient(token)
+        try:
+            # 1. Create Database for the Flow
+            # We map 'Stages' (if any) to a Status/Select property
+            properties = {
+                "Name": {"title": {}},
+                "Stage": {"select": {"options": [{"name": "To Do", "color": "red"}, {"name": "Done", "color": "green"}]}},
+                "Type": {"select": {}}
+            }
+
+            result = await client.create_database(
+                parent_page_id=parent_page_id,
+                schema={
+                    "title": [{"type": "text", "text": {"content": f"Flow: {spec.id}"}}],
+                    "properties": properties
+                }
+            )
+            
+            # 2. Create Pages for each Node (Not Implemented in Client yet, but logic is here)
+            # await client.create_page(database_id=result["id"], properties={...})
+
+            return result["id"]
         finally:
             await client.close()

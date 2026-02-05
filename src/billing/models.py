@@ -17,6 +17,8 @@ class Plan(models.Model):
     is_active = models.BooleanField(default=True)
     is_public = models.BooleanField(default=True)
     seat_limit = models.PositiveIntegerField(blank=True, null=True)
+    max_diagrams = models.PositiveIntegerField(default=5, help_text="Max stored diagrams")
+    max_requests = models.PositiveIntegerField(default=10, help_text="Max integration requests per month")
     trial_days = models.PositiveIntegerField(default=0)
     roles_on_activation = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -78,6 +80,12 @@ class Subscription(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
     quantity = models.PositiveIntegerField(default=1)
+    
+    # Usage Metering
+    diagrams_used = models.PositiveIntegerField(default=0)
+    requests_used = models.PositiveIntegerField(default=0)
+    usage_reset_at = models.DateTimeField(blank=True, null=True)
+
     cancel_at_period_end = models.BooleanField(default=False)
     current_period_end = models.DateTimeField(blank=True, null=True)
     trial_end = models.DateTimeField(blank=True, null=True)
