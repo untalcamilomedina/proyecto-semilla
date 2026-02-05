@@ -86,6 +86,7 @@
             "members": "Miembros",
             "diagrams": "Diagramas",
             "requests": "Peticiones API",
+            "billing": "Facturación",
             "plan": "Plan Actual",
             "activity": "Salud Interna",
             "usage": "Uso",
@@ -109,6 +110,7 @@
         "description": "Gestiona los miembros de tu organización",
         "count": "{count} miembros",
         "invite": "Invitar",
+        "inviteButton": "Invitar Miembros",
         "inviteTitle": "Invitar miembros",
         "inviteDescription": "Ingresa los emails de las personas a invitar (uno por línea)",
         "emails": "Emails",
@@ -116,7 +118,8 @@
         "role": "Rol",
         "sendInvitations": "Enviar invitaciones",
         "noMembers": "No hay miembros todavía",
-        "errorInviting": "Error al invitar"
+        "errorInviting": "Error al invitar",
+        "since": "Desde"
     },
     "roles": {
         "title": "Roles",

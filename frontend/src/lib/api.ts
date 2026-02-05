@@ -77,6 +77,28 @@ export const apiGet = async <T>(endpoint: string): Promise<T> => {
     return response.json();
 };
 
+// Generic PATCH helper
+export const apiPatch = async (endpoint: string, data: any) => {
+    const url = `${API_URL}${endpoint}`;
+    const headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    };
+
+    const response = await fetch(url, {
+        method: "PATCH",
+        headers,
+        credentials: "include",
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new ApiError(response.status, { detail: response.statusText });
+    }
+
+    return response.json();
+};
+
 // Generic DELETE helper
 export const apiDelete = async (endpoint: string) => {
     const url = `${API_URL}${endpoint}`;

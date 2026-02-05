@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { Member } from "@/types/member";
 import { memberService } from "@/services/members";
+import { useTranslations } from "next-intl";
 import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 import { useAuth } from "@/hooks/use-auth";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
 

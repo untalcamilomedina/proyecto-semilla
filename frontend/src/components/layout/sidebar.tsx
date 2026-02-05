@@ -76,11 +76,7 @@ export function Sidebar() {
                 )}
             >
                 <div className="flex h-full flex-col">
-import { BlockFlowLogo } from "@/components/ui/logo";
 
-// ... existing imports ...
-
-// Inside Sidebar component
                     {/* Logo Section */}
                     <div className="flex h-20 shrink-0 items-center gap-3 px-6 border-b border-white/5 relative overflow-hidden">
                         {/* Soft Glow behind logo */}
