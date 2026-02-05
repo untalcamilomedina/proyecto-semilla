@@ -196,3 +196,26 @@ class UserAPIKeyViewSet(viewsets.ModelViewSet):
         api_key_obj.save()
         
         return Response({"status": "Key saved securely"}, status=201)
+
+from .models import IntegrationConnection
+
+class ConnectionStatusViewSet(viewsets.ViewSet):
+    """
+    Check status of 3rd party integrations (Notion, Miro).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        user = request.user
+        connections = IntegrationConnection.objects.filter(user=user)
+        
+        status_map = {
+            "notion": False,
+            "miro": False
+        }
+        
+        for conn in connections:
+            if conn.provider in status_map:
+                status_map[conn.provider] = True
+                
+        return Response(status_map)

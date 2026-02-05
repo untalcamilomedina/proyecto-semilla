@@ -14,7 +14,9 @@ from integrations.api import (
     NotionIntegrationViewSet, 
     MiroIntegrationViewSet,
     AIIntegrationViewSet,
-    UserAPIKeyViewSet
+    AIIntegrationViewSet,
+    UserAPIKeyViewSet,
+    ConnectionStatusViewSet
 )
 from integrations.oauth.views import OAuthConnectView, OAuthCallbackView
 from .views import csrf, login_view, logout_view, signup_view
@@ -50,6 +52,7 @@ router.register("jobs", JobViewSet, basename="jobs")
 router.register("integrations/notion", NotionIntegrationViewSet, basename="notion-integration")
 router.register("integrations/miro", MiroIntegrationViewSet, basename="miro-integration")
 router.register("integrations/ai", AIIntegrationViewSet, basename="ai-integration")
+router.register("integrations/status", ConnectionStatusViewSet, basename="integration-status")
 router.register("user-keys", UserAPIKeyViewSet, basename="user-keys")
 
 urlpatterns = [
