@@ -7,7 +7,15 @@ from config.settings.plugins import optional_api_urls
 
 from core.api.onboarding import OnboardingViewSet
 from core.api.dashboard import DashboardViewSet
-from integrations.api import DiagramViewSet, JobViewSet, NotionIntegrationViewSet, MiroIntegrationViewSet
+from core.api.dashboard import DashboardViewSet
+from integrations.api import (
+    DiagramViewSet, 
+    JobViewSet, 
+    NotionIntegrationViewSet, 
+    MiroIntegrationViewSet,
+    AIIntegrationViewSet,
+    UserAPIKeyViewSet
+)
 from integrations.oauth.views import OAuthConnectView, OAuthCallbackView
 from .views import csrf, login_view, logout_view, signup_view
 from .viewsets import (
@@ -41,6 +49,8 @@ router.register("diagrams", DiagramViewSet, basename="diagrams")
 router.register("jobs", JobViewSet, basename="jobs")
 router.register("integrations/notion", NotionIntegrationViewSet, basename="notion-integration")
 router.register("integrations/miro", MiroIntegrationViewSet, basename="miro-integration")
+router.register("integrations/ai", AIIntegrationViewSet, basename="ai-integration")
+router.register("user-keys", UserAPIKeyViewSet, basename="user-keys")
 
 urlpatterns = [
     re_path(r"^csrf/?$", csrf, name="csrf"),

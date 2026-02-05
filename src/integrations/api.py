@@ -124,3 +124,75 @@ class MiroIntegrationViewSet(viewsets.ViewSet):
             return Response(spec.model_dump())
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+from .ai.services import AIService
+from .models import UserAPIKey
+
+class AIIntegrationViewSet(viewsets.ViewSet):
+    """
+    AI-Powered features (Gemini).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=False, methods=["post"])
+    def translate(self, request):
+        """
+        Translates text to ERDSpec using user's configured key.
+        """
+        text = request.data.get("text")
+        if not text:
+            return Response({"error": "Text is required"}, status=400)
+            
+        try:
+            spec = async_to_sync(AIService.translate_text_to_erd)(request.user, text)
+            return Response(spec)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
+        except Exception as e:
+            return Response({"error": "AI Processing Failed"}, status=500)
+
+class UserAPIKeyViewSet(viewsets.ModelViewSet):
+    """
+    Manage User's own API Keys (Encrypted).
+    Only allow setting keys, not reading raw values back (security).
+    """
+    queryset = UserAPIKey.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.Serializer # Dummy, we'll override methods
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def list(self, request):
+        # Return only metadata, masking key
+        keys = self.get_queryset()
+        return Response([
+            {
+                "id": k.id,
+                "provider": k.provider,
+                "label": k.label,
+                "created_at": k.created_at,
+                "has_key": True
+            } for k in keys
+        ])
+
+    def create(self, request):
+        # Set Key Logic
+        provider = request.data.get("provider", "gemini")
+        label = request.data.get("label", "My Key")
+        raw_key = request.data.get("key")
+        
+        if not raw_key:
+            return Response({"error": "Key is required"}, status=400)
+            
+        # Update or Create
+        api_key_obj, _ = UserAPIKey.objects.update_or_create(
+            user=request.user,
+            provider=provider,
+            defaults={"label": label}
+        )
+        # Encrypt
+        api_key_obj.set_key(raw_key)
+        api_key_obj.save()
+        
+        return Response({"status": "Key saved securely"}, status=201)
