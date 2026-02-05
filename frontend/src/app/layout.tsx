@@ -6,8 +6,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "AppNotion Marketplace",
-    template: "%s | AppNotion",
+    default: "BlockFlow Platform",
+    template: "%s | BlockFlow",
   },
   description: "Marketplace de herramientas para Notion.",
 };

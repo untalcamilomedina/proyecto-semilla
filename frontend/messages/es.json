@@ -46,7 +46,6 @@
         "passwordPlaceholder": "••••••••",
         "signupPasswordPlaceholder": "Mínimo 8 caracteres",
         "confirmPasswordPlaceholder": "Repite tu contraseña",
-        "confirmPasswordPlaceholder": "Repite tu contraseña",
         "invalidCredentials": "Credenciales inválidas",
         "connectionError": "Error de conexión",
         "validation": {
@@ -89,7 +88,9 @@
             "requests": "Peticiones API",
             "plan": "Plan Actual",
             "activity": "Salud Interna",
-            "usage": "Uso"
+            "usage": "Uso",
+            "active_users": "Usuarios Activos",
+            "roles": "Roles"
         },
         "recentActivity": "Actividad Reciente"
     },

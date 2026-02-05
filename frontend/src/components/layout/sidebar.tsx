@@ -1,5 +1,6 @@
 "use client";
 
+import { BlockFlowLogo } from "@/components/ui/logo";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -75,13 +76,20 @@ export function Sidebar() {
                 )}
             >
                 <div className="flex h-full flex-col">
+import { BlockFlowLogo } from "@/components/ui/logo";
+
+// ... existing imports ...
+
+// Inside Sidebar component
                     {/* Logo Section */}
-                    <div className="flex h-20 shrink-0 items-center px-6 border-b border-white/5 relative overflow-hidden">
+                    <div className="flex h-20 shrink-0 items-center gap-3 px-6 border-b border-white/5 relative overflow-hidden">
                         {/* Soft Glow behind logo */}
                         <div className="absolute -top-10 -left-10 w-32 h-32 bg-neon/10 rounded-full blur-3xl" />
                         
-                        <span className="text-xl font-bold bg-gradient-to-r from-neon to-emerald-400 bg-clip-text text-transparent truncate z-10">
-                            {tenant?.name || "Semilla OS"}
+                        <BlockFlowLogo className="h-8 w-8 text-neon z-10" />
+                        
+                        <span className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent truncate z-10">
+                            BlockFlow
                         </span>
                     </div>
 

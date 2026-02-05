@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { BlockFlowLogo } from "@/components/ui/logo";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { cn } from "@/lib/utils";
 
@@ -30,11 +31,15 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
           {/* Decorative Glow inside Card */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-gradient-to-r from-transparent via-neon/50 to-transparent opacity-50" />
           
-          <div className="space-y-2 mb-8 text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
-              {title}
-            </h1>
-            <p className="text-white/50 text-sm">{description}</p>
+          <div className="space-y-6 mb-8 text-center flex flex-col items-center">
+            <BlockFlowLogo className="h-12 w-12 text-neon drop-shadow-[0_0_15px_rgba(13,242,13,0.3)]" />
+            
+            <div className="space-y-2">
+                <h1 className="text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+                  {title}
+                </h1>
+                <p className="text-white/50 text-sm">{description}</p>
+            </div>
           </div>
 
           <div className="flex-1">

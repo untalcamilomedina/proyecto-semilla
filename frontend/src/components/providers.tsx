@@ -27,11 +27,14 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
     );
 
     useEffect(() => {
-        const unsubscribe = persistQueryClient({
+        // persistQueryClient returns [unsubscribe, promise]
+        // We only need to return the unsubscribe function for cleanup
+        const [unsubscribe] = persistQueryClient({
             queryClient,
             persister: dexiePersister,
             maxAge: 1000 * 60 * 60 * 24, // 24 hours
-        });
+        }) as unknown as [() => void, Promise<void>];
+
         return unsubscribe;
     }, [queryClient]);
 
