@@ -1,5 +1,5 @@
-from typing import Any, Dict, List
-from integrations.schemas import ERDEntity
+from typing import Any, Dict, List, Optional
+from integrations.schemas import ERDEntity, ERDRelationship
 
 class MiroAdapter:
     """

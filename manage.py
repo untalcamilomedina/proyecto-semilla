@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 import os
 import sys
-
+from pathlib import Path
 
 def main() -> None:
+    # Add 'src' to sys.path to allow importing 'config'
+    current_path = Path(__file__).resolve().parent
+    sys.path.append(str(current_path / "src"))
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
     try:
         from django.core.management import execute_from_command_line

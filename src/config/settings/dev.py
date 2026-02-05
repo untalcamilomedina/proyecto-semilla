@@ -40,6 +40,9 @@ CORS_ALLOWED_ORIGINS = env.list(
     ],
 )
 
+CORS_ALLOW_CREDENTIALS = True
+
+
 
 
 # Disable manifest storage in dev/test to avoid running collectstatic

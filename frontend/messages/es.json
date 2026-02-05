@@ -46,8 +46,15 @@
         "passwordPlaceholder": "••••••••",
         "signupPasswordPlaceholder": "Mínimo 8 caracteres",
         "confirmPasswordPlaceholder": "Repite tu contraseña",
+        "confirmPasswordPlaceholder": "Repite tu contraseña",
         "invalidCredentials": "Credenciales inválidas",
         "connectionError": "Error de conexión",
+        "validation": {
+            "passwordRequired": "La contraseña es requerida",
+            "passwordMismatch": "Las contraseñas no coinciden",
+            "emailRequired": "El email es requerido",
+            "invalidEmail": "Email inválido"
+        },
         "resetTitle": "Recuperar Contraseña",
         "resetDescription": "Ingresa tu email para recibir un enlace de recuperación.",
         "sendResetLink": "Enviar enlace",
