@@ -77,6 +77,31 @@ export const apiGet = async <T>(endpoint: string): Promise<T> => {
     return response.json();
 };
 
+// Generic DELETE helper
+export const apiDelete = async (endpoint: string) => {
+    const url = `${API_URL}${endpoint}`;
+    const headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    };
+
+    const response = await fetch(url, {
+        method: "DELETE",
+        headers,
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new ApiError(response.status, { detail: response.statusText });
+    }
+
+    if (response.status === 204) {
+        return null;
+    }
+
+    return response.json();
+};
+
 export const clearCsrfToken = () => {
     // Utility to clear cookies if needed, or no-op for now
     // implementation depends on auth strategy (cookies vs headers)

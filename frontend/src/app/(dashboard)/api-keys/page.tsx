@@ -1,191 +1,182 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { enterpriseService } from "@/services/enterprise";
-import { ApiKey } from "@/types";
 import { useEffect, useState } from "react";
-import { GlassCard } from "@/components/ui/glass/GlassCard";
-import { GlassButton } from "@/components/ui/glass/GlassButton";
-import { GlassInput } from "@/components/ui/glass/GlassInput";
-import { Key, Plus, Trash2, Copy, Check, ShieldAlert } from "lucide-react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { Key, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { apiGet, apiPost, apiDelete } from "@/lib/api";
+import { GlassCard } from "@/components/ui/glass-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-/**
- * ApiKeysPage
- * Enterprise key management with Glassmorphism Elite.
- * 
- * @vibe Elite - Secure, developer-focused key orchestration.
- */
+interface ApiKey {
+    id: string;
+    name: string;
+    prefix: string;
+    created_at: string;
+    service: string; // 'gemini', 'openai', etc.
+}
+
 export default function ApiKeysPage() {
-    const t = useTranslations("keys");
     const [keys, setKeys] = useState<ApiKey[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    
+    // Form State
     const [newKeyName, setNewKeyName] = useState("");
-    const [createdKey, setCreatedKey] = useState<string | null>(null);
-    const [copied, setCopied] = useState(false);
+    const [newKeyValue, setNewKeyValue] = useState("");
+    const [newKeyService, setNewKeyService] = useState("gemini");
+
+    const fetchKeys = async () => {
+        try {
+            const data = await apiGet<ApiKey[]>("/api/v1/ai/keys/");
+            setKeys(data || []);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         fetchKeys();
     }, []);
 
-    const fetchKeys = async () => {
-        try {
-            const data = await enterpriseService.getApiKeys();
-            setKeys(data);
-        } catch (error) {
-            console.error("Failed to fetch keys:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleCreate = async () => {
-        if (!newKeyName) return;
         try {
-            const res = await enterpriseService.createApiKey({ name: newKeyName });
-            setCreatedKey(res.key || null);
+            await apiPost("/api/v1/ai/keys/", {
+                name: newKeyName,
+                key: newKeyValue,
+                service: newKeyService
+            });
+            setIsCreateOpen(false);
             setNewKeyName("");
+            setNewKeyValue("");
             fetchKeys();
-            toast.success(t("created"));
-        } catch {
-            toast.error("Error");
+        } catch (e) {
+            console.error("Failed to create key", e);
         }
     };
 
-    const handleRevoke = async (id: number) => {
-        try {
-            await enterpriseService.revokeApiKey(id);
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure? This action cannot be undone.")) return;
+         try {
+            await apiDelete(`/api/v1/ai/keys/${id}/`);
             fetchKeys();
-            toast.success(t("revocationSuccess"));
-        } catch {
-            toast.error("Error");
-        }
-    };
-
-    const copyToClipboard = () => {
-        if (createdKey) {
-            navigator.clipboard.writeText(createdKey);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+        } catch (e) {
+            console.error("Failed to delete key", e);
         }
     };
 
     return (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20">
-                        <Key className="h-6 w-6 text-purple-400" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-white/90">{t("title")}</h1>
-                        <p className="text-sm text-white/40">{t("description")}</p>
-                    </div>
+        <div className="container max-w-4xl py-10 space-y-8">
+             <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold text-white glow-text">API Keys</h1>
+                    <p className="text-white/60">Manage external API keys (Gemini, OpenAI) for AI features.</p>
                 </div>
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-purple-500 hover:bg-purple-600 gap-2">
+                            <Plus className="w-4 h-4" /> Add Key
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-zinc-900 border-white/10 text-white">
+                        <DialogHeader>
+                            <DialogTitle>Add New API Key</DialogTitle>
+                            <DialogDescription>
+                                Your key will be encrypted at rest. We never display the full key again.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label>Name</Label>
+                                <Input 
+                                    placeholder="My Gemini Key" 
+                                    value={newKeyName}
+                                    onChange={(e) => setNewKeyName(e.target.value)}
+                                    className="bg-white/5 border-white/10"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>Service</Label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    value={newKeyService}
+                                    onChange={(e) => setNewKeyService(e.target.value)}
+                                >
+                                    <option value="gemini">Google Gemini</option>
+                                    <option value="openai">OpenAI (GPT-4)</option>
+                                    <option value="anthropic">Anthropic (Claude)</option>
+                                </select>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label>API Key</Label>
+                                <Input 
+                                    type="password" 
+                                    placeholder="sk-..." 
+                                    value={newKeyValue}
+                                    onChange={(e) => setNewKeyValue(e.target.value)}
+                                    className="bg-white/5 border-white/10"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                            <Button className="bg-purple-500" onClick={handleCreate}>Save Key</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
-                {/* Create Key Card */}
-                <div className="lg:col-span-1">
-                    <GlassCard className="p-6 space-y-6">
-                        <h2 className="text-lg font-semibold flex items-center gap-2">
-                            <Plus className="h-4 w-4 text-neon" />
-                            {t("createButton")}
-                        </h2>
-                        <div className="space-y-4">
-                            <GlassInput 
-                                label="Nombre de la llave"
-                                placeholder={t("namePlaceholder")}
-                                value={newKeyName}
-                                onChange={(e) => setNewKeyName(e.target.value)}
-                            />
-                            <GlassButton 
-                                onClick={handleCreate}
-                                className="w-full"
-                                disabled={!newKeyName}
-                            >
-                                {t("createButton")}
-                            </GlassButton>
-                        </div>
+            <div className="grid gap-4">
+                {loading ? (
+                    <div className="text-white/50">Loading keys...</div>
+                ) : keys.length === 0 ? (
+                    <GlassCard className="text-center py-12">
+                        <Key className="w-12 h-12 text-white/20 mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-white">No API Keys Found</h3>
+                        <p className="text-white/50 max-w-sm mx-auto mt-2">
+                            Add an API key to enable AI generation features. 
+                            We support Gemini, OpenAI, and Claude.
+                        </p>
                     </GlassCard>
-                </div>
-
-                {/* Keys List */}
-                <div className="lg:col-span-2 space-y-6">
-                    {createdKey && (
-                        <div className="animate-in zoom-in-95 duration-300">
-                            <GlassCard className="p-6 border-neon/30 bg-neon/5 space-y-4">
-                                <div className="flex items-center gap-2 text-neon text-sm font-bold">
-                                    <ShieldAlert className="h-4 w-4" />
-                                    {t("keyWarning")}
+                ) : (
+                    keys.map((key) => (
+                        <GlassCard key={key.id} className="flex items-center justify-between p-4">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 bg-purple-500/10 rounded-lg">
+                                    <Key className="w-5 h-5 text-purple-400" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <code className="flex-1 p-3 rounded-xl bg-black/40 border border-white/10 font-mono text-neon break-all">
-                                        {createdKey}
-                                    </code>
-                                    <GlassButton onClick={copyToClipboard} className="h-12 w-12 p-0">
-                                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                    </GlassButton>
-                                </div>
-                                <GlassButton 
-                                    variant="secondary" 
-                                    onClick={() => setCreatedKey(null)}
-                                    className="w-full h-9 text-xs"
-                                >
-                                    He guardado la llave
-                                </GlassButton>
-                            </GlassCard>
-                        </div>
-                    )}
-
-                    <div className="grid gap-4">
-                        {isLoading ? (
-                            <GlassCard className="flex items-center justify-center h-32 border-white/5">
-                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-neon" />
-                            </GlassCard>
-                        ) : keys.length === 0 ? (
-                            <GlassCard className="p-12 text-center text-white/20 italic border-dashed border-white/5">
-                                No hay llaves activas
-                            </GlassCard>
-                        ) : (
-                            keys.map((key) => (
-                                <GlassCard key={key.id} className="p-6 group hover:border-white/20 transition-all">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-2 rounded-lg bg-white/5">
-                                                <Key className="h-4 w-4 text-white/40" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-white/90">{key.name}</h3>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-[10px] font-mono text-white/30 tracking-widest">{key.prefix}••••••••</span>
-                                                    <Badge className={cn(
-                                                        "text-[9px] px-1.5 py-0 rounded-md font-bold uppercase",
-                                                        key.revoked_at ? "bg-red-500/10 text-red-500 border-red-500/20" : "bg-neon/10 text-neon border-neon/20"
-                                                    )}>
-                                                        {key.revoked_at ? t("revoked") : t("active")}
-                                                    </Badge>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {!key.revoked_at && (
-                                            <GlassButton 
-                                                variant="danger" 
-                                                onClick={() => handleRevoke(key.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                                            >
-                                                <Trash2 className="h-3.5 w-3.5" />
-                                            </GlassButton>
-                                        )}
+                                <div>
+                                    <h4 className="font-bold text-white">{key.name}</h4>
+                                    <div className="flex items-center gap-2 text-xs text-white/50 font-mono mt-1">
+                                        <span className="uppercase bg-white/10 px-1.5 py-0.5 rounded">{key.service}</span>
+                                        <span>•</span>
+                                        <span>Starts with {key.prefix}...</span>
                                     </div>
-                                </GlassCard>
-                            ))
-                        )}
-                    </div>
-                </div>
+                                </div>
+                            </div>
+                            <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                                onClick={() => handleDelete(key.id)}
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
+                        </GlassCard>
+                    ))
+                )}
             </div>
         </div>
     );

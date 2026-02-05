@@ -1,18 +1,17 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import ReactFlow, {
-  Background,
+import { useMemo } from "react";
+import ReactFlow, { 
+  Node, 
+  Edge,
   Controls,
-  MiniMap,
+  Background,
   useNodesState,
   useEdgesState,
-  Edge,
-  Node,
-  MarkerType,
+  MarkerType
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { GlassCard } from "@/components/ui/glass-card";
+// import { GlassCard } from "@/components/ui/glass-card"; // Removing unused import
 import { ERDEntityNode } from "./nodes/ERDEntityNode";
 
 // Custom node types
@@ -58,11 +57,12 @@ export default function DiagramCanvas({ spec }: DiagramCanvasProps) {
     }));
   }, [spec]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  // Using variables to avoid unused vars warning, calling the hooks is required
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
   return (
-    <div className="h-[600px] w-full bg-slate-950/50">
+    <div className="h-[600px] w-full bg-slate-950/50 rounded-xl border border-white/10">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -71,13 +71,8 @@ export default function DiagramCanvas({ spec }: DiagramCanvasProps) {
         nodeTypes={nodeTypes}
         fitView
       >
-        <Background gap={16} size={1} color="#ffffff20" />
-        <Controls className="bg-white/10 border-white/10 text-white fill-white" />
-        <MiniMap 
-            nodeColor={() => "#ffffff40"} 
-            maskColor="#00000080" 
-            className="bg-black/50 border border-white/10"
-        />
+        <Background />
+        <Controls className="!bg-white/10 !border-white/10 !fill-white" />
       </ReactFlow>
     </div>
   );
