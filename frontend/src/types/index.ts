@@ -142,3 +142,15 @@ export interface ApiKeyCreate {
     name: string;
     scopes?: string[];
 }
+
+// Diagrams
+export interface Diagram {
+    id: string; // UUID
+    title: string;
+    description?: string;
+    spec?: Record<string, any>; // Canonical JSON
+    project: number;
+    entities_count?: number; // Annotated field
+    updated_at: string;
+    created_at: string;
+}

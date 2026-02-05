@@ -40,6 +40,7 @@ export const apiPost = async (endpoint: string, data: any) => {
     const response = await fetch(url, {
         method: "POST",
         headers,
+        credentials: "include",
         body: JSON.stringify(data),
     });
 
@@ -66,6 +67,7 @@ export const apiGet = async <T>(endpoint: string): Promise<T> => {
     const response = await fetch(url, {
         method: "GET",
         headers,
+        credentials: "include",
     });
 
     if (!response.ok) {

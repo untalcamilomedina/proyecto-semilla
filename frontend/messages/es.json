@@ -78,9 +78,22 @@
         "viewBilling": "Ver facturación",
         "stats": {
             "members": "Miembros",
-            "roles": "Roles",
-            "billing": "Facturación",
+            "diagrams": "Diagramas",
+            "requests": "Peticiones API",
+            "plan": "Plan Actual",
+            "activity": "Salud Interna",
             "usage": "Uso"
+        },
+        "recentActivity": "Actividad Reciente"
+    },
+    "diagrams": {
+        "title": "Diagramas",
+        "description": "Visualiza y gestiona tus esquemas de base de datos.",
+        "list": {
+            "name": "Nombre",
+            "entities": "Entidades",
+            "lastModified": "Última Modificación",
+            "actions": "Acciones"
         }
     },
     "members": {

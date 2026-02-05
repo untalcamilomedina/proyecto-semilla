@@ -78,9 +78,22 @@
         "viewBilling": "View billing",
         "stats": {
             "members": "Members",
-            "roles": "Roles",
-            "billing": "Billing",
+            "diagrams": "Diagrams",
+            "requests": "API Requests",
+            "plan": "Current Plan",
+            "activity": "Internal Health",
             "usage": "Usage"
+        },
+        "recentActivity": "Recent Activity"
+    },
+    "diagrams": {
+        "title": "Diagrams",
+        "description": "Visualize and manage your database schemas.",
+        "list": {
+            "name": "Name",
+            "entities": "Entities",
+            "lastModified": "Last Modified",
+            "actions": "Actions"
         }
     },
     "members": {
