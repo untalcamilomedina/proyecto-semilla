@@ -1,29 +1,34 @@
-"use client";
-
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Database, LayoutTemplate } from "lucide-react";
 import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api";
 
-// Mock status hooks (replace with real API later)
-const useIntegrationStatus = (provider: string) => {
-  // In real app: GET /api/v1/integrations/connections/
-  const [isConnected, setIsConnected] = useState(false);
-  useEffect(() => {
-    // Check local storage or API
-    const connected = localStorage.getItem(`connected_${provider}`);
-    setIsConnected(!!connected);
-  }, [provider]);
-  return isConnected;
+type ConnectionStatus = {
+    notion: boolean;
+    miro: boolean;
 };
 
 export default function IntegrationsPage() {
-  const isNotionConnected = useIntegrationStatus("notion");
-  const isMiroConnected = useIntegrationStatus("miro");
+  const [status, setStatus] = useState<ConnectionStatus>({ notion: false, miro: false });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+        try {
+            const data = await apiGet<ConnectionStatus>("/api/v1/integrations/status/");
+            setStatus(data);
+        } catch (error) {
+            console.error("Failed to fetch integration status", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchStatus();
+  }, []);
 
   const handleConnect = (provider: "notion" | "miro") => {
     // Redirect to Backend OAuth Handler
-    // e.g. http://localhost:8010/api/v1/integrations/notion/connect
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8010";
     window.location.href = `${API_URL}/api/v1/integrations/${provider}/connect`;
   };
@@ -52,7 +57,7 @@ export default function IntegrationsPage() {
                 <p className="text-sm text-gray-400">Scan Workspaces & Sync DBs</p>
               </div>
             </div>
-            {isNotionConnected ? (
+            {status.notion ? (
               <span className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-3 py-1 rounded-full">
                 <CheckCircle className="w-4 h-4" /> Connected
               </span>
@@ -69,9 +74,9 @@ export default function IntegrationsPage() {
           <Button 
             className="w-full bg-white text-black hover:bg-white/90"
             onClick={() => handleConnect("notion")}
-            disabled={isNotionConnected}
+            disabled={status.notion}
           >
-            {isNotionConnected ? "Manage Connection" : "Connect Notion"} <ArrowRight className="ml-2 w-4 h-4" />
+            {status.notion ? "Manage Connection" : "Connect Notion"} <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </GlassCard>
 
@@ -87,7 +92,7 @@ export default function IntegrationsPage() {
                 <p className="text-sm text-gray-400">Visual Collaboration</p>
               </div>
             </div>
-            {isMiroConnected ? (
+            {status.miro ? (
               <span className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-3 py-1 rounded-full">
                 <CheckCircle className="w-4 h-4" /> Connected
               </span>
@@ -103,9 +108,9 @@ export default function IntegrationsPage() {
           <Button 
             className="w-full bg-[#FFD02F] text-black hover:bg-[#FFD02F]/90"
              onClick={() => handleConnect("miro")}
-             disabled={isMiroConnected}
+             disabled={status.miro}
           >
-             {isMiroConnected ? "Manage Connection" : "Connect Miro"} <ArrowRight className="ml-2 w-4 h-4" />
+             {status.miro ? "Manage Connection" : "Connect Miro"} <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </GlassCard>
       </div>

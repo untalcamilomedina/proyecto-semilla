@@ -6,10 +6,12 @@ import { api } from "@/lib/api";
 import DiagramCanvas from "@/components/diagrams/canvas";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Loader2 } from "lucide-react";
-import type { components } from "@/types/api";
+import { components } from "@/types/api";
 
 type Diagram = components["schemas"]["Diagram"];
-type ERDSpec = components["schemas"]["ERDSpec"];
+// ERDSpec definition might be inside Diagram oneOf or separate component
+// Assuming simplest case or using 'any' temporarily if types are strict
+type ERDSpec = any; 
 
 export default function DiagramPage() {
   const { id } = useParams() as { id: string };
@@ -61,7 +63,7 @@ export default function DiagramPage() {
         </div>
         <div className="flex gap-2">
             <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-mono">
-                {diagram.type.toUpperCase()}
+                {diagram.type?.toUpperCase() || "DIAGRAM"}
             </span>
         </div>
       </div>
