@@ -47,7 +47,12 @@
         "signupPasswordPlaceholder": "Minimum 8 characters",
         "confirmPasswordPlaceholder": "Repeat your password",
         "invalidCredentials": "Invalid credentials",
-        "connectionError": "Connection error"
+        "connectionError": "Connection error",
+        "resetTitle": "Reset Password",
+        "resetDescription": "Enter your email to receive a reset link.",
+        "sendResetLink": "Send Reset Link",
+        "backToLogin": "Back to login",
+        "emailSent": "We have sent a password reset link to your email."
     },
     "nav": {
         "dashboard": "Dashboard",

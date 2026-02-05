@@ -47,7 +47,12 @@
         "signupPasswordPlaceholder": "Mínimo 8 caracteres",
         "confirmPasswordPlaceholder": "Repite tu contraseña",
         "invalidCredentials": "Credenciales inválidas",
-        "connectionError": "Error de conexión"
+        "connectionError": "Error de conexión",
+        "resetTitle": "Recuperar Contraseña",
+        "resetDescription": "Ingresa tu email para recibir un enlace de recuperación.",
+        "sendResetLink": "Enviar enlace",
+        "backToLogin": "Volver al inicio de sesión",
+        "emailSent": "Hemos enviado un enlace de recuperación a tu correo."
     },
     "nav": {
         "dashboard": "Dashboard",
