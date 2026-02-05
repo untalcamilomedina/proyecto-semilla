@@ -70,3 +70,97 @@ class Job(models.Model):
     
     def __str__(self):
         return f"Job {self.id} [{self.status}]"
+
+# --- Security & OAuth Models (Phase 6 & 7) ---
+
+from cryptography.fernet import Fernet
+import base64
+
+def get_cipher_suite():
+    # Use Django Secret Key to derive a Fernet Key
+    # Fernet key must be 32 url-safe base64-encoded bytes
+    key = settings.SECRET_KEY[:32].encode()
+    # Pad if short (Django secret key might vary)
+    key = base64.urlsafe_b64encode(key.ljust(32, b'x'))
+    return Fernet(key)
+
+class EncryptedTextField(models.TextField):
+    """
+    Custom field that encrypts data on save and decrypts on access is tricky 
+    without a heavy library.
+    For simplicity/transparency, we'll store as Text and use model methods.
+    """
+    pass
+
+class IntegrationConnection(models.Model):
+    """
+    Stores OAuth tokens for external tools (Notion, Miro).
+    Tokens are ENCRYPTED at rest.
+    """
+    PROVIDER_NOTION = "notion"
+    PROVIDER_MIRO = "miro"
+    
+    PROVIDER_CHOICES = [
+        (PROVIDER_NOTION, "Notion"),
+        (PROVIDER_MIRO, "Miro"),
+    ]
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="connections")
+    provider = models.CharField(max_length=50, choices=PROVIDER_CHOICES)
+    
+    # Encrypted Data
+    access_token_enc = models.TextField(help_text="Encrypted Access Token")
+    refresh_token_enc = models.TextField(blank=True, null=True, help_text="Encrypted Refresh Token")
+    
+    expires_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ["user", "provider"]
+        
+    def set_token(self, token: str, refresh: str = None):
+        cipher = get_cipher_suite()
+        self.access_token_enc = cipher.encrypt(token.encode()).decode()
+        if refresh:
+            self.refresh_token_enc = cipher.encrypt(refresh.encode()).decode()
+            
+    def get_token(self) -> str:
+        cipher = get_cipher_suite()
+        return cipher.decrypt(self.access_token_enc.encode()).decode()
+    
+    def get_refresh_token(self) -> str:
+        if not self.refresh_token_enc:
+            return None
+        cipher = get_cipher_suite()
+        return cipher.decrypt(self.refresh_token_enc.encode()).decode()
+
+class UserAPIKey(models.Model):
+    """
+    Stores User-Managed API Keys (e.g. Gemini, OpenAI).
+    Bring Your Own Key (BYOK) model.
+    """
+    PROVIDER_GEMINI = "gemini"
+    
+    PROVIDER_CHOICES = [
+        (PROVIDER_GEMINI, "Google Gemini"),
+    ]
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="integration_api_keys")
+    provider = models.CharField(max_length=50, choices=PROVIDER_CHOICES)
+    label = models.CharField(max_length=100, default="My Key")
+    
+    key_enc = models.TextField(help_text="Encrypted API Key")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ["user", "provider", "label"]
+
+    def set_key(self, raw_key: str):
+        cipher = get_cipher_suite()
+        self.key_enc = cipher.encrypt(raw_key.encode()).decode()
+        
+    def get_key(self) -> str:
+        cipher = get_cipher_suite()
+        return cipher.decrypt(self.key_enc.encode()).decode()

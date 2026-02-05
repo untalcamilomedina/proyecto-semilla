@@ -18,10 +18,10 @@
 - [ ] **Conexión**
   - [ ] OAuth Flow para Notion (`/integrations/notion/connect`).
   - [ ] Gestión de Tokens por Tenant.
-- [ ] **Funcionalidad Escaneo**
-  - [ ] `POST /notion/workspaces/scan`: Escaneo de DBs Notion -> ERD Canónico.
-- [ ] **Escritura en Notion**
-  - [ ] `POST /notion/workspaces/apply-erd`: ERD Canónico -> Crear DBs en Notion.
+- [x] **Funcionalidad Escaneo**
+  - [x] `POST /notion/workspaces/scan`: Escaneo de DBs Notion -> ERD Canónico.
+- [x] **Escritura en Notion**
+  - [x] `POST /notion/workspaces/apply-erd`: ERD Canónico -> Crear DBs en Notion.
   - [ ] Modo `dryRun` para validación antes de escritura.
 
 ## Fase 3: Integración Miro - Export
@@ -55,4 +55,4 @@
 - [x] Configuración Inicial Docker/Django.
 - [x] Autenticación Base (Allauth).
 - [x] **Refactor hacia Estructura Unificada** (Completado).
-- [/] **Fase 2: Integración Notion** (En progreso).
+- [x] **Fase 2: Integración Notion** (Lógica Core Completada).

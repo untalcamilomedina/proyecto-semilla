@@ -34,3 +34,6 @@ django-anymail[sendgrid]
 django-silk>=5.0
 django-redis>=5.4
 django-health-check>=3.18
+notion-client>=2.0.0
+httpx
+cryptography>=0.24.0

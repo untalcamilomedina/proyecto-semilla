@@ -7,7 +7,8 @@ from config.settings.plugins import optional_api_urls
 
 from core.api.onboarding import OnboardingViewSet
 from core.api.dashboard import DashboardViewSet
-from integrations.api import DiagramViewSet, JobViewSet
+from integrations.api import DiagramViewSet, JobViewSet, NotionIntegrationViewSet, MiroIntegrationViewSet
+from integrations.oauth.views import OAuthConnectView, OAuthCallbackView
 from .views import csrf, login_view, logout_view, signup_view
 from .viewsets import (
     ApiKeyViewSet,
@@ -38,6 +39,8 @@ router.register("invoices", InvoiceViewSet, basename="invoices")
 router.register("api-keys", ApiKeyViewSet, basename="api-keys")
 router.register("diagrams", DiagramViewSet, basename="diagrams")
 router.register("jobs", JobViewSet, basename="jobs")
+router.register("integrations/notion", NotionIntegrationViewSet, basename="notion-integration")
+router.register("integrations/miro", MiroIntegrationViewSet, basename="miro-integration")
 
 urlpatterns = [
     re_path(r"^csrf/?$", csrf, name="csrf"),
@@ -47,6 +50,9 @@ urlpatterns = [
     re_path(r"^logout/?$", logout_view, name="logout"),
     re_path(r"^signup/?$", signup_view, name="signup"),
     path("", include(router.urls)),
+    # OAuth Routes
+    path("integrations/<str:provider_name>/connect", OAuthConnectView.as_view(), name="oauth-connect"),
+    path("integrations/<str:provider_name>/callback", OAuthCallbackView.as_view(), name="oauth-callback"),
 ]
 
 for prefix, module in optional_api_urls():
