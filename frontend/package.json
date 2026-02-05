@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "generate-sdk": "openapi-typescript http://localhost:8000/api/schema/ -o src/types/api.ts"
+    "generate-sdk": "openapi-typescript http://localhost:8010/api/schema/ -o src/types/api.ts"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
