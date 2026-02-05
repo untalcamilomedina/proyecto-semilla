@@ -71,5 +71,18 @@ class NotionClient:
             logger.error(f"Failed to create database: {e}")
             raise e
 
+    async def update_database(self, database_id: str, properties: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Updates an existing database (e.g. adding properties).
+        """
+        try:
+            return await self.client.databases.update(
+                database_id=database_id,
+                properties=properties
+            )
+        except APIResponseError as e:
+            logger.error(f"Failed to update database {database_id}: {e}")
+            raise e
+
     async def close(self):
         await self.client.aclose()

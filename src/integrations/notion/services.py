@@ -26,14 +26,27 @@ class NotionService:
             # 1. Fetch all databases
             notion_dbs = await client.search_databases()
             
-            # 2. Convert to Canonical Entities
+            # 2. Convert to Canonical Entities & Relationships
             entities = []
+            relationships = []
+            
             for db in notion_dbs:
+                # Entities
                 entity_data = NotionAdapter.database_to_entity(db)
                 entities.append(ERDEntity(**entity_data))
+                
+                # Relationships
+                db_rels = NotionAdapter.extract_relations(db)
+                for rel in db_rels:
+                    relationships.append({
+                        "id": f"rel_{db['id']}_{rel['target_id']}",
+                        "from": db["id"],
+                        "to": rel["target_id"],
+                        "cardinality": rel["type"]
+                    })
             
             # 3. Return Spec
-            return ERDSpec(entities=entities, relationships=[])
+            return ERDSpec(entities=entities, relationships=relationships)
         finally:
             await client.close()
 
@@ -47,7 +60,10 @@ class NotionService:
 
         client = NotionClient(token)
         created_ids = []
+        id_map = {} # canonical_id -> notion_id
+        
         try:
+            # PASS 1: Create all Databases (Entities)
             for entity in spec.entities:
                 properties = {"Name": {"title": {}}}
                 for attr in entity.attributes:
@@ -65,6 +81,32 @@ class NotionService:
                     }
                 )
                 created_ids.append(result["id"])
+                id_map[entity.id] = result["id"]
+
+            # PASS 2: create Relationships (Update Databases)
+            for rel in spec.relationships:
+                source_db_id = id_map.get(rel.source)
+                target_db_id = id_map.get(rel.target)
+                
+                if source_db_id and target_db_id:
+                    # Create relation property in Source DB pointing to Target DB
+                    # Name convention: "Related to {TargetName}"
+                    # Note: Notion API requires creating the property on one side, it auto-creates the other if specified
+                    
+                    prop_name = f"Relation to {rel.target}" # Ideally iterate names
+                    
+                    await client.update_database(
+                        database_id=source_db_id,
+                        properties={
+                            prop_name: {
+                                "relation": {
+                                    "database_id": target_db_id,
+                                    # "type": "dual_property" # Optional: make it bidirectional
+                                }
+                            }
+                        }
+                    )
+
             return created_ids
         finally:
             await client.close()

@@ -38,8 +38,15 @@ class MiroService:
             miro_item = await client.create_shape(board_id, shape_data)
             created_items[entity.id] = miro_item.get("id")
 
-        # 2. Create Edges (Relationships)
-        # TODO: Implement connectors when we have relationships in ERDSpec
+        # 2. Create Connectors (Relationships)
+        client = MiroClient(token)
+        for rel in spec.relationships:
+            source_miro_id = created_items.get(rel.source)
+            target_miro_id = created_items.get(rel.target)
+            
+            if source_miro_id and target_miro_id:
+                connector_data = MiroAdapter.relationship_to_connector(rel, source_miro_id, target_miro_id)
+                await client.create_connector(board_id, connector_data)
         
         return {"status": "success", "items_created": len(created_items)}
 
@@ -56,15 +63,25 @@ class MiroService:
         entities = []
         relationships = []
         
+        # Pass 1: Entities
         for item in items:
-            # Check if it looks like our shape (rectangle with content)
-            # This is a heuristic. Ideally we'd tag them with metadata.
             if item.get("data", {}).get("shape") == "rectangle":
                 try:
                     entity = MiroAdapter.miro_to_canonical(item)
                     entities.append(entity)
-                except Exception as e:
-                    # Skip items that don't match our format
+                except Exception:
                     continue
-                    
+        
+        # Pass 2: Connectors
+        # We need to map Miro IDs to Canonical IDs if we were changing them, 
+        # but for Import, the Canonical ID IS the Miro ID, so we are good.
+        for item in items:
+            if item.get("type") == "connector":
+                try:
+                    rel = MiroAdapter.connector_to_relationship(item)
+                    if rel:
+                        relationships.append(rel)
+                except Exception:
+                    continue
+
         return ERDSpec(entities=entities, relationships=relationships)

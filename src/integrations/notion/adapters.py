@@ -37,6 +37,27 @@ class NotionAdapter:
         }
 
     @staticmethod
+    def extract_relations(database: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Extracts relationships from a Notion Database.
+        Returns a list of partial ERDRelationship dicts (target_id, type).
+        """
+        properties = database.get("properties", {})
+        relations = []
+        
+        for prop_name, prop_data in properties.items():
+            if prop_data.get("type") == "relation":
+                relation_config = prop_data.get("relation", {})
+                target_db_id = relation_config.get("database_id")
+                if target_db_id:
+                    relations.append({
+                        "name": prop_name,
+                        "target_id": target_db_id,
+                        "type": "1:N" # Notion relations are usually N:M or 1:N, default to 1:N for now
+                    })
+        return relations
+
+    @staticmethod
     def page_to_node(page: Dict[str, Any]) -> FlowNode:
         """
         Maps a Notion Page to a Node in the FlowSpec.

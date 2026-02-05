@@ -91,3 +91,47 @@ class MiroAdapter:
             name=name,
             attributes=attributes
         )
+
+    @staticmethod
+    def relationship_to_connector(rel: ERDRelationship, source_item_id: str, target_item_id: str) -> Dict[str, Any]:
+        """
+        Creates a Miro Connector (Line) between two shapes.
+        """
+        return {
+            "data": {
+                "startItem": {"id": source_item_id},
+                "endItem": {"id": target_item_id},
+                "shape": "elbowed", # Orthogonal lines
+                "captions": [{"content": rel.cardinality}] if rel.cardinality else []
+            },
+            "style": {
+                "strokeColor": "#000000",
+                "strokeWidth": 2,
+                "endArrow": "filled_triangle" # Visual cue for direction
+            }
+        }
+
+    @staticmethod
+    def connector_to_relationship(connector: Dict[str, Any]) -> Optional[ERDRelationship]:
+        """
+        Maps a Miro Connector to an ERD Relationship.
+        """
+        data = connector.get("data", {})
+        start_item = data.get("startItem", {}).get("id")
+        end_item = data.get("endItem", {}).get("id")
+        
+        if not start_item or not end_item:
+            return None
+            
+        captions = data.get("captions", [])
+        cardinality = "1:N" # Default
+        if captions:
+            # Try to grab content from first caption
+            cardinality = captions[0].get("content", "1:N")
+
+        return ERDRelationship(
+            id=connector.get("id"),
+            source=start_item, # Miro ID, will need mapping to Canonical ID if IDs change
+            target=end_item,
+            cardinality=cardinality
+        )
