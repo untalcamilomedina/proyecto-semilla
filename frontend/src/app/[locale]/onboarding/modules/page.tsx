@@ -31,7 +31,7 @@ export default function OnboardingModulesPage() {
         setError(null);
 
         try {
-            await apiPost("/api/v1/onboarding/modules/", { modules: selected });
+            await apiPost("/onboarding/modules/", { modules: selected });
             router.push("/onboarding/stripe");
         } catch (err) {
             if (err instanceof ApiError) {

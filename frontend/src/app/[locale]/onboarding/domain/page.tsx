@@ -23,7 +23,7 @@ export default function OnboardingDomainPage() {
         setIsLoading(true);
         setError(null);
         try {
-            await apiPost("/api/v1/onboarding/domain/", {
+            await apiPost("/onboarding/domain/", {
                 custom_domain: skip ? "" : domain
             });
             router.push("/onboarding/invite");

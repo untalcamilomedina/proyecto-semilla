@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
         setError(null);
 
         try {
-            await apiPost("/api/v1/password/reset/", {
+            await apiPost("/password/reset/", {
                 email: data.email,
             });
             setIsSuccess(true);

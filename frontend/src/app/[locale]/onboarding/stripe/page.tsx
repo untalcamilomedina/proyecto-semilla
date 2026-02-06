@@ -20,7 +20,7 @@ export default function OnboardingStripePage() {
     const onSkip = async () => {
         setIsLoading(true);
         try {
-            await apiPost("/api/v1/onboarding/stripe/", { stripe_connected: false });
+            await apiPost("/onboarding/stripe/", { stripe_connected: false });
             router.push("/onboarding/domain");
         } catch (err) {
             setError(te("stripeError"));
@@ -31,7 +31,7 @@ export default function OnboardingStripePage() {
     const onConnect = async () => {
         setIsLoading(true);
         try {
-            await apiPost("/api/v1/onboarding/stripe/", { stripe_connected: true });
+            await apiPost("/onboarding/stripe/", { stripe_connected: true });
             router.push("/onboarding/domain");
         } catch (err) {
             setError(te("stripeError"));

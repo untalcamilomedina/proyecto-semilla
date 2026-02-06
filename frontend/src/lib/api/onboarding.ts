@@ -11,7 +11,7 @@ export async function submitOnboarding(data: OnboardingData): Promise<void> {
 
   // 1. Create Organization (and Tenant)
   // This endpoint now supports authenticated users without password
-  await apiPost('/api/v1/onboarding/start/', {
+  await apiPost('/onboarding/start/', {
     org_name: data.organization.name,
     subdomain: data.organization.slug,
     admin_email: data.user.email,

@@ -9,10 +9,10 @@ export const tenantService = {
     /**
      * Get current organization details
      */
-    getSettings: () => apiGet<Tenant>("/api/v1/tenant/"),
+    getSettings: () => apiGet<Tenant>("/tenant/"),
 
     /**
      * Update organization branding or settings
      */
-    updateSettings: (data: Partial<Tenant>) => apiPatch<Tenant>("/api/v1/tenant/", data),
+    updateSettings: (data: Partial<Tenant>) => apiPatch<Tenant>("/tenant/", data),
 };

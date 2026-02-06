@@ -13,16 +13,16 @@ export const enterpriseService = {
      */
     getAuditLogs: (params?: Record<string, string>) => {
         const query = params ? `?${new URLSearchParams(params).toString()}` : "";
-        return apiGet<PaginatedResponse<ActivityLog>>(`/api/v1/activity-logs/${query}`);
+        return apiGet<PaginatedResponse<ActivityLog>>(`/activity-logs/${query}`);
     },
 
     /**
      * API Keys Management
      */
-    getApiKeys: () => apiGet<ApiKey[]>("/api/v1/api-keys/"),
+    getApiKeys: () => apiGet<ApiKey[]>("/api-keys/"),
 
-    createApiKey: (data: ApiKeyCreate) => apiPost<ApiKey>("/api/v1/api-keys/", data),
+    createApiKey: (data: ApiKeyCreate) => apiPost<ApiKey>("/api-keys/", data),
 
-    revokeApiKey: (id: number) => apiPost<void>(`/api/v1/api-keys/${id}/revoke/`),
+    revokeApiKey: (id: number) => apiPost<void>(`/api-keys/${id}/revoke/`),
 };
 

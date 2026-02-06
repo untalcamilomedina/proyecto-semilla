@@ -49,7 +49,7 @@ export default function RolesPage() {
     // Fetch roles
     const { data: roles, isLoading } = useQuery({
         queryKey: ["roles"],
-        queryFn: () => apiGet<PaginatedResponse<Role>>("/api/v1/roles/"),
+        queryFn: () => apiGet<PaginatedResponse<Role>>("/roles/"),
     });
 
     // Fetch permissions for form
@@ -60,7 +60,7 @@ export default function RolesPage() {
 
     // Create mutation
     const createMutation = useMutation({
-        mutationFn: (data: RoleForm) => apiPost<Role>("/api/v1/roles/", data),
+        mutationFn: (data: RoleForm) => apiPost<Role>("/roles/", data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["roles"] });
             setIsCreateOpen(false);
@@ -76,7 +76,7 @@ export default function RolesPage() {
     // Update mutation
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: number; data: RoleForm }) =>
-            apiPatch<Role>(`/api/v1/roles/${id}/`, data),
+            apiPatch<Role>(`/roles/${id}/`, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["roles"] });
             setEditingRole(null);
@@ -91,7 +91,7 @@ export default function RolesPage() {
 
     // Delete mutation
     const deleteMutation = useMutation({
-        mutationFn: (id: number) => apiDelete(`/api/v1/roles/${id}/`),
+        mutationFn: (id: number) => apiDelete(`/roles/${id}/`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["roles"] });
         },

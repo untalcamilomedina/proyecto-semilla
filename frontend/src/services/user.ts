@@ -11,16 +11,16 @@ export const userService = {
     /**
      * Get current user profile
      */
-    getProfile: () => apiGet<{ user: User; is_authenticated: boolean }>("/api/v1/me/"),
+    getProfile: () => apiGet<{ user: User; is_authenticated: boolean }>("/me/"),
 
     /**
      * Update user profile data
      */
-    updateProfile: (data: Partial<User>) => apiPatch<User>("/api/v1/me/", data),
+    updateProfile: (data: Partial<User>) => apiPatch<User>("/me/", data),
 
     /**
      * Change user password
      */
     changePassword: (data: Record<string, string>) =>
-        apiPost<{ detail: string }>("/api/v1/me/change_password/", data),
+        apiPost<{ detail: string }>("/me/change_password/", data),
 };

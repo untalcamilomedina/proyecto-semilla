@@ -40,7 +40,7 @@ export default function OnboardingInvitePage() {
                 .map((e) => e.trim().toLowerCase())
                 .filter((e) => e.includes("@"));
 
-            await apiPost("/api/v1/onboarding/invite/", { emails });
+            await apiPost("/onboarding/invite/", { emails });
             router.push("/onboarding/done");
         } catch (err) {
             if (err instanceof ApiError) {
@@ -57,7 +57,7 @@ export default function OnboardingInvitePage() {
         setIsLoading(true);
         setError(null);
         try {
-            await apiPost("/api/v1/onboarding/invite/", { emails: [] });
+            await apiPost("/onboarding/invite/", { emails: [] });
             router.push("/onboarding/done");
         } catch (err) {
             router.push("/onboarding/done");

@@ -47,7 +47,7 @@ export default function SignupPage() {
         setError(null);
 
         try {
-            await apiPost("/api/v1/signup/", {
+            await apiPost("/signup/", {
                 email: data.email,
                 password1: data.password1,
                 password2: data.password2,

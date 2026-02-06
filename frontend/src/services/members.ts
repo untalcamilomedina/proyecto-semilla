@@ -1,7 +1,7 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/api";
 import { Member, MemberInviteRequest } from "@/types/member";
 
-const ENDPOINT = "/api/v1/memberships/";
+const ENDPOINT = "/memberships/";
 
 export const memberService = {
     getAll: async () => {

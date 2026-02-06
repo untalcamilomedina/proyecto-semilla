@@ -42,7 +42,7 @@ services:
       - "${FRONTEND_PORT:-3010}:3010"
     command: sh -c "npm run dev -- -p 3010"
     environment:
-      NEXT_PUBLIC_API_URL: /api/v1
+      NEXT_PUBLIC_API_URL: ""
       DJANGO_BASE_URL: http://web:8000
       NEXT_TELEMETRY_DISABLED: "1"
       WATCHPACK_POLLING: "true"

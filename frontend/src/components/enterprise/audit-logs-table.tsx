@@ -17,7 +17,7 @@ export function AuditLogsTable() {
 
     const { data: paginatedData, isLoading } = usePaginatedQuery<ActivityLog>(
         ["audit-logs"],
-        "/api/v1/activity-logs/"
+        "/activity-logs/"
     );
 
     const columns: ColumnDef<ActivityLog>[] = [

@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             // Use Django's built-in auth check endpoint
             const data = await apiGet<{ user: User; is_authenticated: boolean }>(
-                "/api/v1/me/"
+                "/me/"
             );
             if (data.is_authenticated && data.user) {
                 set({ user: data.user, isAuthenticated: true, isLoading: false });
@@ -46,7 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     loadTenant: async () => {
         try {
-            const tenant = await apiGet<Tenant>("/api/v1/tenant/");
+            const tenant = await apiGet<Tenant>("/tenant/");
             set({ tenant });
         } catch {
             set({ tenant: null });
@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     logout: async () => {
         set({ isLoading: true });
         try {
-            await fetch("/api/v1/logout/", {
+            await fetch("/logout/", {
                 method: "POST",
                 credentials: "include",
             });

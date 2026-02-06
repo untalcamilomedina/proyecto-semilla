@@ -20,7 +20,7 @@ export function MembersTable() {
 
     const { data, isLoading } = useResourceQuery<Member[]>(
         ["members"],
-        "/api/v1/memberships/",
+        "/memberships/",
         { enabled: !!tenant }
     );
 
