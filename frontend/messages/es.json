@@ -60,7 +60,9 @@
             "passwordRequired": "La contraseña es requerida",
             "passwordMismatch": "Las contraseñas no coinciden",
             "emailRequired": "El email es requerido",
-            "invalidEmail": "Email inválido"
+            "invalidEmail": "Email inválido",
+            "minChars": "Mínimo {count} caracteres",
+            "passwordsMatch": "Las contraseñas no coinciden"
         },
         "resetTitle": "Recuperar Contraseña",
         "resetDescription": "Ingresa tu email para recibir un enlace de recuperación.",

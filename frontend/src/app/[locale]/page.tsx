@@ -14,19 +14,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-neon/30 overflow-hidden relative">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-glass-border-subtle bg-glass-overlay backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BlockFlowLogo className="h-8 w-8 text-neon-text" />
-            <span className="text-lg font-bold tracking-tight">BlockFlow</span>
+          <div className="flex items-center gap-3">
+            <BlockFlowLogo className="h-10 w-10 md:h-12 md:w-12 text-foreground" />
+            <span className="text-xl md:text-2xl font-bold tracking-tight">BlockFlow</span>
           </div>
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
             {/* Theme Toggle (Mobile & Desktop) */}
             <div className="flex items-center gap-2 md:gap-4">
                  <ThemeToggle />
-                 <div className="hidden md:block">
-                    <LanguageSwitcher />
-                 </div>
+                 <LanguageSwitcher />
                  <Link href="/login">
                     <GlassButton variant="secondary" className="text-text-subtle hover:text-foreground border-transparent bg-transparent hover:bg-glass-bg">{useTranslations('auth')('login')}</GlassButton>
                  </Link>
@@ -47,7 +45,7 @@ export default function LandingPage() {
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-gradient-heading animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
                 {t('title')}<br />
-                <span className="text-neon-text drop-shadow-[0_0_20px_rgba(13,242,13,0.3)]">{t('subtitle')}</span>
+                <span className="text-neon-text">{t('subtitle')}</span>
             </h1>
 
             <p className="text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">

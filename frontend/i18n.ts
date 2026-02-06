@@ -1,14 +1,11 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies, headers } from 'next/headers';
-import { locales, defaultLocale, Locale } from './src/config';
+import { routing } from './src/lib/routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
-    // This typically comes from the middleware matcher
     let locale = await requestLocale;
 
-    // Ensure that a valid locale is used
-    if (!locale || !locales.includes(locale as any)) {
-        locale = defaultLocale;
+    if (!locale || !routing.locales.includes(locale as any)) {
+        locale = routing.defaultLocale;
     }
 
     return {

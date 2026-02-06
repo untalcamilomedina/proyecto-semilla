@@ -60,7 +60,13 @@
         "resetDescription": "Enter your email to receive a reset link.",
         "sendResetLink": "Send Reset Link",
         "backToLogin": "Back to login",
-        "emailSent": "We have sent a password reset link to your email."
+        "emailSent": "We have sent a password reset link to your email.",
+        "validation": {
+            "invalidEmail": "Invalid email",
+            "passwordRequired": "Password is required",
+            "minChars": "Minimum {count} characters",
+            "passwordsMatch": "Passwords don't match"
+        }
     },
     "nav": {
         "dashboard": "Dashboard",

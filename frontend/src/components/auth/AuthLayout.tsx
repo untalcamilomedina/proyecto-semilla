@@ -25,7 +25,7 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
       </div>
 
       <section className="w-full max-w-md z-10 space-y-8">
-        <GlassCard className="p-8 md:p-10 w-full flex flex-col relative overflow-hidden border-glass-border bg-glass-overlay" as="article">
+        <GlassCard className="p-8 md:p-10 w-full flex flex-col relative overflow-hidden border-glass-border bg-card/80 dark:bg-glass-overlay" as="article">
           {/* Decorative Glow inside Card (dark only) */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-gradient-to-r from-transparent via-neon/50 to-transparent opacity-50 hidden dark:block" />
 
