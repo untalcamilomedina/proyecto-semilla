@@ -5,6 +5,7 @@ export interface GlassInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
+    id?: string;
 }
 
 /**
@@ -16,11 +17,15 @@ export interface GlassInputProps
  * @param {string} [props.error] - Mensaje de error opcional.
  */
 export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
-  ({ className, type, label, error, ...props }, ref) => {
+  ({ className, type, label, error, id, ...props }, ref) => {
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
+
     return (
       <div className="space-y-1.5 w-full">
-        {label && <label className="text-xs font-medium text-white/50 ml-1">{label}</label>}
+        {label && <label htmlFor={inputId} className="text-xs font-medium text-white/50 ml-1">{label}</label>}
         <input
+          id={inputId}
           type={type}
           className={cn(
             "flex h-11 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/50 transition-all duration-300",

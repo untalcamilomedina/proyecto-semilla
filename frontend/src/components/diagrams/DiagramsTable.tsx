@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { 
     Table, 
@@ -24,7 +24,7 @@ import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { MoreHorizontal, FileEdit, Trash, Eye, Plus } from "lucide-react";
 import { apiGet, apiPost } from "@/lib/api"; // Assuming we might add delete helper later
 import { Diagram } from "@/types"; // Need to ensure Diagram type exists
-import Link from "next/link";
+import { Link } from "@/lib/navigation";
 
 interface DiagramsTableProps {
     data: Diagram[];

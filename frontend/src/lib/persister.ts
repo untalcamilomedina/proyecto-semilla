@@ -1,18 +1,19 @@
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { offlineStorage } from './storage';
 
 /**
- * Custom persister for TanStack Query using Dexie (IndexedDB) with encryption.
- * This allows the query cache to persist across reloads and work offline.
+ * Custom persister for TanStack Query using Dexie (IndexedDB).
+ * Allows the query cache to persist across reloads and work offline.
  */
 export const dexiePersister = {
-    persistClient: async (client: any) => {
+    persistClient: async (client: PersistedClient) => {
         await offlineStorage.setItem('queryCache', client);
     },
-    restoreClient: async () => {
-        return await offlineStorage.getItem('queryCache');
+    restoreClient: async (): Promise<PersistedClient | undefined> => {
+        const data = await offlineStorage.getItem<PersistedClient>('queryCache');
+        return data ?? undefined;
     },
     removeClient: async () => {
         await offlineStorage.removeItem('queryCache');
-    }
+    },
 };

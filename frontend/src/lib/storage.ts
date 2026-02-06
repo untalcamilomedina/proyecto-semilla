@@ -1,81 +1,69 @@
 import Dexie, { type Table } from 'dexie';
-import CryptoJS from 'crypto-js';
-
-const DEFAULT_KEY = "seed-insecure-fallback";
 
 /**
- * Gets the encryption key for the current user.
- * In a real scenario, this would be derived from the user's login session
- * or a PBKDF2 derivative of their password stored only in memory.
+ * Offline storage using IndexedDB via Dexie.
+ *
+ * Note: Client-side "encryption" with a key embedded in the bundle provides
+ * no real confidentiality against XSS or browser extensions. Instead of
+ * false security theater, we store data as plain JSON and rely on:
+ *   1. HttpOnly session cookies (not accessible to JS)
+ *   2. CSP headers to prevent XSS
+ *   3. Not storing sensitive data (tokens, passwords) client-side
+ *
+ * If encryption is truly needed, use the Web Crypto API with a key derived
+ * from user credentials via PBKDF2, stored only in memory.
  */
-function getEncryptionKey(): string {
-  // Attempt to get user ID from a cookie or session to make the key user-specific
-  if (typeof window !== 'undefined') {
-    const userId = localStorage.getItem('user_id') || 'anonymous';
-    return `${process.env.NEXT_PUBLIC_STORAGE_KEY || DEFAULT_KEY}-${userId}`;
-  }
-  return DEFAULT_KEY;
-}
 
-export interface EncryptedItem {
+export interface CachedItem {
   id?: number;
   key: string;
-  value: string; // Encrypted string
+  value: string;
   timestamp: number;
 }
 
 export class OfflineStorage extends Dexie {
-  items!: Table<EncryptedItem>;
+  items!: Table<CachedItem>;
 
   constructor() {
-    super('OfflineEncryptedDB');
-    this.version(1).stores({
-      items: '++id, key' // Primary key and indexed props
+    super('OfflineDB');
+    this.version(2).stores({
+      items: '++id, key',
     });
   }
 
-  private encrypt(data: any): string {
-    const key = getEncryptionKey();
-    return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
-  }
-
-  private decrypt(ciphertext: string): any {
-    const key = getEncryptionKey();
-    try {
-      const bytes = CryptoJS.AES.decrypt(ciphertext, key);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (e) {
-      console.error("Failed to decrypt data", e);
-      return null;
-    }
-  }
-
-  async setItem(key: string, value: any) {
-    const encrypted = this.encrypt(value);
-    // Check if exists to update
+  async setItem(key: string, value: unknown) {
+    const serialized = JSON.stringify(value);
     const existing = await this.items.where('key').equals(key).first();
     if (existing) {
       await this.items.update(existing.id!, {
-        value: encrypted,
-        timestamp: Date.now()
+        value: serialized,
+        timestamp: Date.now(),
       });
     } else {
       await this.items.add({
         key,
-        value: encrypted,
-        timestamp: Date.now()
+        value: serialized,
+        timestamp: Date.now(),
       });
     }
   }
 
-  async getItem(key: string) {
+  async getItem<T = unknown>(key: string): Promise<T | null> {
     const item = await this.items.where('key').equals(key).first();
     if (!item) return null;
-    return this.decrypt(item.value);
+    try {
+      return JSON.parse(item.value) as T;
+    } catch {
+      return null;
+    }
   }
 
   async removeItem(key: string) {
     await this.items.where('key').equals(key).delete();
+  }
+
+  async clear() {
+    await this.items.clear();
   }
 }
 

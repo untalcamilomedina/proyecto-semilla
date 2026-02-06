@@ -12,9 +12,12 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 
 import EntityNode from "@/components/diagrams/nodes/entity-node";
-import type { components } from "@/types/api";
+// import type { components } from "@/types/api";
 
-type ERDSpec = components["schemas"]["ERDSpec"];
+type ERDSpec = {
+    entities: any[];
+    relationships?: any[];
+};
 
 interface DiagramCanvasProps {
     spec: ERDSpec;

@@ -14,7 +14,7 @@ SRC_DIR = ROOT_DIR / "src"
 env = Env()
 env.read_env(os.environ.get("ENV_FILE"))  # optional explicit path
 
-SECRET_KEY = env.str("DJANGO_SECRET_KEY", default="changeme")
+SECRET_KEY = env.str("DJANGO_SECRET_KEY", default="dev-only-insecure-key-do-not-use-in-production")
 DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
@@ -66,7 +66,6 @@ INSTALLED_APPS = [
     "csp",
     "djstripe",
     "anymail",
-    "silk",
     "health_check",
     "health_check.db",
     "health_check.cache",
@@ -84,6 +83,10 @@ INSTALLED_APPS = [
     "integrations",
 ] + optional_apps()
 
+# Silk profiler only in development
+if DEBUG:
+    INSTALLED_APPS.insert(-1, "silk")
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "csp.middleware.CSPMiddleware",
@@ -93,10 +96,9 @@ MIDDLEWARE = [
 if MULTITENANT_MODE == "schema":
     MIDDLEWARE.append("multitenant.middleware.TenantMiddleware")
 MIDDLEWARE += [
+    "corsheaders.middleware.CorsMiddleware",
     "common.middleware.MetricsMiddleware",
     "django.middleware.gzip.GZipMiddleware",
-    "silk.middleware.SilkyMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -105,6 +107,13 @@ MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+# Silk middleware only in development
+if DEBUG:
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.gzip.GZipMiddleware") + 1,
+        "silk.middleware.SilkyMiddleware",
+    )
+
 AXES_ENABLED = env.bool("ENABLE_AXES", default=not DEBUG)
 
 ROOT_URLCONF = "config.urls"
@@ -148,6 +157,13 @@ CACHES = {
 }
 
 AUTH_USER_MODEL = "core.User"
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 10}},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
@@ -233,7 +249,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "api.authentication.ApiKeyAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_THROTTLE_CLASSES": [
@@ -290,7 +305,6 @@ DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 
 AXES_FAILURE_LIMIT = env.int("AXES_FAILURE_LIMIT", default=5)
 AXES_COOLOFF_TIME = env.int("AXES_COOLOFF_TIME", default=1)  # hours
-AXES_LOCK_OUT_AT_FAILURE = True
 AXES_LOCK_OUT_AT_FAILURE = True
 AXES_RESET_ON_SUCCESS = True
 AXES_CACHE = "default"

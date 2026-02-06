@@ -4,8 +4,19 @@ import { cn } from "@/lib/utils";
 import { Database } from "lucide-react";
 
 // Types derived from our SDK
-import type { components } from "@/types/api";
-type ERDEntity = components["schemas"]["ERDEntity"];
+// Types derived from our SDK
+// import type { components } from "@/types/api";
+
+type ERDEntity = {
+    id: string | number;
+    name: string;
+    attributes: Array<{
+        name: string;
+        type: string;
+        pk?: boolean;
+        fk?: boolean;
+    }>;
+};
 
 interface EntityNodeProps {
   data: ERDEntity;

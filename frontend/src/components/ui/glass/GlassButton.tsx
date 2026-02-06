@@ -24,7 +24,7 @@ export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>
       <button
         ref={ref}
         className={cn(
-          "px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300 font-medium",
+          "inline-flex items-center justify-center px-4 py-2 rounded-xl backdrop-blur-md transition-all duration-300 font-medium",
           "hover:scale-[1.01] active:scale-95",
           
           // Primary (Neon Green)
@@ -33,7 +33,7 @@ export const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>
           
           // Secondary
           variant === "secondary" && 
-            "bg-white/5 text-zinc-100 border border-white/10 hover:bg-white/10",
+            "bg-white/5 text-white border border-white/10 hover:bg-white/10",
             
           // Danger
           variant === "danger" && 

@@ -5,7 +5,7 @@ import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { GlassInput } from "@/components/ui/glass/GlassInput";
 import { useOnboardingStore } from "@/stores/onboarding";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { Check, CreditCard, Lock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";

@@ -35,9 +35,9 @@ Validar que **NO** existan textos hardcodeados.
 
 Validar cumplimiento básico de WCAG 2.1.
 
-- Contraste de colores (texto gris sobre fondo oscuro).
 - Focus visible al navegar con tabulador.
 - Etiquetas `aria-label` en botones de solo ícono.
+- **Botones de Acción**: Texto con alto contraste (blanco sobre fondo oscuro) y alineación horizontal (icono + texto).
 
 ### 4. Consola y Red
 

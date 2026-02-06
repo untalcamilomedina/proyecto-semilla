@@ -32,7 +32,8 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-gradient-to-r from-transparent via-neon/50 to-transparent opacity-50" />
           
           <div className="space-y-6 mb-8 text-center flex flex-col items-center">
-            <BlockFlowLogo className="h-12 w-12 text-neon drop-shadow-[0_0_15px_rgba(13,242,13,0.3)]" />
+            <BlockFlowLogo className="h-16 w-16" color="white" />
+            <span className="text-2xl font-bold text-white tracking-tight mt-2">BlockFlow Platform</span>
             
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">

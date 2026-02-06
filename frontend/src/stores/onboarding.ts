@@ -93,12 +93,17 @@ export const useOnboardingStore = create<OnboardingState>()(
     {
       name: 'onboarding-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ 
-        user: state.user,
+      partialize: (state) => ({
+        // SECURITY: Never persist secrets to localStorage
+        user: state.user
+          ? { firstName: state.user.firstName, lastName: state.user.lastName, email: state.user.email, role: state.user.role }
+          : state.user,
         organization: state.organization,
         language: state.language,
-        stripe: state.stripe,
-        step: state.step
+        stripe: state.stripe
+          ? { enabled: state.stripe.enabled, publicKey: state.stripe.publicKey }
+          : state.stripe,
+        step: state.step,
       }),
     }
   )

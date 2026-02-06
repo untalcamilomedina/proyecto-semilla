@@ -25,7 +25,8 @@
             "searchPlaceholder": "Search...",
             "noResults": "No results found.",
             "paginationInfo": "Page {current} of {total}"
-        }
+        },
+        "user": "User"
     },
     "auth": {
         "login": "Log in",
@@ -102,13 +103,24 @@
         "count": "{count} members",
         "invite": "Invite",
         "inviteTitle": "Invite members",
-        "inviteDescription": "Enter the emails of people to invite (one per line)",
+        "inviteDescription": "Send email invitations to your colleagues to join the organization.",
         "emails": "Emails",
-        "emailsPlaceholder": "email1@example.com\nemail2@example.com",
+        "emailsPlaceholder": "example@email.com, another@email.com",
+        "emailsHint": "Press Enter or Comma to add multiple emails.",
         "role": "Role",
+        "roleOwner": "Owner",
+        "roleAdmin": "Admin",
+        "roleMember": "Member",
+        "selectRole": "Select a role",
         "sendInvitations": "Send invitations",
+        "inviteButton": "Invite",
         "noMembers": "No members yet",
-        "errorInviting": "Error inviting"
+        "errorInviting": "Error sending invitations",
+        "invalidEmail": "Invalid email format",
+        "duplicateEmail": "Email already added",
+        "minOneEmail": "Add at least one email",
+        "inviteSuccess": "{count} invitations sent.",
+        "since": "Since"
     },
     "roles": {
         "title": "Roles",
@@ -137,21 +149,27 @@
         "currentSubscription": "Current subscription",
         "noSubscription": "No active subscription",
         "plan": "Plan",
+        "planLabel": "{plan} PLAN",
         "nextInvoice": "Next invoice",
         "users": "Users",
         "cancelSubscription": "Cancel subscription",
         "willCancelAtEnd": "Will cancel at end of period",
-        "availablePlans": "Available plans",
+        "availablePlans": "Available Plans",
         "noPlans": "No plans available.",
         "current": "Current",
-        "currentPlan": "Current plan",
+        "currentPlan": "Current Plan",
         "changePlan": "Change plan",
         "select": "Select",
+        "upgrade": "Upgrade",
         "upToUsers": "Up to {count} users",
         "trialDays": "{count} day trial",
         "free": "Free",
-        "perMonth": "/month",
+        "pro": "Pro",
+        "enterprise": "Enterprise",
+        "custom": "Custom",
+        "perMonth": "/mo",
         "perYear": "/year",
+        "popular": "POPULAR",
         "confirmCancel": "Cancel subscription?",
         "cancelDescription": "Your subscription will remain active until the end of the current period. No further charges will be made.",
         "keepSubscription": "Keep subscription",
@@ -163,6 +181,24 @@
         "invoiceHistory": "Invoice history",
         "noInvoices": "No invoices yet",
         "paid": "Paid",
+        "diagramsUsed": "Diagrams Used",
+        "aiRequests": "AI Requests",
+        "needMorePower": "Need more power?",
+        "upgradeDescription": "Upgrade to Pro to unlock unlimited diagrams and advanced AI features.",
+        "upgradeNow": "Upgrade Now",
+        "contactSales": "Contact Sales",
+        "loadingBilling": "Loading billing info...",
+        "failedToLoad": "Failed to load subscription.",
+        "features": {
+            "diagrams5": "5 Diagrams",
+            "basicAI": "Basic AI Gen",
+            "unlimitedDiagrams": "Unlimited Diagrams",
+            "advancedAI": "Advanced AI (Gemini Pro)",
+            "prioritySupport": "Priority Support",
+            "sso": "SSO & Audit Logs",
+            "customModels": "Custom AI Models",
+            "sla": "SLA Guarantee"
+        },
         "status": {
             "active": "Active",
             "trialing": "Trial",
@@ -226,7 +262,8 @@
             "customDomainPlaceholder": "app.yourdomain.com",
             "dnsConfig": "DNS Configuration",
             "dnsDescription": "If you configure a custom domain, you'll need to add a CNAME record pointing to",
-            "leaveEmpty": "You can leave this empty and use the assigned subdomain"
+            "leaveEmpty": "You can leave this empty and use the assigned subdomain",
+            "skipForNow": "Skip"
         },
         "step5": {
             "title": "Invite your team",
@@ -235,7 +272,9 @@
             "emailsPlaceholder": "email1@example.com\nemail2@example.com\nemail3@example.com",
             "emailsHint": "One email per line or separated by commas",
             "invitationNotice": "An invitation email will be sent to each address",
-            "sending": "Sending..."
+            "sending": "Sending...",
+            "sendInvitations": "Send invitations",
+            "skipForNow": "Skip"
         },
         "step6": {
             "title": "All set!",
@@ -272,24 +311,29 @@
     },
     "settings": {
         "title": "Settings",
-        "description": "Manage your organization preferences",
+        "description": "Manage your account preferences and security.",
         "profile": "Profile",
         "organization": "Organization",
-        "saveChanges": "Save changes",
+        "saveChanges": "Save Changes",
         "language": "Language",
         "theme": "Theme",
         "notifications": "Notifications",
         "security": "Security",
         "changePassword": "Change Password",
+        "updatePassword": "Update Password",
         "currentPassword": "Current Password",
         "newPassword": "New Password",
         "confirmNewPassword": "Confirm New Password",
         "profileUpdated": "Profile updated successfully",
         "passwordChanged": "Password changed successfully",
         "orgUpdated": "Organization updated successfully",
-        "personalInfo": "Personal Information",
+        "personalInfo": "Profile Information",
         "firstName": "First Name",
-        "lastName": "Last Name"
+        "lastName": "Last Name",
+        "email": "Email",
+        "fullName": "Full Name",
+        "emailCannotChange": "Email cannot be changed.",
+        "notificationsComingSoon": "Notification settings coming soon."
     },
     "audit": {
         "title": "Audit Logs",
@@ -303,16 +347,83 @@
     },
     "keys": {
         "title": "API Keys",
-        "description": "Manage keys for external integrations.",
+        "description": "Manage external API keys (Gemini, OpenAI) for AI features.",
         "createButton": "New Key",
+        "addKey": "Add Key",
+        "addTitle": "Add New API Key",
+        "addDescription": "Your key will be encrypted at rest. We never display the full key again.",
         "revoked": "Revoked",
         "active": "Active",
         "prefix": "Prefix",
         "lastUsed": "Last used",
         "keyWarning": "Save this key in a safe place. It will not be shown again.",
-        "namePlaceholder": "Key name",
+        "name": "Name",
+        "namePlaceholder": "My Gemini Key",
+        "service": "Service",
+        "apiKey": "API Key",
+        "apiKeyPlaceholder": "sk-...",
+        "saveKey": "Save Key",
+        "noKeys": "No API Keys Found",
+        "noKeysDescription": "Add an API key to enable AI generation features. We support Gemini, OpenAI, and Claude.",
+        "startsWith": "Starts with {prefix}...",
+        "confirmDelete": "Are you sure? This action cannot be undone.",
+        "loadingKeys": "Loading keys...",
         "created": "Key created",
         "revocationSuccess": "Key revoked",
         "copy": "Copy"
+    },
+    "landing": {
+        "beta": "v1.0 Public Beta",
+        "title": "Connect Notion with your tools.",
+        "subtitle": "Without barriers.",
+        "description": "Bring your Notion databases to Miro to visualize workflows, audit permissions, and automate workspace creation. Everything synchronized.",
+        "startFree": "Start for Free",
+        "features": {
+            "notionToMiro": {
+                "title": "Notion to Miro",
+                "desc": "Convert complex Notion databases into visual diagrams in Miro. Understand your team's relationships and dependencies instantly."
+            },
+            "roleAudit": {
+                "title": "Role Audit",
+                "desc": "Who has access to what? Visualize and manage Notion permissions from a centralized and secure dashboard."
+            },
+            "miroToNotion": {
+                "title": "Miro to Notion",
+                "desc": "Design your ideal workflow in Miro and automatically generate it in Notion as ready-to-use pages and databases."
+            }
+        },
+        "footer": {
+            "rights": "© 2024 BlockFlow Platform",
+            "privacy": "Privacy",
+            "terms": "Terms",
+            "twitter": "Twitter"
+        }
+    },
+    "integrations": {
+        "title": "Integrations Hub",
+        "description": "Connect your favorite tools to import/export diagrams autonomously.",
+        "connected": "Connected",
+        "notConnected": "Not Connected",
+        "manageConnection": "Manage Connection",
+        "notion": {
+            "title": "Notion",
+            "subtitle": "Scan Workspaces & Sync DBs",
+            "description": "Import your Notion pages as flowcharts or export your ERD diagrams directly into Notion databases. Supports recursive page scanning.",
+            "connect": "Connect Notion"
+        },
+        "miro": {
+            "title": "Miro",
+            "subtitle": "Visual Collaboration",
+            "description": "Two-way sync with Miro boards. Convert sticky notes to Database schemas and visualize your architecture.",
+            "connect": "Connect Miro"
+        }
+    },
+    "tools": {
+        "notionER": {
+            "title": "Notion ER Diagram",
+            "description": "Visualize your Notion databases as Entity-Relationship diagrams.",
+            "selectDb": "Select a Database",
+            "scanDemo": "Scan Demo Database"
+        }
     }
 }

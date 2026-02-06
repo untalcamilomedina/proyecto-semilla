@@ -1,7 +1,7 @@
 "use client";
 
 import { useOnboardingStore } from "@/stores/onboarding";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { useEffect } from "react";
 
 interface StepGuardProps {

@@ -2,8 +2,7 @@
 
 import { BlockFlowLogo } from "@/components/ui/logo";
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import {
     LayoutDashboard,
@@ -20,6 +19,8 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 /**
  * Sidebar
@@ -30,6 +31,7 @@ import { GlassButton } from "@/components/ui/glass/GlassButton";
 export function Sidebar() {
     const t = useTranslations("nav");
     const ta = useTranslations("auth");
+    const tc = useTranslations("common");
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
     const { user, tenant, logout } = useAuth();
@@ -49,6 +51,7 @@ export function Sidebar() {
             {/* Mobile menu button */}
             <button
                 type="button"
+                aria-label="Toggle menu"
                 className="fixed top-5 left-5 z-50 lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md"
                 onClick={() => setIsOpen(!isOpen)}
             >
@@ -118,8 +121,8 @@ export function Sidebar() {
                     </nav>
 
                     {/* User Profile Section */}
-                    <div className="border-t border-white/5 p-4 bg-white/[0.02]">
-                        <div className="flex items-center gap-3 px-2 mb-4">
+                    <div className="border-t border-white/5 p-4 bg-white/[0.02] space-y-4">
+                        <div className="flex items-center gap-3 px-2">
                             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon/20 to-blue-500/20 border border-white/10 flex items-center justify-center relative overflow-hidden">
                                 <span className="text-sm font-bold text-neon relative z-10">
                                     {(user?.first_name || user?.username || "U").charAt(0).toUpperCase()}
@@ -128,10 +131,15 @@ export function Sidebar() {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-white/90 truncate">
-                                    {user?.first_name || user?.username || "Usuario"}
+                                    {user?.first_name || user?.username || tc("user")}
                                 </p>
                                 <p className="text-[10px] text-white/40 truncate tracking-tight">{user?.email}</p>
                             </div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 px-1">
+                            <ThemeToggle />
+                            <LanguageSwitcher />
                         </div>
                         
                         <GlassButton

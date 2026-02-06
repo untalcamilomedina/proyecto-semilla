@@ -15,14 +15,14 @@ USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=True)  # type: i
 CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
     default=[
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
         "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3010",
+        "http://localhost:8010",
         "http://127.0.0.1:3000",
-        "http://localhost:9000",
-        "http://127.0.0.1:9000",
-        "http://localhost:9001",
-        "http://127.0.0.1:9001",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3010",
+        "http://127.0.0.1:8010",
     ],
 )
 

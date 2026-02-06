@@ -4,7 +4,7 @@ import React from "react";
 import { GlassInput } from "@/components/ui/glass/GlassInput";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { useOnboardingStore } from "@/stores/onboarding";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { CreditCard, Lock } from "lucide-react";
 
 export default function PaymentSetup() {

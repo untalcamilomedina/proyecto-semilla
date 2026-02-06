@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,6 +39,8 @@ interface InviteMemberModalProps {
 }
 
 export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps) {
+    const t = useTranslations("members");
+    const tc = useTranslations("common");
     const [isPending, startTransition] = useTransition();
     const [emails, setEmails] = useState<string[]>([]);
     const [currentEmail, setCurrentEmail] = useState("");
@@ -54,12 +57,12 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            toast.error("Format de email inválido");
+            toast.error(t("invalidEmail"));
             return;
         }
 
         if (emails.includes(email)) {
-             toast.error("Email ya agregado");
+             toast.error(t("duplicateEmail"));
              return;
         }
 
@@ -73,7 +76,7 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
 
     const onSubmit = () => {
         if (emails.length === 0) {
-            toast.error("Agrega al menos un email");
+            toast.error(t("minOneEmail"));
             return;
         }
 
@@ -83,14 +86,12 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
                     emails,
                     role_slug: role,
                 });
-                toast.success(`Se enviaron ${emails.length} invitaciones.`);
+                toast.success(t("inviteSuccess", { count: emails.length }));
                 onOpenChange(false);
                 setEmails([]);
-                // Reload logic typically handled by parent or query invalidation
-                window.location.reload(); // Simple reload for now
             } catch (error) {
                 console.error(error);
-                toast.error("Error al enviar invitaciones.");
+                toast.error(t("errorInviting"));
             }
         });
     };
@@ -99,58 +100,58 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Invitar miembros</DialogTitle>
+                    <DialogTitle>{t("inviteTitle")}</DialogTitle>
                     <DialogDescription>
-                        Envía invitaciones por correo a tus colegas para unirse a la organización.
+                        {t("inviteDescription")}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                        <Label>Emails</Label>
+                        <Label>{t("emails")}</Label>
                         <div className="flex flex-wrap gap-2 p-2 border rounded-md min-h-[42px]">
                             {emails.map((email) => (
-                                <div key={email} className="bg-zinc-100 flex items-center gap-1 px-2 py-1 rounded text-sm group">
+                                <div key={email} className="bg-zinc-100 dark:bg-zinc-800 flex items-center gap-1 px-2 py-1 rounded text-sm group">
                                     <span>{email}</span>
-                                    <button onClick={() => removeEmail(email)} className="text-zinc-400 hover:text-zinc-600">
+                                    <button onClick={() => removeEmail(email)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
                                         <X className="h-3 w-3" />
                                     </button>
                                 </div>
                             ))}
                             <input
                                 className="flex-1 outline-none text-sm min-w-[120px] bg-transparent"
-                                placeholder={emails.length === 0 ? "ejemplo@correo.com, otro@correo.com" : ""}
+                                placeholder={emails.length === 0 ? t("emailsPlaceholder") : ""}
                                 value={currentEmail}
                                 onChange={(e) => setCurrentEmail(e.target.value)}
                                 onKeyDown={handleAddEmail}
-                                onBlur={(e) => { 
-                                    if(currentEmail) handleAddEmail(e as any) 
+                                onBlur={(e) => {
+                                    if(currentEmail) handleAddEmail(e as any)
                                 }}
                             />
                         </div>
-                        <p className="text-xs text-zinc-500">Presiona Enter o Coma para agregar múltiples emails.</p>
+                        <p className="text-xs text-zinc-500">{t("emailsHint")}</p>
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Rol</Label>
+                        <Label>{t("role")}</Label>
                         <Select value={role} onValueChange={setRole}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Selecciona un rol" />
+                                <SelectValue placeholder={t("selectRole")} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="owner">Owner (Propietario)</SelectItem>
-                                <SelectItem value="admin">Admin (Administrador)</SelectItem>
-                                <SelectItem value="member">Member (Miembro)</SelectItem>
+                                <SelectItem value="owner">{t("roleOwner")}</SelectItem>
+                                <SelectItem value="admin">{t("roleAdmin")}</SelectItem>
+                                <SelectItem value="member">{t("roleMember")}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-                        Cancelar
+                        {tc("cancel")}
                     </Button>
                     <Button onClick={onSubmit} disabled={isPending || emails.length === 0}>
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Invitar
+                        {t("inviteButton")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

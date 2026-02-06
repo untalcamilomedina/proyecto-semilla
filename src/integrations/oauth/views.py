@@ -1,80 +1,109 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import redirect
+from __future__ import annotations
+
+import logging
+import secrets
+
+from asgiref.sync import async_to_sync
 from django.conf import settings
-from .adapters import get_provider
+from django.shortcuts import redirect
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from integrations.models import IntegrationConnection
+
+from .adapters import get_provider
+
+logger = logging.getLogger(__name__)
+
 
 class OAuthConnectView(APIView):
     """
     Initiates the OAuth Flow.
     GET /api/v1/integrations/{provider}/connect
     """
+
     def get(self, request, provider_name):
         try:
             adapter = get_provider(provider_name)
         except ValueError:
             return Response({"error": "Invalid provider"}, status=400)
-            
-        # State should ideally be random + saved in session/cache to prevent CSRF
-        # For MVP, we pass a simple state or user_id signature
-        state = f"user_{request.user.id}" 
-        
+
+        # Cryptographically secure state to prevent OAuth CSRF
+        state = secrets.token_urlsafe(32)
+        request.session[f"oauth_state_{provider_name}"] = state
+        request.session.save()
+
         auth_url = adapter.get_authorization_url(state=state)
-        
-        # Return the URL so the frontend can redirect (API-First style)
+
         return Response({"auth_url": auth_url})
+
 
 class OAuthCallbackView(APIView):
     """
     Handles the provider callback.
     GET /api/v1/integrations/{provider}/callback?code=...
     """
+
     def get(self, request, provider_name):
         code = request.query_params.get("code")
         error = request.query_params.get("error")
-        
+
         if error:
             return Response({"error": error}, status=400)
-        
+
         if not code:
-            return Response({"error": "No code provided"}, status=400)
-            
+            return Response({"error": "No authorization code provided."}, status=400)
+
+        # Validate OAuth state to prevent CSRF
+        received_state = request.query_params.get("state")
+        expected_state = request.session.pop(f"oauth_state_{provider_name}", None)
+
+        if not received_state or not expected_state or received_state != expected_state:
+            logger.warning(
+                "OAuth state mismatch for provider=%s user=%s",
+                provider_name,
+                request.user.id,
+            )
+            return Response(
+                {"error": "Invalid OAuth state. Please initiate the connection again."},
+                status=400,
+            )
+
         try:
             adapter = get_provider(provider_name)
-            
-            # Exchange code for tokens
-            # This is async in our adapter, but DRF Views are sync by default unless using adrf or async_to_sync
-            # We used 'async def' in adapters. Integration needs `asgiref`.
-            from asgiref.sync import async_to_sync
+
             token_data = async_to_sync(adapter.exchange_code)(code)
-            
+
             access_token = token_data.get("access_token")
             refresh_token = token_data.get("refresh_token")
-            expires_in = token_data.get("expires_in") # Optional handling
-            
-            # Save Encrypted
-            IntegrationConnection.objects.update_or_create(
+
+            if not access_token:
+                return Response(
+                    {"error": "No access token received from provider."},
+                    status=502,
+                )
+
+            conn, _ = IntegrationConnection.objects.update_or_create(
                 user=request.user,
                 provider=provider_name,
-                defaults={
-                    "access_token_enc": "", # Will be set by set_token
-                    # We need to set them via the helper method to encrypt
-                }
-            )
-            
-            # Re-fetch to use model methods for encryption (cleaner)
-            conn, _ = IntegrationConnection.objects.get_or_create(
-                user=request.user, 
-                provider=provider_name
+                defaults={"access_token_enc": "", "refresh_token_enc": ""},
             )
             conn.set_token(access_token, refresh_token)
             conn.save()
-            
-            # Redirect to Frontend Success Page
-            frontend_success = f"{settings.FRONTEND_URL}/integrations?status=success&provider={provider_name}"
+
+            frontend_success = (
+                f"{settings.FRONTEND_URL}/integrations"
+                f"?status=success&provider={provider_name}"
+            )
             return redirect(frontend_success)
-            
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+
+        except ValueError as e:
+            logger.exception("OAuth value error for provider=%s", provider_name)
+            return Response({"error": "Invalid provider configuration."}, status=400)
+        except Exception:
+            logger.exception("OAuth callback failed for provider=%s", provider_name)
+            return Response(
+                {"error": "Failed to complete OAuth connection. Please try again."},
+                status=500,
+            )

@@ -67,8 +67,10 @@ class NotionIntegrationViewSet(viewsets.ViewSet):
             # Sync wrapper around async service
             spec = async_to_sync(NotionService.scan_databases)(token)
             return Response(spec.model_dump())
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Integration operation failed")
+            return Response({"error": "An internal error occurred. Please try again."}, status=500)
 
     @action(detail=False, methods=["post"])
     def apply_erd(self, request):
@@ -83,8 +85,10 @@ class NotionIntegrationViewSet(viewsets.ViewSet):
             spec = ERDSpec(**spec_data)
             created_ids = async_to_sync(NotionService.apply_erd)(token, parent_page_id, spec)
             return Response({"created_databases": created_ids})
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Integration operation failed")
+            return Response({"error": "An internal error occurred. Please try again."}, status=500)
 
 from .miro.services import MiroService
 
@@ -107,8 +111,10 @@ class MiroIntegrationViewSet(viewsets.ViewSet):
             spec = ERDSpec(**spec_data)
             result = async_to_sync(MiroService.export_erd_to_board)(token, board_id, spec)
             return Response(result)
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Integration operation failed")
+            return Response({"error": "An internal error occurred. Please try again."}, status=500)
 
     @action(detail=False, methods=["post"])
     def import_erd(self, request):
@@ -122,8 +128,10 @@ class MiroIntegrationViewSet(viewsets.ViewSet):
             # Sync wrapper around async service
             spec = async_to_sync(MiroService.import_from_miro)(token, board_id)
             return Response(spec.model_dump())
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Integration operation failed")
+            return Response({"error": "An internal error occurred. Please try again."}, status=500)
 
 from .ai.services import AIService
 from .models import UserAPIKey

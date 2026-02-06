@@ -7,7 +7,7 @@ import * as z from "zod";
 import { GlassInput } from "@/components/ui/glass/GlassInput";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { useOnboardingStore } from "@/stores/onboarding";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/lib/navigation";
 import { Label } from "@/components/ui/label";
 
 const schema = z.object({

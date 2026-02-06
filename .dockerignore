@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+.mypy_cache
+.pytest_cache
+.ruff_cache
+htmlcov
+.coverage
+
+# Node
+node_modules
+frontend/node_modules
+frontend/.next
+
+# Environment
+.env
+.env.*
+local.env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+compose/
+Dockerfile
+
+# Docs & CI
+docs/
+.github/
+.pre-commit-config.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+celerybeat-schedule
+*.sqlite3
+media/
+
+# Agent skills
+.agent/

@@ -11,7 +11,11 @@ class DashboardViewSet(viewsets.ViewSet):
         Return real summary statistics for the dashboard.
         """
         tenant = getattr(request, "tenant", None)
-        # Stats Cache
+        if tenant is None:
+            return Response(
+                {"stats": {}, "recent_activity": [], "modules_status": {}},
+            )
+
         from django.core.cache import cache
         cache_key = f"dashboard_stats:{tenant.id}"
         stats = cache.get(cache_key)

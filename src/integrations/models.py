@@ -73,16 +73,21 @@ class Job(models.Model):
 
 # --- Security & OAuth Models (Phase 6 & 7) ---
 
+import os
+
 from cryptography.fernet import Fernet
-import base64
+from django.core.exceptions import ImproperlyConfigured
+
 
 def get_cipher_suite():
-    # Use Django Secret Key to derive a Fernet Key
-    # Fernet key must be 32 url-safe base64-encoded bytes
-    key = settings.SECRET_KEY[:32].encode()
-    # Pad if short (Django secret key might vary)
-    key = base64.urlsafe_b64encode(key.ljust(32, b'x'))
-    return Fernet(key)
+    """Use a dedicated encryption key, independent of SECRET_KEY."""
+    encryption_key = os.environ.get("FIELD_ENCRYPTION_KEY")
+    if not encryption_key:
+        raise ImproperlyConfigured(
+            "FIELD_ENCRYPTION_KEY must be set. "
+            "Generate one with: python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'"
+        )
+    return Fernet(encryption_key.encode())
 
 class EncryptedTextField(models.TextField):
     """

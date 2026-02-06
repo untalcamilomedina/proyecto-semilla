@@ -73,16 +73,20 @@ class TenantViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets
     serializer_class = TenantSerializer
 
     def get_object(self):
-        return self.request.tenant
+        tenant = getattr(self.request, "tenant", None)
+        if tenant is None:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("No tenant context available.")
+        return tenant
 
     def retrieve(self, request, *args, **kwargs):
         """Get current tenant details."""
         return super().retrieve(request, *args, **kwargs)
 
-    def partial_update(self, request, *args, **kwargs):
-        """Update current tenant settings."""
-        self.permission_codename = "core.manage_organization" # Requiere permiso para editar
-        return super().partial_update(request, *args, **kwargs)
+    def get_permissions(self):
+        if self.action in ("update", "partial_update"):
+            self.permission_codename = "core.manage_organization"
+        return super().get_permissions()
 
 
 class PermissionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

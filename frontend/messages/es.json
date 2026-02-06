@@ -25,7 +25,8 @@
             "searchPlaceholder": "Buscar...",
             "noResults": "No se encontraron resultados.",
             "paginationInfo": "Página {current} de {total}"
-        }
+        },
+        "user": "Usuario"
     },
     "auth": {
         "login": "Iniciar sesión",
@@ -110,15 +111,24 @@
         "description": "Gestiona los miembros de tu organización",
         "count": "{count} miembros",
         "invite": "Invitar",
-        "inviteButton": "Invitar Miembros",
         "inviteTitle": "Invitar miembros",
-        "inviteDescription": "Ingresa los emails de las personas a invitar (uno por línea)",
+        "inviteDescription": "Envía invitaciones por correo a tus colegas para unirse a la organización.",
         "emails": "Emails",
-        "emailsPlaceholder": "email1@example.com\nemail2@example.com",
+        "emailsPlaceholder": "ejemplo@correo.com, otro@correo.com",
+        "emailsHint": "Presiona Enter o Coma para agregar múltiples emails.",
         "role": "Rol",
+        "roleOwner": "Propietario",
+        "roleAdmin": "Administrador",
+        "roleMember": "Miembro",
+        "selectRole": "Selecciona un rol",
         "sendInvitations": "Enviar invitaciones",
+        "inviteButton": "Invitar",
         "noMembers": "No hay miembros todavía",
-        "errorInviting": "Error al invitar",
+        "errorInviting": "Error al enviar invitaciones",
+        "invalidEmail": "Formato de email inválido",
+        "duplicateEmail": "Email ya agregado",
+        "minOneEmail": "Agrega al menos un email",
+        "inviteSuccess": "Se enviaron {count} invitaciones.",
         "since": "Desde"
     },
     "roles": {
@@ -148,21 +158,27 @@
         "currentSubscription": "Suscripción actual",
         "noSubscription": "Sin suscripción activa",
         "plan": "Plan",
+        "planLabel": "PLAN {plan}",
         "nextInvoice": "Próxima factura",
         "users": "Usuarios",
         "cancelSubscription": "Cancelar suscripción",
         "willCancelAtEnd": "Se cancelará al final del período",
-        "availablePlans": "Planes disponibles",
+        "availablePlans": "Planes Disponibles",
         "noPlans": "No hay planes disponibles.",
         "current": "Actual",
-        "currentPlan": "Plan actual",
+        "currentPlan": "Plan Actual",
         "changePlan": "Cambiar plan",
         "select": "Seleccionar",
+        "upgrade": "Mejorar",
         "upToUsers": "Hasta {count} usuarios",
         "trialDays": "{count} días de prueba",
         "free": "Gratis",
+        "pro": "Pro",
+        "enterprise": "Empresarial",
+        "custom": "Personalizado",
         "perMonth": "/mes",
         "perYear": "/año",
+        "popular": "POPULAR",
         "confirmCancel": "¿Cancelar suscripción?",
         "cancelDescription": "Tu suscripción permanecerá activa hasta el final del período actual. No se realizarán más cobros.",
         "keepSubscription": "Mantener suscripción",
@@ -174,6 +190,24 @@
         "invoiceHistory": "Historial de facturas",
         "noInvoices": "No hay facturas todavía",
         "paid": "Pagada",
+        "diagramsUsed": "Diagramas Usados",
+        "aiRequests": "Solicitudes de IA",
+        "needMorePower": "¿Necesitas más potencia?",
+        "upgradeDescription": "Mejora a Pro para desbloquear diagramas ilimitados y funciones avanzadas de IA.",
+        "upgradeNow": "Mejorar Ahora",
+        "contactSales": "Contactar Ventas",
+        "loadingBilling": "Cargando facturación...",
+        "failedToLoad": "Error al cargar la suscripción.",
+        "features": {
+            "diagrams5": "5 Diagramas",
+            "basicAI": "IA Básica",
+            "unlimitedDiagrams": "Diagramas Ilimitados",
+            "advancedAI": "IA Avanzada (Gemini Pro)",
+            "prioritySupport": "Soporte Prioritario",
+            "sso": "SSO y Logs de Auditoría",
+            "customModels": "Modelos de IA Personalizados",
+            "sla": "Garantía SLA"
+        },
         "status": {
             "active": "Activa",
             "trialing": "Prueba",
@@ -237,7 +271,8 @@
             "customDomainPlaceholder": "app.tudominio.com",
             "dnsConfig": "Configuración DNS",
             "dnsDescription": "Si configuras un dominio personalizado, deberás agregar un registro CNAME apuntando a",
-            "leaveEmpty": "Puedes dejar esto vacío y usar el subdominio asignado"
+            "leaveEmpty": "Puedes dejar esto vacío y usar el subdominio asignado",
+            "skipForNow": "Saltar"
         },
         "step5": {
             "title": "Invita a tu equipo",
@@ -246,7 +281,9 @@
             "emailsPlaceholder": "email1@ejemplo.com\nemail2@ejemplo.com\nemail3@ejemplo.com",
             "emailsHint": "Un email por línea o separados por comas",
             "invitationNotice": "Se enviará un email de invitación a cada dirección",
-            "sending": "Enviando..."
+            "sending": "Enviando...",
+            "sendInvitations": "Enviar invitaciones",
+            "skipForNow": "Saltar"
         },
         "step6": {
             "title": "¡Todo listo!",
@@ -283,24 +320,29 @@
     },
     "settings": {
         "title": "Configuración",
-        "description": "Gestiona las preferencias de tu organización",
+        "description": "Gestiona las preferencias de tu cuenta y seguridad.",
         "profile": "Perfil",
         "organization": "Organización",
-        "saveChanges": "Guardar cambios",
+        "saveChanges": "Guardar Cambios",
         "language": "Idioma",
         "theme": "Tema",
         "notifications": "Notificaciones",
         "security": "Seguridad",
-        "changePassword": "Cambiar contraseña",
+        "changePassword": "Cambiar Contraseña",
+        "updatePassword": "Actualizar Contraseña",
         "currentPassword": "Contraseña actual",
         "newPassword": "Nueva contraseña",
         "confirmNewPassword": "Confirmar nueva contraseña",
         "profileUpdated": "Perfil actualizado correctamente",
         "passwordChanged": "Contraseña cambiada correctamente",
         "orgUpdated": "Organización actualizada correctamente",
-        "personalInfo": "Información Personal",
+        "personalInfo": "Información del Perfil",
         "firstName": "Nombre",
-        "lastName": "Apellido"
+        "lastName": "Apellido",
+        "email": "Email",
+        "fullName": "Nombre Completo",
+        "emailCannotChange": "El email no se puede cambiar.",
+        "notificationsComingSoon": "Configuración de notificaciones próximamente."
     },
     "audit": {
         "title": "Logs de Auditoría",
@@ -314,16 +356,83 @@
     },
     "keys": {
         "title": "Llaves de API",
-        "description": "Gestiona llaves para integraciones externas.",
+        "description": "Gestiona llaves de API externas (Gemini, OpenAI) para funciones de IA.",
         "createButton": "Nueva Llave",
+        "addKey": "Agregar Llave",
+        "addTitle": "Agregar Nueva Llave de API",
+        "addDescription": "Tu llave se cifrará en reposo. Nunca mostramos la llave completa nuevamente.",
         "revoked": "Revocada",
         "active": "Activa",
         "prefix": "Prefijo",
         "lastUsed": "Último uso",
         "keyWarning": "Guarda esta llave en un lugar seguro. No se volverá a mostrar.",
-        "namePlaceholder": "Nombre de la llave",
+        "name": "Nombre",
+        "namePlaceholder": "Mi Llave Gemini",
+        "service": "Servicio",
+        "apiKey": "Llave de API",
+        "apiKeyPlaceholder": "sk-...",
+        "saveKey": "Guardar Llave",
+        "noKeys": "No se encontraron Llaves de API",
+        "noKeysDescription": "Agrega una llave de API para habilitar funciones de generación con IA. Soportamos Gemini, OpenAI y Claude.",
+        "startsWith": "Empieza con {prefix}...",
+        "confirmDelete": "¿Estás seguro? Esta acción no se puede deshacer.",
+        "loadingKeys": "Cargando llaves...",
         "created": "Llave creada",
         "revocationSuccess": "Llave revocada",
         "copy": "Copiar"
+    },
+    "landing": {
+        "beta": "v1.0 Beta Pública",
+        "title": "Conecta Notion con tus herramientas.",
+        "subtitle": "Sin barreras.",
+        "description": "Lleva tus bases de datos de Notion a Miro para visualizar flujos, auditar permisos y automatizar la creación de espacios de trabajo. Todo sincronizado.",
+        "startFree": "Empezar Gratis",
+        "features": {
+            "notionToMiro": {
+                "title": "Notion a Miro",
+                "desc": "Convierte bases de datos complejas de Notion en diagramas visuales en Miro. Entiende las relaciones y dependencias de tu equipo al instante."
+            },
+            "roleAudit": {
+                "title": "Auditoría de Roles",
+                "desc": "¿Quién tiene acceso a qué? Visualiza y gestiona permisos de Notion desde un panel centralizado y seguro."
+            },
+            "miroToNotion": {
+                "title": "Miro a Notion",
+                "desc": "Diseña tu flujo de trabajo ideal en Miro y généralo automáticamente en Notion como páginas y bases de datos listas para usar."
+            }
+        },
+        "footer": {
+            "rights": "© 2024 BlockFlow Platform",
+            "privacy": "Privacidad",
+            "terms": "Términos",
+            "twitter": "Twitter"
+        }
+    },
+    "integrations": {
+        "title": "Centro de Integraciones",
+        "description": "Conecta tus herramientas favoritas para importar/exportar diagramas de forma autónoma.",
+        "connected": "Conectado",
+        "notConnected": "No Conectado",
+        "manageConnection": "Gestionar Conexión",
+        "notion": {
+            "title": "Notion",
+            "subtitle": "Escanear Workspaces y Sincronizar DBs",
+            "description": "Importa tus páginas de Notion como diagramas de flujo o exporta tus diagramas ER directamente a bases de datos de Notion. Soporta escaneo recursivo de páginas.",
+            "connect": "Conectar Notion"
+        },
+        "miro": {
+            "title": "Miro",
+            "subtitle": "Colaboración Visual",
+            "description": "Sincronización bidireccional con tableros de Miro. Convierte notas adhesivas en esquemas de base de datos y visualiza tu arquitectura.",
+            "connect": "Conectar Miro"
+        }
+    },
+    "tools": {
+        "notionER": {
+            "title": "Diagrama ER de Notion",
+            "description": "Visualiza sus bases de datos de Notion como diagramas Entidad-Relación.",
+            "selectDb": "Seleccione una Base de Datos",
+            "scanDemo": "Escanear Demo Database"
+        }
     }
 }
