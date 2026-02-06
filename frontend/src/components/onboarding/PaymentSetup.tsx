@@ -13,15 +13,14 @@ export default function PaymentSetup() {
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, Stripe Elements would handle this
     nextStep();
     router.push("/onboarding/review");
   };
 
   return (
     <form onSubmit={handleContinue} className="space-y-6 animate-in slide-in-from-right-8 duration-500">
-      <div className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-4">
-        <div className="flex items-center justify-between text-white/70 text-sm mb-2">
+      <div className="bg-glass-bg p-4 rounded-xl border border-glass-border space-y-4">
+        <div className="flex items-center justify-between text-text-subtle text-sm mb-2">
           <div className="flex items-center gap-2">
             <CreditCard className="w-4 h-4" />
             Credit Card
@@ -32,7 +31,7 @@ export default function PaymentSetup() {
         </div>
 
         <GlassInput placeholder="Card number" className="font-mono" />
-        
+
         <div className="grid grid-cols-2 gap-4">
           <GlassInput placeholder="MM / YY" className="font-mono text-center" />
           <GlassInput placeholder="CVC" className="font-mono text-center" />
@@ -41,7 +40,7 @@ export default function PaymentSetup() {
         <GlassInput placeholder="Cardholder name" />
       </div>
 
-      <div className="text-center text-xs text-white/40">
+      <div className="text-center text-xs text-text-tertiary">
         This is a demo payment form. No actual charge will be made.
       </div>
 

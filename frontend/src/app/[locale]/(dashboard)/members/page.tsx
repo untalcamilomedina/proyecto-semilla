@@ -25,8 +25,8 @@ export default function MembersPage() {
                         <Users className="h-6 w-6 text-blue-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white/90">{t("title")}</h1>
-                        <p className="text-sm text-white/40">
+                        <h1 className="text-2xl font-bold text-text-highlight">{t("title")}</h1>
+                        <p className="text-sm text-text-tertiary">
                             {t("description")}
                         </p>
                     </div>
@@ -34,7 +34,7 @@ export default function MembersPage() {
                 
                 <GlassButton 
                     onClick={() => setIsInviteOpen(true)}
-                    className="h-11 px-6 shadow-[0_0_20px_rgba(13,242,13,0.1)] active:shadow-none"
+                    className="h-11 px-6 shadow-neon active:shadow-none"
                 >
                     <Plus className="mr-2 h-4 w-4" />
                     {t("inviteButton")}

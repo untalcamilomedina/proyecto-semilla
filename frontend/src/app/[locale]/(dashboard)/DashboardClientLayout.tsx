@@ -7,8 +7,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 
 /**
  * DashboardClientLayout
- * Main wrapper for the authenticated area. 
- * Implements the "Elite" vibe with deep shadows and neon accents.
+ * Main wrapper for the authenticated area.
+ * Uses semantic tokens for full light/dark theme support.
  */
 export default function DashboardClientLayout({
     children,
@@ -30,7 +30,7 @@ export default function DashboardClientLayout({
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+            <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon" />
             </div>
         );
@@ -41,10 +41,10 @@ export default function DashboardClientLayout({
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white relative overflow-hidden">
-            {/* Ambient Background Glows */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-neon/5 rounded-full blur-[120px] opacity-40" />
+        <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+            {/* Ambient Background Glows (dark mode only) */}
+            <div className="fixed inset-0 pointer-events-none hidden dark:block">
+                <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-neon-bg rounded-full blur-[120px] opacity-40" />
                 <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] opacity-40" />
             </div>
 

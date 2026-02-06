@@ -40,14 +40,14 @@ export function MembersTable() {
 
     if (isLoading) {
         return (
-            <GlassCard className="flex items-center justify-center h-64 border-white/5">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon" />
+            <GlassCard className="flex items-center justify-center h-64 border-glass-border-subtle">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-text" />
             </GlassCard>
         );
     }
 
     return (
-        <GlassCard className="p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+        <GlassCard className="p-0 overflow-hidden border-glass-border-subtle bg-glass-bg">
             <div className="p-4 md:p-6">
                 <DataTable columns={columns} data={data} />
             </div>

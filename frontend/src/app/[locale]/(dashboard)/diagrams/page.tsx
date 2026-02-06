@@ -85,10 +85,10 @@ export default function DiagramsPage() {
         <div className="space-y-8 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white glow-text">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">
                         {t("title")}
                     </h2>
-                    <p className="text-white/60">
+                    <p className="text-text-subtle">
                         {t("description")}
                     </p>
                 </div>

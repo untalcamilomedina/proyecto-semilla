@@ -25,8 +25,7 @@ import { LanguageSwitcher } from "@/components/ui/language-switcher";
 /**
  * Sidebar
  * Premium navigation bar with glassmorphism and backdrop blur.
- * 
- * @vibe Elite - Integrated with i18n and neon themes.
+ * Uses semantic tokens for full light/dark theme support.
  */
 export function Sidebar() {
     const t = useTranslations("nav");
@@ -52,20 +51,20 @@ export function Sidebar() {
             <button
                 type="button"
                 aria-label="Toggle menu"
-                className="fixed top-5 left-5 z-50 lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md"
+                className="fixed top-5 left-5 z-50 lg:hidden p-2 rounded-xl bg-glass-bg border border-glass-border backdrop-blur-md"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {isOpen ? (
-                    <X className="h-5 w-5 text-white" />
+                    <X className="h-5 w-5 text-foreground" />
                 ) : (
-                    <Menu className="h-5 w-5 text-white" />
+                    <Menu className="h-5 w-5 text-foreground" />
                 )}
             </button>
 
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
+                    className="fixed inset-0 z-40 bg-glass-overlay-strong backdrop-blur-sm lg:hidden animate-in fade-in duration-300"
                     onClick={() => setIsOpen(false)}
                 />
             )}
@@ -73,21 +72,21 @@ export function Sidebar() {
             {/* Sidebar */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-64 transform transition-all duration-500 ease-in-out border-r border-white/5",
-                    "bg-black/20 backdrop-blur-2xl lg:translate-x-0",
+                    "fixed inset-y-0 left-0 z-40 w-64 transform transition-all duration-500 ease-in-out border-r border-glass-border-subtle",
+                    "bg-sidebar backdrop-blur-2xl lg:translate-x-0",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <div className="flex h-full flex-col">
 
                     {/* Logo Section */}
-                    <div className="flex h-20 shrink-0 items-center gap-3 px-6 border-b border-white/5 relative overflow-hidden">
-                        {/* Soft Glow behind logo */}
-                        <div className="absolute -top-10 -left-10 w-32 h-32 bg-neon/10 rounded-full blur-3xl" />
-                        
+                    <div className="flex h-20 shrink-0 items-center gap-3 px-6 border-b border-glass-border-subtle relative overflow-hidden">
+                        {/* Soft Glow behind logo (dark only) */}
+                        <div className="absolute -top-10 -left-10 w-32 h-32 bg-neon-bg rounded-full blur-3xl hidden dark:block" />
+
                         <BlockFlowLogo className="h-8 w-8 text-neon z-10" />
-                        
-                        <span className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent truncate z-10">
+
+                        <span className="text-xl font-bold text-gradient-heading-r truncate z-10">
                             BlockFlow
                         </span>
                     </div>
@@ -104,14 +103,14 @@ export function Sidebar() {
                                     className={cn(
                                         "group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300",
                                         isActive
-                                            ? "bg-neon/10 text-neon border border-neon/20 shadow-[0_0_15px_rgba(13,242,13,0.05)]"
-                                            : "text-white/50 hover:bg-white/5 hover:text-white border border-transparent"
+                                            ? "bg-neon-bg text-neon-text border border-neon-border shadow-neon"
+                                            : "text-text-secondary hover:bg-glass-bg hover:text-foreground border border-transparent"
                                     )}
                                 >
                                     <item.icon
                                         className={cn(
                                             "h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110",
-                                            isActive ? "text-neon" : "text-white/30 group-hover:text-white/60"
+                                            isActive ? "text-neon-text" : "text-text-quaternary group-hover:text-text-subtle"
                                         )}
                                     />
                                     {item.name}
@@ -121,19 +120,19 @@ export function Sidebar() {
                     </nav>
 
                     {/* User Profile Section */}
-                    <div className="border-t border-white/5 p-4 bg-white/[0.02] space-y-4">
+                    <div className="border-t border-glass-border-subtle p-4 bg-glass-bg space-y-4">
                         <div className="flex items-center gap-3 px-2">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon/20 to-blue-500/20 border border-white/10 flex items-center justify-center relative overflow-hidden">
-                                <span className="text-sm font-bold text-neon relative z-10">
+                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-neon-bg-strong to-blue-500/20 border border-glass-border flex items-center justify-center relative overflow-hidden">
+                                <span className="text-sm font-bold text-neon-text relative z-10">
                                     {(user?.first_name || user?.username || "U").charAt(0).toUpperCase()}
                                 </span>
-                                <div className="absolute inset-0 bg-neon/5 animate-pulse" />
+                                <div className="absolute inset-0 bg-neon-bg animate-pulse" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-white/90 truncate">
+                                <p className="text-sm font-semibold text-text-highlight truncate">
                                     {user?.first_name || user?.username || tc("user")}
                                 </p>
-                                <p className="text-[10px] text-white/40 truncate tracking-tight">{user?.email}</p>
+                                <p className="text-[10px] text-text-tertiary truncate tracking-tight">{user?.email}</p>
                             </div>
                         </div>
 
@@ -141,10 +140,10 @@ export function Sidebar() {
                             <ThemeToggle />
                             <LanguageSwitcher />
                         </div>
-                        
+
                         <GlassButton
                             variant="secondary"
-                            className="w-full justify-start py-2.5 text-xs border-transparent hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400 group"
+                            className="w-full justify-start py-2.5 text-xs border-transparent hover:border-error-border hover:bg-error-bg hover:text-error-text group"
                             onClick={logout}
                         >
                             <LogOut className="mr-2 h-3.5 w-3.5 opacity-50 group-hover:opacity-100 transition-opacity" />

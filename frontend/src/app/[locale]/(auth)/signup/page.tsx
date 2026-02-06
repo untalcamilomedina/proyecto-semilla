@@ -73,7 +73,7 @@ export default function SignupPage() {
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {error && (
-                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <div className="rounded-xl bg-error-bg border border-error-border p-4 text-sm text-error-text animate-in fade-in slide-in-from-top-1 duration-300">
                         {error}
                     </div>
                 )}
@@ -113,9 +113,9 @@ export default function SignupPage() {
                         {isLoading ? "..." : t("createAccount")}
                     </GlassButton>
 
-                    <p className="text-sm text-white/40 text-center">
+                    <p className="text-sm text-text-tertiary text-center">
                         {t("haveAccount")}{" "}
-                        <Link href="/login" className="text-neon hover:text-neon/80 font-medium transition-colors">
+                        <Link href="/login" className="text-neon-text hover:text-neon-text font-medium transition-colors">
                             {t("login")}
                         </Link>
                     </p>

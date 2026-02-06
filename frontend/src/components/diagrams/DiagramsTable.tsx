@@ -43,7 +43,7 @@ export function DiagramsTable({ data, isLoading, onDelete }: DiagramsTableProps)
     );
 
     if (isLoading) {
-        return <div className="p-8 text-center text-white/50">{t("loading")}</div>;
+        return <div className="p-8 text-center text-text-secondary">{t("loading")}</div>;
     }
 
     return (
@@ -64,53 +64,53 @@ export function DiagramsTable({ data, isLoading, onDelete }: DiagramsTableProps)
                 </Link>
             </div>
 
-            <div className="rounded-md border border-white/10 bg-white/5 backdrop-blur-sm">
+            <div className="rounded-md border border-glass-border bg-glass-bg backdrop-blur-sm">
                 <Table>
                     <TableHeader>
-                        <TableRow className="border-white/10 hover:bg-white/5">
-                            <TableHead className="text-white/70">{tList("name")}</TableHead>
-                            <TableHead className="text-white/70">{tList("entities")}</TableHead>
-                            <TableHead className="text-white/70">{tList("lastModified")}</TableHead>
-                            <TableHead className="text-right text-white/70">{tList("actions")}</TableHead>
+                        <TableRow className="border-glass-border hover:bg-glass-bg">
+                            <TableHead className="text-text-subtle">{tList("name")}</TableHead>
+                            <TableHead className="text-text-subtle">{tList("entities")}</TableHead>
+                            <TableHead className="text-text-subtle">{tList("lastModified")}</TableHead>
+                            <TableHead className="text-right text-text-subtle">{tList("actions")}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredData.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center text-white/50">
+                                <TableCell colSpan={4} className="h-24 text-center text-text-secondary">
                                     {t("table.noResults")}
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredData.map((diagram) => (
-                                <TableRow key={diagram.id} className="border-white/10 hover:bg-white/5">
-                                    <TableCell className="font-medium text-white">{diagram.title}</TableCell>
-                                    <TableCell className="text-white/70">{diagram.entities_count || 0}</TableCell>
-                                    <TableCell className="text-white/70">{new Date(diagram.updated_at).toLocaleDateString()}</TableCell>
+                                <TableRow key={diagram.id} className="border-glass-border hover:bg-glass-bg">
+                                    <TableCell className="font-medium text-foreground">{diagram.title}</TableCell>
+                                    <TableCell className="text-text-subtle">{diagram.entities_count || 0}</TableCell>
+                                    <TableCell className="text-text-subtle">{new Date(diagram.updated_at).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="h-8 w-8 p-0 text-white/70 hover:text-white">
+                                                <button className="h-8 w-8 p-0 text-text-subtle hover:text-foreground">
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="bg-glass-panel border-white/10 text-white backdrop-blur-xl">
+                                            <DropdownMenuContent align="end" className="bg-glass-panel border-glass-border text-foreground backdrop-blur-xl">
                                                 <DropdownMenuLabel>{t("actions")}</DropdownMenuLabel>
                                                 <DropdownMenuItem 
                                                     onClick={() => router.push(`/diagrams/${diagram.id}`)}
-                                                    className="cursor-pointer hover:bg-white/5"
+                                                    className="cursor-pointer hover:bg-glass-bg"
                                                 >
                                                     <Eye className="mr-2 h-4 w-4" />
                                                     View
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+                                                <DropdownMenuItem className="cursor-pointer hover:bg-glass-bg">
                                                     <FileEdit className="mr-2 h-4 w-4" />
                                                     {t("edit")}
                                                 </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="bg-white/10" />
+                                                <DropdownMenuSeparator className="bg-glass-bg-hover" />
                                                 <DropdownMenuItem 
                                                     onClick={() => onDelete(diagram.id)}
-                                                    className="cursor-pointer text-red-400 hover:bg-red-500/10 focus:text-red-400"
+                                                    className="cursor-pointer text-error-text hover:bg-error-bg focus:text-error-text"
                                                 >
                                                     <Trash className="mr-2 h-4 w-4" />
                                                     {t("delete")}

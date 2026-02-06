@@ -3,18 +3,8 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/**
- * GlassModal Root
- * Wraps the dialog content and manages state.
- */
 const GlassModal = DialogPrimitive.Root;
-
-/**
- * GlassModal Trigger
- * The element that opens the modal.
- */
 const GlassModalTrigger = DialogPrimitive.Trigger;
-
 const GlassModalPortal = DialogPrimitive.Portal;
 
 const GlassModalOverlay = React.forwardRef<
@@ -24,7 +14,7 @@ const GlassModalOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-glass-overlay backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -32,10 +22,6 @@ const GlassModalOverlay = React.forwardRef<
 ));
 GlassModalOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-/**
- * GlassModal Content
- * The modal container with glassmorphism styling and animations.
- */
 const GlassModalContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -46,7 +32,7 @@ const GlassModalContent = React.forwardRef<
       ref={ref}
       className={cn(
         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4",
-        "bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-glass p-6 duration-200",
+        "bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-neon p-6 duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
@@ -54,7 +40,7 @@ const GlassModalContent = React.forwardRef<
     >
       {children}
       <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X className="h-4 w-4 text-white" />
+        <X className="h-4 w-4 text-foreground" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
@@ -68,7 +54,7 @@ const GlassModalHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left text-white",
+      "flex flex-col space-y-1.5 text-center sm:text-left text-foreground",
       className
     )}
     {...props}
@@ -83,7 +69,7 @@ const GlassModalTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight text-white",
+      "text-lg font-semibold leading-none tracking-tight text-foreground",
       className
     )}
     {...props}

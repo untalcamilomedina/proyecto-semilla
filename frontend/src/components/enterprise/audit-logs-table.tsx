@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { enterpriseService } from "@/services/enterprise";
 import { ActivityLog } from "@/types";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
-import { DataTable } from "@/components/members/data-table"; // Reuse the generic DataTable if possible
+import { DataTable } from "@/components/members/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -42,13 +42,13 @@ export function AuditLogsTable() {
 
                 return (
                     <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 border border-white/10">
+                        <Avatar className="h-8 w-8 border border-glass-border">
                             <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${email}`} />
-                            <AvatarFallback className="bg-neon/10 text-neon text-[10px]">{initial}</AvatarFallback>
+                            <AvatarFallback className="bg-neon-bg text-neon-text text-[10px]">{initial}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <span className="text-xs font-semibold text-white/90">{email.split("@")[0]}</span>
-                            <span className="text-[9px] text-white/30 font-mono">{email}</span>
+                            <span className="text-xs font-semibold text-text-highlight">{email.split("@")[0]}</span>
+                            <span className="text-[9px] text-text-quaternary font-mono">{email}</span>
                         </div>
                     </div>
                 );
@@ -60,7 +60,7 @@ export function AuditLogsTable() {
             cell: ({ row }) => {
                 const action = row.original.action;
                 return (
-                    <Badge className="bg-white/5 text-white/60 border-white/10 text-[10px] uppercase tracking-wider font-bold">
+                    <Badge className="bg-glass-bg text-text-subtle border-glass-border text-[10px] uppercase tracking-wider font-bold">
                         {action}
                     </Badge>
                 );
@@ -79,7 +79,7 @@ export function AuditLogsTable() {
             cell: ({ row }) => {
                 const date = new Date(row.original.created_at);
                 return (
-                    <div className="flex items-center gap-2 text-white/40 font-mono text-[10px]">
+                    <div className="flex items-center gap-2 text-text-tertiary font-mono text-[10px]">
                         <Clock className="h-3 w-3" />
                         {date.toLocaleString()}
                     </div>
@@ -90,14 +90,14 @@ export function AuditLogsTable() {
 
     if (isLoading) {
         return (
-            <GlassCard className="flex items-center justify-center h-64 border-white/5">
+            <GlassCard className="flex items-center justify-center h-64 border-glass-border-subtle">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon" />
             </GlassCard>
         );
     }
 
     return (
-        <GlassCard className="p-0 overflow-hidden border-white/5 bg-white/[0.02]">
+        <GlassCard className="p-0 overflow-hidden border-glass-border-subtle bg-glass-bg">
             <div className="p-4 md:p-6">
                 <DataTable columns={columns} data={data} />
             </div>

@@ -158,8 +158,8 @@ export default function RolesPage() {
                         <Shield className="h-6 w-6 text-indigo-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white/90">{t("title")}</h1>
-                        <p className="text-sm text-white/40">
+                        <h1 className="text-2xl font-bold text-text-highlight">{t("title")}</h1>
+                        <p className="text-sm text-text-tertiary">
                             {t("description")}
                         </p>
                     </div>
@@ -187,12 +187,12 @@ export default function RolesPage() {
                     }
                 }}
             >
-                <DialogContent className="bg-zinc-900/90 border-white/10 backdrop-blur-xl text-white">
+                <DialogContent className="bg-surface-raised border-glass-border backdrop-blur-xl text-foreground">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold">
                             {editingRole ? t("editRole") : t("createRole")}
                         </DialogTitle>
-                        <DialogDescription className="text-white/50">
+                        <DialogDescription className="text-text-secondary">
                             {editingRole
                                 ? t("editDescription")
                                 : t("createDescription")}
@@ -201,7 +201,7 @@ export default function RolesPage() {
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-4">
                         {error && (
-                            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-3 text-sm text-red-400">
+                            <div className="rounded-xl bg-error-bg border border-error-border p-4 flex items-center gap-3 text-sm text-error-text">
                                 <AlertCircle className="h-4 w-4 shrink-0" />
                                 {error}
                             </div>
@@ -215,15 +215,15 @@ export default function RolesPage() {
                         />
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-white/50 ml-1">
+                            <label className="text-xs font-medium text-text-secondary ml-1">
                                 {t("roleDescription")}
                             </label>
                             <textarea
                                 {...register("description")}
                                 rows={3}
                                 className={cn(
-                                    "flex w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-white/20 transition-all duration-300",
-                                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon/50 shadow-sm"
+                                    "flex w-full rounded-xl border border-glass-border bg-glass-bg px-4 py-2 text-sm text-foreground placeholder:text-text-secondary transition-all duration-300",
+                                    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon-border shadow-sm"
                                 )}
                                 placeholder={t("descriptionPlaceholder")}
                             />
@@ -231,14 +231,14 @@ export default function RolesPage() {
 
                         {permissions && permissions.results.length > 0 && (
                             <div className="space-y-3">
-                                <label className="text-xs font-medium text-white/50 ml-1">
+                                <label className="text-xs font-medium text-text-secondary ml-1">
                                     {t("permissions")} ({selectedPermissions.length} {tc("confirm")})
                                 </label>
-                                <div className="max-h-48 overflow-y-auto border border-white/5 bg-white/[0.02] rounded-xl p-2 space-y-1 custom-scrollbar">
+                                <div className="max-h-48 overflow-y-auto border border-glass-border-subtle bg-glass-bg rounded-xl p-2 space-y-1 custom-scrollbar">
                                     {permissions.results.map((perm) => (
                                         <label
                                             key={perm.id}
-                                            className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                                            className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-glass-bg cursor-pointer transition-colors"
                                         >
                                             <input
                                                 type="checkbox"
@@ -255,9 +255,9 @@ export default function RolesPage() {
                                                         );
                                                     }
                                                 }}
-                                                className="rounded border-white/10 bg-white/5 text-neon focus:ring-neon accent-neon"
+                                                className="rounded border-glass-border bg-glass-bg text-neon-text focus:ring-neon accent-neon"
                                             />
-                                            <span className="text-sm text-white/70">{perm.name}</span>
+                                            <span className="text-sm text-text-subtle">{perm.name}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -288,17 +288,17 @@ export default function RolesPage() {
             {isLoading ? (
                 <div className="flex justify-center py-20">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-neon/20 blur-xl rounded-full" />
-                        <Loader2 className="h-10 w-10 animate-spin text-neon relative z-10" />
+                        <div className="absolute inset-0 bg-neon-bg-strong blur-xl rounded-full" />
+                        <Loader2 className="h-10 w-10 animate-spin text-neon-text relative z-10" />
                     </div>
                 </div>
             ) : roles?.results.length === 0 ? (
-                <GlassCard className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-dashed border-white/10">
-                    <div className="p-6 rounded-full bg-white/5">
-                        <Shield className="h-12 w-12 text-white/10" />
+                <GlassCard className="py-20 flex flex-col items-center justify-center text-center space-y-4 border-dashed border-glass-border">
+                    <div className="p-6 rounded-full bg-glass-bg">
+                        <Shield className="h-12 w-12 text-text-ghost" />
                     </div>
                     <div>
-                        <p className="text-white/40 font-medium">
+                        <p className="text-text-tertiary font-medium">
                             {t("noRoles")}
                         </p>
                     </div>
@@ -311,7 +311,7 @@ export default function RolesPage() {
                     {roles?.results.map((role) => (
                         <GlassCard 
                             key={role.id} 
-                            className="group hover:border-indigo-500/30 transition-all duration-500 bg-white/[0.01] hover:bg-white/[0.03]"
+                            className="group hover:border-indigo-500/30 transition-all duration-500 bg-glass-bg hover:bg-glass-bg"
                         >
                             <div className="p-6 space-y-4">
                                 <div className="flex items-start justify-between">
@@ -319,20 +319,20 @@ export default function RolesPage() {
                                         <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                                             <Shield className="h-5 w-5 text-indigo-400" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-white/90 group-hover:text-white transition-colors">
+                                        <h3 className="text-lg font-bold text-text-highlight group-hover:text-foreground transition-colors">
                                             {role.name}
                                         </h3>
                                     </div>
                                     {!role.is_system && (
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <button
-                                                className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all transform hover:scale-110"
+                                                className="p-2 rounded-lg hover:bg-glass-bg-hover text-text-tertiary hover:text-foreground transition-all transform hover:scale-110"
                                                 onClick={() => openEdit(role)}
                                             >
                                                 <Edit2 className="h-4 w-4" />
                                             </button>
                                             <button
-                                                className="p-2 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all transform hover:scale-110"
+                                                className="p-2 rounded-lg hover:bg-error-bg text-text-tertiary hover:text-error-text transition-all transform hover:scale-110"
                                                 onClick={() => deleteMutation.mutate(role.id)}
                                                 disabled={deleteMutation.isPending}
                                             >
@@ -342,22 +342,22 @@ export default function RolesPage() {
                                     )}
                                 </div>
                                 <div className="space-y-4">
-                                    <p className="text-sm text-white/40 line-clamp-2 leading-relaxed h-10">
+                                    <p className="text-sm text-text-tertiary line-clamp-2 leading-relaxed h-10">
                                         {role.description || t("noDescription")}
                                     </p>
-                                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                                    <div className="pt-4 border-t border-glass-border-subtle flex items-center justify-between">
                                         {role.is_system ? (
                                             <span className="inline-flex items-center rounded-lg bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-400 border border-indigo-500/20">
                                                 {t("system")}
                                             </span>
                                         ) : (
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-white/20">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-ghost">
                                                 Custom Role
                                             </span>
                                         )}
                                         <button 
                                             onClick={() => openEdit(role)}
-                                            className="text-xs font-semibold text-neon/50 hover:text-neon transition-colors"
+                                            className="text-xs font-semibold text-neon-text opacity-50 hover:text-neon-text hover:opacity-100 transition-colors"
                                         >
                                             View Details
                                         </button>
@@ -370,12 +370,12 @@ export default function RolesPage() {
                     {/* Empty "New Role" skeleton-style card for better UX */}
                     <button 
                         onClick={openCreate}
-                        className="group relative rounded-2xl border-2 border-dashed border-white/5 hover:border-white/10 transition-all duration-500 min-h-[180px] flex items-center justify-center overflow-hidden"
+                        className="group relative rounded-2xl border-2 border-dashed border-glass-border-subtle hover:border-glass-border transition-all duration-500 min-h-[180px] flex items-center justify-center overflow-hidden"
                     >
-                        <div className="absolute inset-0 bg-white/[0.01] group-hover:bg-white/[0.03] transition-colors" />
+                        <div className="absolute inset-0 bg-glass-bg group-hover:bg-glass-bg transition-colors" />
                         <div className="relative text-center space-y-2">
-                            <Plus className="h-8 w-8 text-white/10 group-hover:text-neon/50 mx-auto transition-all transform group-hover:rotate-90 group-hover:scale-125" />
-                            <p className="text-sm font-medium text-white/20 group-hover:text-white/40 transition-colors">
+                            <Plus className="h-8 w-8 text-text-ghost group-hover:text-neon-text group-hover:opacity-50 mx-auto transition-all transform group-hover:rotate-90 group-hover:scale-125" />
+                            <p className="text-sm font-medium text-text-ghost group-hover:text-text-tertiary transition-colors">
                                 {t("newRole")}
                             </p>
                         </div>

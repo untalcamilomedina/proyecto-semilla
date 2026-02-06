@@ -33,12 +33,12 @@ export default function AdminSettingsPage() {
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20">
-          <Shield className="h-6 w-6 text-red-500" />
+        <div className="p-3 rounded-2xl bg-error-bg border border-error-border">
+          <Shield className="h-6 w-6 text-error-text" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white/90">Superadmin Settings</h1>
-          <p className="text-sm text-white/40">
+          <h1 className="text-2xl font-bold text-text-highlight">Superadmin Settings</h1>
+          <p className="text-sm text-text-tertiary">
             Gestión de credenciales críticas y configuración del sistema.
           </p>
         </div>
@@ -48,18 +48,18 @@ export default function AdminSettingsPage() {
         {/* OAuth Configuration */}
         <GlassCard className="p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Key className="h-5 w-5 text-neon" />
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Key className="h-5 w-5 text-neon-text" />
               Integraciones OAuth
             </h3>
-            <span className="px-2 py-1 rounded bg-neon/10 text-[10px] text-neon font-mono uppercase">
+            <span className="px-2 py-1 rounded bg-neon-bg text-[10px] text-neon-text font-mono uppercase">
               Secure Storage
             </span>
           </div>
 
           <form onSubmit={handleSave} className="space-y-4">
             <div className="space-y-4 pt-2">
-               <h4 className="text-sm font-medium text-white/60 uppercase tracking-wider">Notion Integration</h4>
+               <h4 className="text-sm font-medium text-text-subtle uppercase tracking-wider">Notion Integration</h4>
                <GlassInput 
                   label="Client ID" 
                   type="password" 
@@ -80,8 +80,8 @@ export default function AdminSettingsPage() {
                />
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-white/5">
-               <h4 className="text-sm font-medium text-white/60 uppercase tracking-wider">Google OAuth</h4>
+            <div className="space-y-4 pt-4 border-t border-glass-border-subtle">
+               <h4 className="text-sm font-medium text-text-subtle uppercase tracking-wider">Google OAuth</h4>
                <GlassInput 
                   label="Client ID" 
                   type="password" 
@@ -117,11 +117,11 @@ export default function AdminSettingsPage() {
         {/* System Status & Config */}
         <div className="space-y-6">
              <GlassCard className="p-6 space-y-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Database className="h-5 w-5 text-blue-400" />
                   DB Diagram Sync
                 </h3>
-                <p className="text-sm text-white/50">
+                <p className="text-sm text-text-secondary">
                     Configuración para la sincronización automática de esquemas con DBDiagram.io.
                 </p>
                 <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm">

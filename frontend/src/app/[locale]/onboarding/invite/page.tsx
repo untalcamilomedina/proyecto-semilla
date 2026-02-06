@@ -65,11 +65,11 @@ export default function OnboardingInvitePage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
             <Card className="w-full max-w-lg">
                 <CardHeader className="text-center">
-                    <div className="mx-auto w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-4">
-                        <Users className="h-6 w-6 text-orange-600" />
+                    <div className="mx-auto w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                        <Users className="h-6 w-6 text-orange-400" />
                     </div>
                     <CardTitle className="text-2xl">{t("title")}</CardTitle>
                     <CardDescription>
@@ -80,29 +80,29 @@ export default function OnboardingInvitePage() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <CardContent className="space-y-4">
                         {error && (
-                            <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                            <div className="rounded-md bg-error-bg border border-error-border p-3 text-sm text-error-text">
                                 {error}
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-zinc-700">
+                            <label className="text-sm font-medium text-foreground">
                                 {t("memberEmails")}
                             </label>
                             <textarea
                                 rows={5}
-                                className="flex w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                 placeholder={t("emailsPlaceholder")}
                                 {...register("emails")}
                             />
-                            <p className="text-xs text-zinc-500">
+                            <p className="text-xs text-muted-foreground">
                                 {t("emailsHint")}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3">
-                            <Mail className="h-5 w-5 text-blue-500 shrink-0" />
-                            <p className="text-sm text-blue-700">
+                        <div className="flex items-center gap-3 rounded-lg bg-blue-500/10 p-3">
+                            <Mail className="h-5 w-5 text-blue-400 shrink-0" />
+                            <p className="text-sm text-blue-400">
                                 {t("invitationNotice")}
                             </p>
                         </div>

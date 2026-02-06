@@ -51,29 +51,29 @@ export default function IntegrationsPage() {
         <GlassCard className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-white/10 rounded-lg">
-                <Database className="w-8 h-8 text-white" />
+              <div className="p-3 bg-glass-bg-hover rounded-lg">
+                <Database className="w-8 h-8 text-foreground" />
               </div>
               <div>
                 <h3 className="text-xl font-semibold">{t("notion.title")}</h3>
-                <p className="text-sm text-gray-400">{t("notion.subtitle")}</p>
+                <p className="text-sm text-text-secondary">{t("notion.subtitle")}</p>
               </div>
             </div>
             {status.notion ? (
-              <span className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-3 py-1 rounded-full">
+              <span className="flex items-center gap-2 text-success-text text-sm font-medium bg-success-text/10 px-3 py-1 rounded-full">
                 <CheckCircle className="w-4 h-4" /> {t("connected")}
               </span>
             ) : (
-                <span className="text-sm text-gray-500">{t("notConnected")}</span>
+                <span className="text-sm text-text-secondary">{t("notConnected")}</span>
             )}
           </div>
 
-          <div className="flex-1 text-sm text-gray-300">
+          <div className="flex-1 text-sm text-text-subtle">
             {t("notion.description")}
           </div>
 
           <Button
-            className="w-full bg-white text-black hover:bg-white/90"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => handleConnect("notion")}
             disabled={status.notion}
           >
@@ -89,19 +89,19 @@ export default function IntegrationsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-semibold">{t("miro.title")}</h3>
-                <p className="text-sm text-gray-400">{t("miro.subtitle")}</p>
+                <p className="text-sm text-text-secondary">{t("miro.subtitle")}</p>
               </div>
             </div>
             {status.miro ? (
-              <span className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 px-3 py-1 rounded-full">
+              <span className="flex items-center gap-2 text-success-text text-sm font-medium bg-success-text/10 px-3 py-1 rounded-full">
                 <CheckCircle className="w-4 h-4" /> {t("connected")}
               </span>
             ) : (
-                <span className="text-sm text-gray-500">{t("notConnected")}</span>
+                <span className="text-sm text-text-secondary">{t("notConnected")}</span>
             )}
           </div>
 
-          <div className="flex-1 text-sm text-gray-300">
+          <div className="flex-1 text-sm text-text-subtle">
             {t("miro.description")}
           </div>
 

@@ -82,8 +82,8 @@ export default function ApiKeysPage() {
         <div className="container max-w-4xl py-10 space-y-8">
              <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-white glow-text">{t("title")}</h1>
-                    <p className="text-white/60">{t("description")}</p>
+                    <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
+                    <p className="text-text-subtle">{t("description")}</p>
                 </div>
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
@@ -91,7 +91,7 @@ export default function ApiKeysPage() {
                             <Plus className="w-4 h-4" /> {t("addKey")}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-zinc-900 border-white/10 text-white">
+                    <DialogContent className="bg-surface-raised border-glass-border text-foreground">
                         <DialogHeader>
                             <DialogTitle>{t("addTitle")}</DialogTitle>
                             <DialogDescription>
@@ -105,13 +105,13 @@ export default function ApiKeysPage() {
                                     placeholder={t("namePlaceholder")}
                                     value={newKeyName}
                                     onChange={(e) => setNewKeyName(e.target.value)}
-                                    className="bg-white/5 border-white/10"
+                                    className="bg-glass-bg border-glass-border"
                                 />
                             </div>
                             <div className="grid gap-2">
                                 <Label>{t("service")}</Label>
                                 <select
-                                    className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    className="flex h-10 w-full rounded-md border border-glass-border bg-glass-bg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     value={newKeyService}
                                     onChange={(e) => setNewKeyService(e.target.value)}
                                 >
@@ -127,7 +127,7 @@ export default function ApiKeysPage() {
                                     placeholder={t("apiKeyPlaceholder")}
                                     value={newKeyValue}
                                     onChange={(e) => setNewKeyValue(e.target.value)}
-                                    className="bg-white/5 border-white/10"
+                                    className="bg-glass-bg border-glass-border"
                                 />
                             </div>
                         </div>
@@ -141,12 +141,12 @@ export default function ApiKeysPage() {
 
             <div className="grid gap-4">
                 {loading ? (
-                    <div className="text-white/50">{t("loadingKeys")}</div>
+                    <div className="text-text-secondary">{t("loadingKeys")}</div>
                 ) : keys.length === 0 ? (
                     <GlassCard className="text-center py-12">
-                        <Key className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-white">{t("noKeys")}</h3>
-                        <p className="text-white/50 max-w-sm mx-auto mt-2">
+                        <Key className="w-12 h-12 text-text-ghost mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-foreground">{t("noKeys")}</h3>
+                        <p className="text-text-secondary max-w-sm mx-auto mt-2">
                             {t("noKeysDescription")}
                         </p>
                     </GlassCard>
@@ -158,9 +158,9 @@ export default function ApiKeysPage() {
                                     <Key className="w-5 h-5 text-purple-400" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-white">{key.name}</h4>
-                                    <div className="flex items-center gap-2 text-xs text-white/50 font-mono mt-1">
-                                        <span className="uppercase bg-white/10 px-1.5 py-0.5 rounded">{key.service}</span>
+                                    <h4 className="font-bold text-foreground">{key.name}</h4>
+                                    <div className="flex items-center gap-2 text-xs text-text-secondary font-mono mt-1">
+                                        <span className="uppercase bg-glass-bg-hover px-1.5 py-0.5 rounded">{key.service}</span>
                                         <span>&bull;</span>
                                         <span>{t("startsWith", { prefix: key.prefix })}</span>
                                     </div>
@@ -169,7 +169,7 @@ export default function ApiKeysPage() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                                className="text-error-text hover:text-error-text hover:bg-error-bg"
                                 onClick={() => handleDelete(key.id)}
                             >
                                 <Trash2 className="w-4 h-4" />

@@ -32,7 +32,7 @@ export default function NotionDiagram({ databaseId }: { databaseId: string }) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
-        className="bg-gray-50 dark:bg-zinc-900"
+        className="bg-muted"
       >
         <Controls className="!bg-background !border-border !fill-foreground" />
         <MiniMap className="!bg-background !border-border" />

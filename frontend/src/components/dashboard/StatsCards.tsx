@@ -20,7 +20,7 @@ export function StatsCards({ usage, planName, isLoading }: StatsCardsProps) {
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_, i) => (
-                    <GlassCard key={i} className="h-32 animate-pulse bg-white/5" children={null} />
+                    <GlassCard key={i} className="h-32 animate-pulse bg-glass-bg" children={null} />
                 ))}
             </div>
         );
@@ -46,7 +46,7 @@ export function StatsCards({ usage, planName, isLoading }: StatsCardsProps) {
             color: "text-purple-400",
         },
         {
-            title: t("activity" as any) || "Health", // Placeholder
+            title: t("activity" as any) || "Health",
             value: "98%",
             icon: Activity,
             color: "text-green-400",
@@ -60,12 +60,12 @@ export function StatsCards({ usage, planName, isLoading }: StatsCardsProps) {
                 return (
                     <GlassCard key={index} className="flex flex-col justify-between">
                         <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <span className="text-sm font-medium text-white/60">
+                            <span className="text-sm font-medium text-text-subtle">
                                 {card.title}
                             </span>
                             <Icon className={`h-4 w-4 ${card.color}`} />
                         </div>
-                        <div className="text-2xl font-bold text-white">
+                        <div className="text-2xl font-bold text-foreground">
                             {card.value}
                         </div>
                     </GlassCard>

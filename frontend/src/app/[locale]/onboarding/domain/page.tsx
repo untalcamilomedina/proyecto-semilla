@@ -39,11 +39,11 @@ export default function OnboardingDomainPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
             <Card className="w-full max-w-md">
                 <CardHeader className="text-center">
-                    <div className="mx-auto w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mb-4">
-                        <Globe className="h-6 w-6 text-teal-600" />
+                    <div className="mx-auto w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-4">
+                        <Globe className="h-6 w-6 text-teal-400" />
                     </div>
                     <CardTitle className="text-2xl">{t("title")}</CardTitle>
                     <CardDescription>
@@ -53,13 +53,13 @@ export default function OnboardingDomainPage() {
 
                 <CardContent className="space-y-4">
                      {error && (
-                        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                        <div className="rounded-md bg-error-bg border border-error-border p-3 text-sm text-error-text">
                             {error}
                         </div>
                     )}
 
                     <div className="space-y-2">
-                        <p className="text-sm text-zinc-600">
+                        <p className="text-sm text-muted-foreground">
                             {t("leaveEmpty")}
                         </p>
                     </div>

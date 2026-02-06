@@ -62,26 +62,26 @@ export function DataTable<TData, TValue>({
         <div className="space-y-4">
             <div className="flex items-center gap-4 py-2">
                 <div className="relative w-full max-w-sm group">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20 group-focus-within:text-neon transition-colors" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-text-ghost group-focus-within:text-neon-text transition-colors" />
                     <GlassInput
                         placeholder={t("table.searchPlaceholder")}
                         value={(table.getColumn("user_email")?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
                             table.getColumn("user_email")?.setFilterValue(event.target.value)
                         }
-                        className="pl-10 h-10 bg-white/5 border-white/5 focus:border-neon/30"
+                        className="pl-10 h-10 bg-glass-bg border-glass-border-subtle focus:border-neon-border"
                     />
                 </div>
             </div>
             
-            <div className="rounded-xl border border-white/5 overflow-hidden">
+            <div className="rounded-xl border border-glass-border-subtle overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-white/[0.02]">
+                    <TableHeader className="bg-glass-bg">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
+                            <TableRow key={headerGroup.id} className="border-glass-border-subtle hover:bg-transparent">
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className="text-white/40 font-bold text-xs uppercase tracking-wider h-12">
+                                        <TableHead key={header.id} className="text-text-tertiary font-bold text-xs uppercase tracking-wider h-12">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -100,10 +100,10 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
-                                    className="border-white/5 hover:bg-white/[0.03] transition-colors"
+                                    className="border-glass-border-subtle hover:bg-glass-bg transition-colors"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-4 text-sm text-white/70">
+                                        <TableCell key={cell.id} className="py-4 text-sm text-text-subtle">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-32 text-center text-white/30 font-medium"
+                                    className="h-32 text-center text-text-quaternary font-medium"
                                 >
                                     {t("table.noResults")}
                                 </TableCell>
@@ -127,7 +127,7 @@ export function DataTable<TData, TValue>({
             </div>
 
             <div className="flex items-center justify-between py-2">
-                <p className="text-xs text-white/30 font-medium">
+                <p className="text-xs text-text-quaternary font-medium">
                     {t("table.paginationInfo", {
                         current: table.getState().pagination.pageIndex + 1,
                         total: table.getPageCount()
@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
                 <div className="flex items-center gap-2">
                     <GlassButton
                         variant="secondary"
-                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-white/5"
+                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-glass-border-subtle"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
@@ -144,7 +144,7 @@ export function DataTable<TData, TValue>({
                     </GlassButton>
                     <GlassButton
                         variant="secondary"
-                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-white/5"
+                        className="h-9 w-9 p-0 flex items-center justify-center rounded-lg border-glass-border-subtle"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >

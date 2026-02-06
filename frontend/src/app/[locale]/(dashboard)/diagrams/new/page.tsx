@@ -110,7 +110,7 @@ export default function ImportWizardPage() {
         )}
 
         {/* Footer Navigation */}
-        <div className="flex justify-between mt-auto pt-8 border-t border-white/10">
+        <div className="flex justify-between mt-auto pt-8 border-t border-glass-border-subtle">
             <Button 
                 variant="ghost" 
                 onClick={() => setCurrentStep(p => Math.max(0, p - 1))}

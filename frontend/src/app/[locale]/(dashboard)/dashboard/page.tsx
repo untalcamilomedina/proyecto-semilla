@@ -65,8 +65,8 @@ export default function DashboardPage() {
             name: t("stats.roles"), 
             value: "3", 
             icon: Shield, 
-            color: "text-neon",
-            bg: "bg-neon/10"
+            color: "text-neon-text",
+            bg: "bg-neon-bg"
         },
         { 
             name: t("stats.billing"), 
@@ -89,10 +89,10 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-bold text-gradient-heading-r">
                         {t("title")}
                     </h1>
-                    <p className="mt-1 text-white/40 font-medium">
+                    <p className="mt-1 text-text-tertiary font-medium">
                         {t("welcome", { name: user?.first_name || user?.username || tc("user") })}
                     </p>
                 </div>
@@ -110,8 +110,8 @@ export default function DashboardPage() {
                                 <stat.icon className={cn("h-6 w-6", stat.color)} />
                             </div>
                             <div>
-                                <p className="text-xs font-medium text-white/40 mb-0.5">{stat.name}</p>
-                                <p className="text-2xl font-bold text-white tracking-tight">{stat.value}</p>
+                                <p className="text-xs font-medium text-text-tertiary mb-0.5">{stat.name}</p>
+                                <p className="text-2xl font-bold text-foreground tracking-tight">{stat.value}</p>
                             </div>
                         </div>
                     </GlassCard>
@@ -123,63 +123,63 @@ export default function DashboardPage() {
                 {/* Organization Info */}
                 <GlassCard className="lg:col-span-2 p-8">
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-xl font-bold text-white/90">{t("organization")}</h2>
-                        <span className="px-3 py-1 rounded-full bg-neon/10 border border-neon/20 text-neon text-[10px] uppercase font-bold tracking-wider">
+                        <h2 className="text-xl font-bold text-text-highlight">{t("organization")}</h2>
+                        <span className="px-3 py-1 rounded-full bg-neon-bg border border-neon-border text-neon-text text-[10px] uppercase font-bold tracking-wider">
                             {tenant?.plan_code || t("stats.plan")}
                         </span>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         <div className="space-y-1">
-                            <p className="text-xs font-medium text-white/30 uppercase tracking-widest">{t("name")}</p>
-                            <p className="text-lg font-semibold text-white/90">{tenant?.name}</p>
+                            <p className="text-xs font-medium text-text-quaternary uppercase tracking-widest">{t("name")}</p>
+                            <p className="text-lg font-semibold text-text-highlight">{tenant?.name}</p>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-xs font-medium text-white/30 uppercase tracking-widest">{t("slug")}</p>
-                            <p className="text-sm font-mono text-neon/80">@{tenant?.slug}</p>
+                            <p className="text-xs font-medium text-text-quaternary uppercase tracking-widest">{t("slug")}</p>
+                            <p className="text-sm font-mono text-neon-text">@{tenant?.slug}</p>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-xs font-medium text-white/30 uppercase tracking-widest">{t("modules")}</p>
-                            <p className="text-lg font-semibold text-white/90">{t("modulesActive", { count: tenant?.enabled_modules?.length || 0 })}</p>
+                            <p className="text-xs font-medium text-text-quaternary uppercase tracking-widest">{t("modules")}</p>
+                            <p className="text-lg font-semibold text-text-highlight">{t("modulesActive", { count: tenant?.enabled_modules?.length || 0 })}</p>
                         </div>
                     </div>
                 </GlassCard>
 
                 {/* Quick Actions */}
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-white/90 px-2">{t("quickActions")}</h2>
+                    <h2 className="text-xl font-bold text-text-highlight px-2">{t("quickActions")}</h2>
                     <div className="grid gap-3">
                         <Link 
                             href="/members" 
-                            className="group flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300"
+                            className="group flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border-subtle hover:bg-glass-bg-hover hover:border-glass-border transition-all duration-300"
                         >
                             <div className="flex items-center gap-3">
                                 <Users className="h-5 w-5 text-blue-400" />
-                                <span className="text-sm font-medium text-white/70 group-hover:text-white">{t("inviteMembers")}</span>
+                                <span className="text-sm font-medium text-text-subtle group-hover:text-foreground">{t("inviteMembers")}</span>
                             </div>
-                            <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-neon group-hover:translate-x-1 transition-all" />
+                            <ArrowRight className="h-4 w-4 text-text-ghost group-hover:text-neon-text group-hover:translate-x-1 transition-all" />
                         </Link>
                         
                         <Link 
                             href="/roles" 
-                            className="group flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300"
+                            className="group flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border-subtle hover:bg-glass-bg-hover hover:border-glass-border transition-all duration-300"
                         >
                             <div className="flex items-center gap-3">
-                                <Shield className="h-5 w-5 text-neon" />
-                                <span className="text-sm font-medium text-white/70 group-hover:text-white">{t("manageRoles")}</span>
+                                <Shield className="h-5 w-5 text-neon-text" />
+                                <span className="text-sm font-medium text-text-subtle group-hover:text-foreground">{t("manageRoles")}</span>
                             </div>
-                            <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-neon group-hover:translate-x-1 transition-all" />
+                            <ArrowRight className="h-4 w-4 text-text-ghost group-hover:text-neon-text group-hover:translate-x-1 transition-all" />
                         </Link>
 
                         <Link 
                             href="/billing" 
-                            className="group flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300"
+                            className="group flex items-center justify-between p-4 rounded-2xl bg-glass-bg border border-glass-border-subtle hover:bg-glass-bg-hover hover:border-glass-border transition-all duration-300"
                         >
                             <div className="flex items-center gap-3">
                                 <CreditCard className="h-5 w-5 text-purple-400" />
-                                <span className="text-sm font-medium text-white/70 group-hover:text-white">{t("viewBilling")}</span>
+                                <span className="text-sm font-medium text-text-subtle group-hover:text-foreground">{t("viewBilling")}</span>
                             </div>
-                            <ArrowRight className="h-4 w-4 text-white/20 group-hover:text-neon group-hover:translate-x-1 transition-all" />
+                            <ArrowRight className="h-4 w-4 text-text-ghost group-hover:text-neon-text group-hover:translate-x-1 transition-all" />
                         </Link>
                     </div>
                 </div>

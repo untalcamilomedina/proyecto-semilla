@@ -18,7 +18,7 @@ export function LanguageSwitcher() {
   return (
     <GlassButton
       variant="secondary"
-      className="h-9 px-3 py-1 text-xs gap-2 border-white/5 hover:bg-white/10 text-white/60 hover:text-white"
+      className="h-9 px-3 py-1 text-xs gap-2 border-glass-border-subtle hover:bg-glass-bg-hover text-text-subtle hover:text-foreground"
       onClick={toggleLocale}
       aria-label="Switch language"
     >

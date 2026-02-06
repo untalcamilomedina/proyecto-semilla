@@ -1,13 +1,13 @@
 ---
 name: scaffold-page
-description: Genera páginas Next.js App Router con i18n, layout consistente y patrones del proyecto.
-author: AppNotion Dev Team
-version: 1.0.0
+description: Genera páginas Next.js App Router con i18n, tokens semánticos de tema, a11y y patrones del proyecto BlockFlow.
+author: BlockFlow Dev Team
+version: 2.0.0
 ---
 
 # Skill: Scaffold de Página Next.js
 
-Esta skill estandariza la creación de nuevas páginas en el frontend, asegurando consistencia con la arquitectura App Router de Next.js 14+, integración con i18n (next-intl), y adherencia al design system Glass Minimalist.
+Estandariza la creación de nuevas páginas en el frontend, asegurando consistencia con App Router, i18n (next-intl), sistema de temas dual (light/dark), y design system Glass.
 
 ## Prerrequisitos
 
@@ -25,52 +25,61 @@ Esta skill estandariza la creación de nuevas páginas en el frontend, asegurand
 
 ```
 frontend/src/app/
-├── (auth)/                    # Grupo: páginas públicas de autenticación
-│   ├── layout.tsx             # Layout con AuthLayout
-│   ├── login/page.tsx
-│   └── signup/page.tsx
-├── (dashboard)/               # Grupo: páginas protegidas
-│   ├── layout.tsx             # Layout con Sidebar
-│   ├── DashboardClientLayout.tsx
-│   ├── page.tsx               # Dashboard home
-│   ├── members/page.tsx
-│   ├── roles/page.tsx
-│   ├── billing/page.tsx
-│   ├── settings/page.tsx
-│   ├── audit-logs/page.tsx
-│   ├── api-keys/page.tsx
-│   └── tools/
-│       └── notion-er/page.tsx
-├── onboarding/                # Flujo de onboarding
-│   ├── layout.tsx
-│   └── [step]/page.tsx
-└── layout.tsx                 # Root layout
+├── [locale]/                      # Raíz i18n (next-intl)
+│   ├── (auth)/                    # Grupo: páginas públicas de autenticación
+│   │   ├── login/page.tsx
+│   │   └── signup/page.tsx
+│   ├── (dashboard)/               # Grupo: páginas protegidas
+│   │   ├── DashboardClientLayout.tsx
+│   │   ├── dashboard/page.tsx
+│   │   ├── members/page.tsx
+│   │   ├── roles/page.tsx
+│   │   ├── billing/page.tsx
+│   │   ├── settings/page.tsx
+│   │   ├── audit-logs/page.tsx
+│   │   ├── api-keys/page.tsx
+│   │   └── tools/notion-er/page.tsx
+│   └── onboarding/                # Flujo de onboarding
+│       ├── page.tsx
+│       └── [step]/page.tsx
+└── layout.tsx                     # Root layout
 ```
 
-## Proceso
+## Reglas de Estilo OBLIGATORIAS
 
-### Paso 1: Determinar Ubicación y Tipo
+### Tokens de Tema (CERO HARDCODING)
 
-| Tipo de Página | Ubicación | Layout Heredado |
-|----------------|-----------|-----------------|
-| Dashboard protegida | `(dashboard)/[nombre]/` | Sidebar + Auth |
-| Autenticación | `(auth)/[nombre]/` | AuthLayout |
-| Pública (landing) | `(marketing)/[nombre]/` | Marketing layout |
-| Herramienta/Tool | `(dashboard)/tools/[nombre]/` | Sidebar |
+| Categoría | Tokens Permitidos |
+|---|---|
+| **Fondos** | `bg-background`, `bg-glass-bg`, `bg-glass-bg-hover`, `bg-glass-bg-strong`, `bg-glass-overlay`, `bg-surface-page`, `bg-surface-raised`, `bg-card`, `bg-muted`, `bg-popover`, `bg-sidebar` |
+| **Texto** | `text-foreground`, `text-text-highlight`, `text-text-subtle`, `text-text-secondary`, `text-text-tertiary`, `text-text-quaternary`, `text-text-ghost`, `text-muted-foreground`, `text-card-foreground` |
+| **Bordes** | `border-border`, `border-glass-border`, `border-glass-border-subtle`, `border-input` |
+| **Brand** | `text-neon-text`, `bg-neon-bg`, `bg-neon-bg-strong`, `border-neon-border`, `shadow-neon` |
+| **Error** | `text-error-text`, `bg-error-bg`, `border-error-border` |
+| **Gradientes** | `text-gradient-heading`, `text-gradient-heading-r` |
 
-### Paso 2: Crear Archivo de Página
+**PROHIBIDO**: `text-white`, `bg-white/*`, `bg-zinc-*`, `text-zinc-*`, `bg-black/*`, `text-gray-*`, `border-gray-*`, `bg-slate-*`
 
-**Ubicación:** `frontend/src/app/(dashboard)/[nombre]/page.tsx`
+**Excepciones**: Colores de feature/marca con opacity (`bg-blue-500/10`, `text-blue-400`, `bg-purple-500/10`).
 
-### Paso 3: Elegir Template según Tipo
+### Navegación
+
+```tsx
+// CORRECTO
+import { Link, useRouter, usePathname } from "@/lib/navigation";
+
+// INCORRECTO
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+```
+
+**Excepciones**: `redirect` y `useParams` desde `next/navigation`.
 
 ---
 
 ## Templates
 
 ### Template A: Página de Listado (CRUD)
-
-Ideal para: Members, Roles, API Keys, etc.
 
 ```tsx
 "use client";
@@ -80,29 +89,23 @@ import { useTranslations } from "next-intl";
 import { Plus, IconName } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 
-/**
- * [FeatureName]Page
- * [Descripción breve de la página].
- *
- * @vibe Elite - High-density information with premium aesthetics.
- */
 export default function FeatureNamePage() {
     const t = useTranslations("featureName");
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Header Section */}
+            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                     <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20">
                         <IconName className="h-6 w-6 text-blue-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white/90">
+                        <h1 className="text-2xl font-bold text-text-highlight">
                             {t("title")}
                         </h1>
-                        <p className="text-sm text-white/40">
+                        <p className="text-sm text-text-tertiary">
                             {t("description")}
                         </p>
                     </div>
@@ -117,25 +120,19 @@ export default function FeatureNamePage() {
                 </GlassButton>
             </div>
 
-            {/* Content Section */}
+            {/* Content */}
             <div className="relative">
-                {/* Decorative glow */}
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
+                {/* Decorative glow - only dark mode */}
+                <div className="hidden dark:block absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-                {/* Table/List Component */}
                 {/* <FeatureTable /> */}
             </div>
-
-            {/* Modals */}
-            {/* <CreateFeatureModal open={isCreateOpen} onOpenChange={setIsCreateOpen} /> */}
         </div>
     );
 }
 ```
 
 ### Template B: Página de Detalle/Configuración
-
-Ideal para: Settings, Profile, Billing details.
 
 ```tsx
 "use client";
@@ -144,10 +141,6 @@ import { useTranslations } from "next-intl";
 import { Settings } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
 
-/**
- * [FeatureName]Page
- * [Descripción breve].
- */
 export default function FeatureNamePage() {
     const t = useTranslations("featureName");
 
@@ -155,14 +148,14 @@ export default function FeatureNamePage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl bg-zinc-500/10 border border-zinc-500/20">
-                    <Settings className="h-6 w-6 text-zinc-400" />
+                <div className="p-3 rounded-2xl bg-neon-bg border border-neon-border">
+                    <Settings className="h-6 w-6 text-neon-text" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-white/90">
+                    <h1 className="text-2xl font-bold text-text-highlight">
                         {t("title")}
                     </h1>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-text-tertiary">
                         {t("description")}
                     </p>
                 </div>
@@ -170,15 +163,15 @@ export default function FeatureNamePage() {
 
             {/* Content Cards */}
             <div className="grid gap-6 md:grid-cols-2">
-                <GlassCard>
-                    <h2 className="text-lg font-semibold text-white/80 mb-4">
+                <GlassCard className="p-6">
+                    <h2 className="text-lg font-semibold text-foreground mb-4">
                         {t("section1.title")}
                     </h2>
                     {/* Section content */}
                 </GlassCard>
 
-                <GlassCard>
-                    <h2 className="text-lg font-semibold text-white/80 mb-4">
+                <GlassCard className="p-6">
+                    <h2 className="text-lg font-semibold text-foreground mb-4">
                         {t("section2.title")}
                     </h2>
                     {/* Section content */}
@@ -189,50 +182,7 @@ export default function FeatureNamePage() {
 }
 ```
 
-### Template C: Página Server Component (Data Fetching)
-
-Ideal para: Páginas que necesitan datos del servidor antes de renderizar.
-
-```tsx
-import { getTranslations } from "next-intl/server";
-import { Metadata } from "next";
-import { FeatureClient } from "./FeatureClient";
-
-export const metadata: Metadata = {
-    title: "Feature Name | AppNotion",
-    description: "Feature description for SEO",
-};
-
-async function getData() {
-    // Fetch data from API
-    const res = await fetch(`${process.env.API_URL}/endpoint`, {
-        cache: "no-store", // o 'force-cache' para datos estáticos
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch data");
-    return res.json();
-}
-
-export default async function FeatureNamePage() {
-    const t = await getTranslations("featureName");
-    const data = await getData();
-
-    return (
-        <div className="space-y-8">
-            <h1 className="text-2xl font-bold text-white/90">
-                {t("title")}
-            </h1>
-
-            {/* Client Component para interactividad */}
-            <FeatureClient initialData={data} />
-        </div>
-    );
-}
-```
-
-### Template D: Página con Tabs
-
-Ideal para: Settings con múltiples secciones, Profile.
+### Template C: Página con Tabs
 
 ```tsx
 "use client";
@@ -252,14 +202,14 @@ export default function SettingsPage() {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-white/90">
+                <h1 className="text-2xl font-bold text-text-highlight">
                     {t("title")}
                 </h1>
-                <p className="text-sm text-white/40">{t("description")}</p>
+                <p className="text-sm text-text-tertiary">{t("description")}</p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 p-1 bg-white/5 rounded-xl w-fit">
+            <div className="flex gap-1 p-1 bg-glass-bg rounded-xl w-fit">
                 {TABS.map((tab) => (
                     <button
                         key={tab}
@@ -267,8 +217,8 @@ export default function SettingsPage() {
                         className={cn(
                             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                             activeTab === tab
-                                ? "bg-white/10 text-white"
-                                : "text-white/50 hover:text-white/70"
+                                ? "bg-glass-bg-hover text-foreground"
+                                : "text-text-secondary hover:text-foreground"
                         )}
                     >
                         {t(`tabs.${tab}`)}
@@ -287,112 +237,120 @@ export default function SettingsPage() {
 }
 ```
 
+### Template D: Formulario con GlassInput
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { GlassInput } from "@/components/ui/glass/GlassInput";
+import { GlassButton } from "@/components/ui/glass/GlassButton";
+import { GlassCard } from "@/components/ui/glass/GlassCard";
+
+const formSchema = z.object({
+    name: z.string().min(2),
+    email: z.string().email(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export default function FormPage() {
+    const t = useTranslations("formPage");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+    });
+
+    const onSubmit = async (data: FormData) => {
+        setIsLoading(true);
+        try {
+            // API call here
+        } catch (err) {
+            // Error handling
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div>
+                <h1 className="text-2xl font-bold text-text-highlight">{t("title")}</h1>
+                <p className="text-sm text-text-tertiary">{t("description")}</p>
+            </div>
+
+            <GlassCard className="max-w-lg p-8">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <GlassInput
+                        label={t("nameLabel")}
+                        placeholder={t("namePlaceholder")}
+                        error={errors.name?.message}
+                        {...register("name")}
+                    />
+                    <GlassInput
+                        label={t("emailLabel")}
+                        type="email"
+                        placeholder={t("emailPlaceholder")}
+                        error={errors.email?.message}
+                        {...register("email")}
+                    />
+                    <GlassButton type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? t("saving") : t("save")}
+                    </GlassButton>
+                </form>
+            </GlassCard>
+        </div>
+    );
+}
+```
+
 ---
 
 ## Pasos Post-Creación
 
 ### Paso 4: Agregar Keys i18n
 
-Usar skill `add-i18n-keys` para agregar las traducciones necesarias.
-
-**Mínimo requerido:**
-```json
-{
-  "featureName": {
-    "title": "Page Title",
-    "description": "Page description"
-  }
-}
-```
+Usar skill `add-i18n-keys` para agregar las traducciones necesarias en `messages/en.json` y `messages/es.json`.
 
 ### Paso 5: Agregar a Navegación (si aplica)
 
-Editar `frontend/src/components/layout/sidebar.tsx`:
-
-```tsx
-const navItems = [
-  // ... existing items
-  {
-    href: "/feature-name",
-    icon: IconName,
-    label: t("nav.featureName"),
-  },
-];
-```
+Editar `frontend/src/components/layout/sidebar.tsx` y agregar el item usando `Link` de `@/lib/navigation`.
 
 ### Paso 6: Agregar Metadata (SEO)
 
-Para páginas públicas, agregar metadata:
-
-```tsx
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Page Title | AppNotion",
-    description: "Page description for search engines",
-    openGraph: {
-        title: "Page Title",
-        description: "Description for social sharing",
-    },
-};
-```
+Para páginas públicas, agregar metadata.
 
 ---
 
 ## Checklist de Verificación
 
 ### Estructura
-- [ ] Archivo `page.tsx` creado en ubicación correcta
+- [ ] Archivo `page.tsx` creado en `[locale]/` path correcto
 - [ ] `"use client"` presente si usa hooks/estado
-- [ ] JSDoc con descripción y `@vibe` tag
+
+### Tema (Zero Hardcoding)
+- [ ] CERO uso de `text-white`, `bg-white/*`, `bg-zinc-*`, `text-zinc-*`, `bg-black/*`, `text-gray-*`
+- [ ] Todos los colores usan tokens semánticos
+- [ ] Glows decorativos con `hidden dark:block`
 
 ### i18n
-- [ ] `useTranslations` o `getTranslations` implementado
-- [ ] Keys agregadas a `en.json` y `es.json`
-- [ ] No hay textos hardcodeados
+- [ ] `useTranslations("namespace")` implementado
+- [ ] Keys en `en.json` Y `es.json`
+- [ ] Cero textos hardcodeados en español/inglés
 
-### Estilo
-- [ ] Usa componentes Glass (`GlassCard`, `GlassButton`)
-- [ ] Animación de entrada: `animate-in fade-in slide-in-from-bottom-2`
-- [ ] Responsive: funciona en móvil (`flex-col sm:flex-row`)
-- [ ] Glow decorativo donde aplica
+### Navegación
+- [ ] Imports de `Link`, `useRouter`, `usePathname` desde `@/lib/navigation`
 
-### Accesibilidad
+### a11y
 - [ ] Headings jerárquicos (`h1` > `h2` > `h3`)
-- [ ] Iconos tienen `aria-hidden="true"` o texto alternativo
-- [ ] Botones tienen texto descriptivo
+- [ ] Inputs con labels asociados (`htmlFor`)
+- [ ] Botones de ícono con `aria-label`
 
 ---
 
-## Errores Comunes
-
-### Error: "useTranslations is not a function"
-
-**Causa:** Usar hook en Server Component sin `'use client'`.
-
-**Solución:** Agregar `"use client";` al inicio o usar `getTranslations`.
-
-### Error: Página no aparece en navegación
-
-**Causa:** Falta agregar entrada en sidebar.
-
-**Solución:** Editar `sidebar.tsx` y agregar el item de navegación.
-
-### Error: Layout incorrecto
-
-**Causa:** Página fuera del grupo de rutas correcto.
-
-**Solución:** Mover a `(dashboard)/` para sidebar, `(auth)/` para auth layout.
-
----
-
-## Referencias
-
-- [Estructura de rutas](../../frontend/src/app/)
-- [Componentes Glass](../../frontend/src/components/ui/glass/)
-- [Skill add-i18n-keys](../add-i18n-keys/SKILL.md)
-- [Next.js App Router Docs](https://nextjs.org/docs/app)
-
----
-
-*Última actualización: 2025-02-04*
+*Última actualización: 2026-02-05*

@@ -38,6 +38,49 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Glass System */
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-hover: var(--glass-bg-hover);
+  --color-glass-bg-strong: var(--glass-bg-strong);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-subtle: var(--glass-border-subtle);
+  --color-glass-overlay: var(--glass-overlay);
+  --color-glass-overlay-strong: var(--glass-overlay-strong);
+
+  /* Text Hierarchy */
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-quaternary);
+  --color-text-ghost: var(--text-ghost);
+  --color-text-highlight: var(--text-highlight);
+  --color-text-subtle: var(--text-subtle);
+
+  /* Brand / Neon */
+  --color-neon: var(--neon);
+  --color-neon-bg: var(--neon-bg);
+  --color-neon-bg-strong: var(--neon-bg-strong);
+  --color-neon-border: var(--neon-border);
+  --color-neon-text: var(--neon-text);
+
+  /* Error */
+  --color-error-bg: var(--error-bg);
+  --color-error-border: var(--error-border);
+  --color-error-text: var(--error-text);
+
+  /* Status */
+  --color-success-text: var(--success-text);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+
+  /* Surfaces */
+  --color-surface-page: var(--surface-page);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+
+  /* Shadows */
+  --shadow-neon: var(--neon-glow);
+
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
@@ -68,7 +111,7 @@
   --accent: #f7f7f7;
   --accent-foreground: #000000;
 
-  --destructive: #000000; /* Minimal error style */
+  --destructive: #000000;
   --destructive-foreground: #ffffff;
 
   --border: #e0e0e0;
@@ -91,6 +134,51 @@
   --sidebar-accent-foreground: #000000;
   --sidebar-border: #e0e0e0;
   --sidebar-ring: #000000;
+
+  /* Glass System (Light) */
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-bg-hover: rgba(0, 0, 0, 0.06);
+  --glass-bg-strong: rgba(0, 0, 0, 0.05);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-border-subtle: rgba(0, 0, 0, 0.06);
+  --glass-overlay: rgba(0, 0, 0, 0.2);
+  --glass-overlay-strong: rgba(0, 0, 0, 0.5);
+
+  /* Text Hierarchy (Light) */
+  --text-secondary: rgba(0, 0, 0, 0.5);
+  --text-tertiary: rgba(0, 0, 0, 0.4);
+  --text-quaternary: rgba(0, 0, 0, 0.3);
+  --text-ghost: rgba(0, 0, 0, 0.15);
+  --text-highlight: rgba(0, 0, 0, 0.85);
+  --text-subtle: rgba(0, 0, 0, 0.6);
+
+  /* Brand / Neon (Light - toned down for readability) */
+  --neon: #059c05;
+  --neon-bg: rgba(5, 156, 5, 0.08);
+  --neon-bg-strong: rgba(5, 156, 5, 0.15);
+  --neon-border: rgba(5, 156, 5, 0.25);
+  --neon-text: #047a04;
+  --neon-glow: none;
+
+  /* Error (Light) */
+  --error-bg: rgba(220, 38, 38, 0.08);
+  --error-border: rgba(220, 38, 38, 0.25);
+  --error-text: #dc2626;
+
+  /* Status (Light) */
+  --success-text: #16a34a;
+  --warning-bg: rgba(245, 158, 11, 0.08);
+  --warning-border: rgba(245, 158, 11, 0.25);
+  --warning-text: #b45309;
+
+  /* Surfaces (Light) */
+  --surface-page: #ffffff;
+  --surface-raised: #f7f7f7;
+  --surface-overlay: #ffffff;
+
+  /* Gradient Heading (Light) */
+  --gradient-heading-from: #000000;
+  --gradient-heading-to: rgba(0, 0, 0, 0.6);
 }
 
 .dark {
@@ -137,6 +225,51 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #2f2f2f;
   --sidebar-ring: #ffffff;
+
+  /* Glass System (Dark) */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-hover: rgba(255, 255, 255, 0.1);
+  --glass-bg-strong: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-subtle: rgba(255, 255, 255, 0.05);
+  --glass-overlay: rgba(0, 0, 0, 0.4);
+  --glass-overlay-strong: rgba(0, 0, 0, 0.6);
+
+  /* Text Hierarchy (Dark) */
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-quaternary: rgba(255, 255, 255, 0.3);
+  --text-ghost: rgba(255, 255, 255, 0.15);
+  --text-highlight: rgba(255, 255, 255, 0.9);
+  --text-subtle: rgba(255, 255, 255, 0.6);
+
+  /* Brand / Neon (Dark - vibrant for dark backgrounds) */
+  --neon: #0df20d;
+  --neon-bg: rgba(13, 242, 13, 0.1);
+  --neon-bg-strong: rgba(13, 242, 13, 0.2);
+  --neon-border: rgba(13, 242, 13, 0.25);
+  --neon-text: #0df20d;
+  --neon-glow: 0 0 15px rgba(13, 242, 13, 0.3);
+
+  /* Error (Dark) */
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.25);
+  --error-text: #f87171;
+
+  /* Status (Dark) */
+  --success-text: #4ade80;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --warning-border: rgba(245, 158, 11, 0.25);
+  --warning-text: #fbbf24;
+
+  /* Surfaces (Dark) */
+  --surface-page: #191919;
+  --surface-raised: #202020;
+  --surface-overlay: #191919;
+
+  /* Gradient Heading (Dark) */
+  --gradient-heading-from: #ffffff;
+  --gradient-heading-to: rgba(255, 255, 255, 0.6);
 }
 
 @layer base {
@@ -145,5 +278,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-gradient-heading {
+    background-image: linear-gradient(to bottom, var(--gradient-heading-from), var(--gradient-heading-to));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-heading-r {
+    background-image: linear-gradient(to right, var(--gradient-heading-from), var(--gradient-heading-to));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }

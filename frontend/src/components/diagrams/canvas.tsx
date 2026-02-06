@@ -53,7 +53,7 @@ export default function DiagramCanvas({ spec }: DiagramCanvasProps) {
       markerEnd: {
         type: MarkerType.ArrowClosed,
       },
-      style: { stroke: "#fff" }, // White lines for dark mode
+      style: { stroke: "var(--foreground)" },
     }));
   }, [spec]);
 
@@ -62,7 +62,7 @@ export default function DiagramCanvas({ spec }: DiagramCanvasProps) {
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
   return (
-    <div className="h-[600px] w-full bg-slate-950/50 rounded-xl border border-white/10">
+    <div className="h-[600px] w-full bg-surface-overlay rounded-xl border border-glass-border-subtle">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -72,7 +72,7 @@ export default function DiagramCanvas({ spec }: DiagramCanvasProps) {
         fitView
       >
         <Background />
-        <Controls className="!bg-white/10 !border-white/10 !fill-white" />
+        <Controls className="!bg-glass-bg !border-glass-border !fill-foreground" />
       </ReactFlow>
     </div>
   );

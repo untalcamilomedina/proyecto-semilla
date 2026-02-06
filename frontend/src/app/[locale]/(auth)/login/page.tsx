@@ -74,7 +74,7 @@ export default function LoginPage() {
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {error && (
-                    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-400 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <div className="rounded-xl bg-error-bg border border-error-border p-4 text-sm text-error-text animate-in fade-in slide-in-from-top-1 duration-300">
                         {error}
                     </div>
                 )}
@@ -99,7 +99,7 @@ export default function LoginPage() {
                         <div className="flex justify-end px-1">
                             <Link 
                                 href="/forgot-password" 
-                                className="text-[11px] text-neon/70 hover:text-neon transition-colors"
+                                className="text-[11px] text-neon-text hover:text-neon-text transition-colors"
                             >
                                 {t("forgotPassword")}
                             </Link>
@@ -116,9 +116,9 @@ export default function LoginPage() {
                         {isLoading ? "..." : t("login")}
                     </GlassButton>
 
-                    <p className="text-sm text-white/40 text-center">
+                    <p className="text-sm text-text-tertiary text-center">
                         {t("noAccount")}{" "}
-                        <Link href="/signup" className="text-neon hover:text-neon/80 font-medium transition-colors">
+                        <Link href="/signup" className="text-neon-text hover:text-neon-text font-medium transition-colors">
                             {t("register")}
                         </Link>
                     </p>

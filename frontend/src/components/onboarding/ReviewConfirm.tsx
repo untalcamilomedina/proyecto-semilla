@@ -27,44 +27,44 @@ export default function ReviewConfirm() {
 
   return (
     <div className="space-y-6 animate-in slide-in-from-right-8 duration-500">
-      
+
       <div className="space-y-4">
         {/* User */}
-        <div className="bg-white/5 p-4 rounded-xl flex justify-between items-center">
+        <div className="bg-glass-bg p-4 rounded-xl flex justify-between items-center">
           <div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">Profile</div>
-            <div className="text-white font-medium">{store.user.firstName} {store.user.lastName}</div>
+            <div className="text-xs text-text-secondary uppercase tracking-wider">Profile</div>
+            <div className="text-foreground font-medium">{store.user.firstName} {store.user.lastName}</div>
           </div>
-          <Check className="w-5 h-5 text-neon" />
+          <Check className="w-5 h-5 text-neon-text" />
         </div>
 
         {/* Organization */}
-        <div className="bg-white/5 p-4 rounded-xl flex justify-between items-center">
+        <div className="bg-glass-bg p-4 rounded-xl flex justify-between items-center">
           <div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">Workspace</div>
-            <div className="text-white font-medium">{store.organization.name}</div>
-            <div className="text-xs text-white/30">{store.organization.slug}.acme.dev</div>
+            <div className="text-xs text-text-secondary uppercase tracking-wider">Workspace</div>
+            <div className="text-foreground font-medium">{store.organization.name}</div>
+            <div className="text-xs text-text-quaternary">{store.organization.slug}.acme.dev</div>
           </div>
-          <Check className="w-5 h-5 text-neon" />
+          <Check className="w-5 h-5 text-neon-text" />
         </div>
 
         {/* Billing */}
-        <div className="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-neon/30">
+        <div className="bg-glass-bg p-4 rounded-xl flex justify-between items-center border border-neon-border">
           <div>
-             <div className="text-xs text-white/50 uppercase tracking-wider">Billing Setup</div>
-             <div className="text-white font-medium">
+             <div className="text-xs text-text-secondary uppercase tracking-wider">Billing Setup</div>
+             <div className="text-foreground font-medium">
                 {store.stripe.enabled ? "Monetization Enabled" : "No Monetization"}
              </div>
              {store.stripe.enabled && (
-                <div className="text-xs text-neon mt-1">Stripe Keys Configured</div>
+                <div className="text-xs text-neon-text mt-1">Stripe Keys Configured</div>
              )}
           </div>
-          <Check className="w-5 h-5 text-neon" />
+          <Check className="w-5 h-5 text-neon-text" />
         </div>
       </div>
 
-      <GlassButton 
-        onClick={handleSubmit} 
+      <GlassButton
+        onClick={handleSubmit}
         disabled={isSubmitting}
         variant="primary"
         className="w-full text-lg py-4 h-auto"

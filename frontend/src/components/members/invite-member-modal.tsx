@@ -51,7 +51,7 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
         if ('key' in e) {
             if (e.key !== "Enter" && e.key !== ",") return;
         }
-        
+
         const email = currentEmail.trim().replace(/,$/, "");
         if (!email) return;
 
@@ -110,9 +110,9 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
                         <Label>{t("emails")}</Label>
                         <div className="flex flex-wrap gap-2 p-2 border rounded-md min-h-[42px]">
                             {emails.map((email) => (
-                                <div key={email} className="bg-zinc-100 dark:bg-zinc-800 flex items-center gap-1 px-2 py-1 rounded text-sm group">
+                                <div key={email} className="bg-muted flex items-center gap-1 px-2 py-1 rounded text-sm group">
                                     <span>{email}</span>
-                                    <button onClick={() => removeEmail(email)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
+                                    <button onClick={() => removeEmail(email)} className="text-text-tertiary hover:text-foreground">
                                         <X className="h-3 w-3" />
                                     </button>
                                 </div>
@@ -128,7 +128,7 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
                                 }}
                             />
                         </div>
-                        <p className="text-xs text-zinc-500">{t("emailsHint")}</p>
+                        <p className="text-xs text-text-secondary">{t("emailsHint")}</p>
                     </div>
 
                     <div className="space-y-2">

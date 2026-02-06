@@ -35,7 +35,6 @@ export default function OrganizationForm() {
 
   const nameValue = watch("name");
 
-  // Auto-generate slug from name
   useEffect(() => {
     if (nameValue && !organization.slug) {
       const slug = nameValue
@@ -55,29 +54,29 @@ export default function OrganizationForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in slide-in-from-right-8 duration-500">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-white">Organization Name</Label>
-        <GlassInput 
-          id="name" 
+        <Label htmlFor="name" className="text-foreground">Organization Name</Label>
+        <GlassInput
+          id="name"
           placeholder="Acme Corp"
-          {...register("name")} 
-          className={errors.name ? "border-red-500" : ""} 
+          {...register("name")}
+          className={errors.name ? "border-error-border" : ""}
         />
-        {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-error-text">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="slug" className="text-white">Workspace URL</Label>
+        <Label htmlFor="slug" className="text-foreground">Workspace URL</Label>
         <div className="flex items-center">
-          <span className="text-white/50 text-sm mr-2">acme.dev/</span>
-          <GlassInput 
-            id="slug" 
-            placeholder="acme-corp" 
-            {...register("slug")} 
-            className={cn(errors.slug ? "border-red-500" : "")} 
+          <span className="text-text-secondary text-sm mr-2">acme.dev/</span>
+          <GlassInput
+            id="slug"
+            placeholder="acme-corp"
+            {...register("slug")}
+            className={cn(errors.slug ? "border-error-border" : "")}
           />
         </div>
-        {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-        <p className="text-xs text-white/40">This will be your unique address.</p>
+        {errors.slug && <p className="text-xs text-error-text">{errors.slug.message}</p>}
+        <p className="text-xs text-text-tertiary">This will be your unique address.</p>
       </div>
 
       <GlassButton type="submit" className="w-full">

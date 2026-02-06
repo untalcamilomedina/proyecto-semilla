@@ -22,8 +22,8 @@ export default function AuditLogsPage() {
                         <ScrollText className="h-6 w-6 text-blue-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-white/90">{t("title")}</h1>
-                        <p className="text-sm text-white/40">
+                        <h1 className="text-2xl font-bold text-text-highlight">{t("title")}</h1>
+                        <p className="text-sm text-text-tertiary">
                             {t("description")}
                         </p>
                     </div>

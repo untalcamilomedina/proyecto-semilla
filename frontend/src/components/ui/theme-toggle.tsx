@@ -10,7 +10,7 @@ export function ThemeToggle() {
   return (
     <GlassButton
       variant="secondary"
-      className="h-9 w-9 p-0 rounded-lg border-white/5 hover:bg-white/10 text-white/60 hover:text-white"
+      className="h-9 w-9 p-0 rounded-lg border-glass-border-subtle hover:bg-glass-bg-hover text-text-subtle hover:text-foreground"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
     >

@@ -36,7 +36,7 @@ export default function UserProfileForm() {
     resolver: zodResolver(schema),
     defaultValues: {
       ...user,
-      confirmPassword: user.password || "", // Pre-fill if editing (unsafe but acceptable for wizard flow)
+      confirmPassword: user.password || "",
     },
   });
 
@@ -56,40 +56,40 @@ export default function UserProfileForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in slide-in-from-right-8 duration-500">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-white">First Name</Label>
-          <GlassInput id="firstName" {...register("firstName")} className={errors.firstName ? "border-red-500" : ""} />
-          {errors.firstName && <p className="text-xs text-red-500">{errors.firstName.message}</p>}
+          <Label htmlFor="firstName" className="text-foreground">First Name</Label>
+          <GlassInput id="firstName" {...register("firstName")} className={errors.firstName ? "border-error-border" : ""} />
+          {errors.firstName && <p className="text-xs text-error-text">{errors.firstName.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-white">Last Name</Label>
-          <GlassInput id="lastName" {...register("lastName")} className={errors.lastName ? "border-red-500" : ""} />
-          {errors.lastName && <p className="text-xs text-red-500">{errors.lastName.message}</p>}
+          <Label htmlFor="lastName" className="text-foreground">Last Name</Label>
+          <GlassInput id="lastName" {...register("lastName")} className={errors.lastName ? "border-error-border" : ""} />
+          {errors.lastName && <p className="text-xs text-error-text">{errors.lastName.message}</p>}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-white">Email Address</Label>
-        <GlassInput id="email" type="email" {...register("email")} className={errors.email ? "border-red-500" : ""} />
-        {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+        <Label htmlFor="email" className="text-foreground">Email Address</Label>
+        <GlassInput id="email" type="email" {...register("email")} className={errors.email ? "border-error-border" : ""} />
+        {errors.email && <p className="text-xs text-error-text">{errors.email.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-white">Password</Label>
-          <GlassInput id="password" type="password" {...register("password")} className={errors.password ? "border-red-500" : ""} />
-          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+          <Label htmlFor="password" className="text-foreground">Password</Label>
+          <GlassInput id="password" type="password" {...register("password")} className={errors.password ? "border-error-border" : ""} />
+          {errors.password && <p className="text-xs text-error-text">{errors.password.message}</p>}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
-          <GlassInput id="confirmPassword" type="password" {...register("confirmPassword")} className={errors.confirmPassword ? "border-red-500" : ""} />
-          {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>}
+          <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+          <GlassInput id="confirmPassword" type="password" {...register("confirmPassword")} className={errors.confirmPassword ? "border-error-border" : ""} />
+          {errors.confirmPassword && <p className="text-xs text-error-text">{errors.confirmPassword.message}</p>}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="role" className="text-white">Role</Label>
+        <Label htmlFor="role" className="text-foreground">Role</Label>
         <GlassInput id="role" {...register("role")} disabled className="opacity-50" />
-        <p className="text-xs text-white/40">You are creating this workspace, so you are the Owner.</p>
+        <p className="text-xs text-text-tertiary">You are creating this workspace, so you are the Owner.</p>
       </div>
 
       <GlassButton type="submit" className="w-full">

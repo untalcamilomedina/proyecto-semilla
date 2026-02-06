@@ -45,11 +45,11 @@ export default function OnboardingModulesPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 px-4 py-12">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
             <Card className="w-full max-w-lg">
                 <CardHeader className="text-center">
-                    <div className="mx-auto w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4">
-                        <Blocks className="h-6 w-6 text-purple-600" />
+                    <div className="mx-auto w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
+                        <Blocks className="h-6 w-6 text-purple-400" />
                     </div>
                     <CardTitle className="text-2xl">{t("title")}</CardTitle>
                     <CardDescription>
@@ -59,7 +59,7 @@ export default function OnboardingModulesPage() {
 
                 <CardContent className="space-y-3">
                     {error && (
-                        <div className="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                        <div className="rounded-md bg-error-bg border border-error-border p-3 text-sm text-error-text">
                             {error}
                         </div>
                     )}
@@ -68,24 +68,24 @@ export default function OnboardingModulesPage() {
                         <label
                             key={modId}
                             className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${selected.includes(modId)
-                                    ? "border-indigo-500 bg-indigo-50"
-                                    : "border-zinc-200 hover:border-zinc-300"
+                                    ? "border-primary bg-primary/10"
+                                    : "border-border hover:border-ring"
                                 }`}
                         >
                             <input
                                 type="checkbox"
                                 checked={selected.includes(modId)}
                                 onChange={() => toggleModule(modId)}
-                                className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                                className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                             />
                             <div>
-                                <p className="font-medium text-zinc-900">{t(`modules.${modId}.label`)}</p>
-                                <p className="text-sm text-zinc-500">{t(`modules.${modId}.description`)}</p>
+                                <p className="font-medium text-foreground">{t(`modules.${modId}.label`)}</p>
+                                <p className="text-sm text-muted-foreground">{t(`modules.${modId}.description`)}</p>
                             </div>
                         </label>
                     ))}
 
-                    <p className="text-xs text-zinc-500 text-center pt-2">
+                    <p className="text-xs text-muted-foreground text-center pt-2">
                         {t("changeLater")}
                     </p>
                 </CardContent>
