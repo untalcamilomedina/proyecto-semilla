@@ -1,10 +1,12 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://blockflow.app'
+
     return {
         rules: {
             userAgent: '*',
-            allow: ['/', '/login', '/signup', '/docs'],
+            allow: ['/', '/login', '/signup'],
             disallow: [
                 '/dashboard/',
                 '/onboarding/',
@@ -13,6 +15,6 @@ export default function robots(): MetadataRoute.Robots {
                 '/static/'
             ],
         },
-        sitemap: 'https://semilla.automacon.com.mx/sitemap.xml',
+        sitemap: `${baseUrl}/sitemap.xml`,
     }
 }

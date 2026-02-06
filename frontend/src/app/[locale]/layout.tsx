@@ -1,16 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { getLocale, getMessages, setRequestLocale } from "next-intl/server";
+import { getLocale, getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Providers } from "@/components/providers";
+import { WebVitals } from "@/components/web-vitals";
 import { Toaster } from "@/components/ui/sonner";
-import "@/app/globals.css"; // Adjusted import path since we moved to [locale]
+import "@/app/globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "BlockFlow Platform",
-    template: "%s | BlockFlow",
-  },
-  description: "Marketplace de herramientas para Notion.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "meta" });
+
+  return {
+    title: {
+      default: t("title"),
+      template: `%s | ${t("siteName")}`,
+    },
+    description: t("description"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://blockflow.app"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      siteName: t("siteName"),
+      locale,
+      type: "website",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -40,6 +58,7 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <Providers locale={locale} messages={messages}>
+          <WebVitals />
           {children}
           <Toaster />
         </Providers>

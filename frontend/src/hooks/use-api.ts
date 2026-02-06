@@ -73,13 +73,20 @@ export function useUpdateMutation<TData, TResponse = TData>(
 }
 
 /**
- * Generic hook for deleting a resource
+ * Generic hook for deleting a resource.
+ * Accepts a static path or a function (id) => path for dynamic endpoints.
  */
-export function useDeleteMutation(path: string, invalidateKeys?: string[][]) {
+export function useDeleteMutation(
+    pathOrFn: string | ((id: string) => string),
+    invalidateKeys?: string[][]
+) {
     const queryClient = useQueryClient();
 
-    return useMutation<void, ApiError, void>({
-        mutationFn: () => apiDelete(path),
+    return useMutation<void, ApiError, string | void>({
+        mutationFn: (id) => {
+            const path = typeof pathOrFn === "function" ? pathOrFn(id as string) : pathOrFn;
+            return apiDelete(path);
+        },
         onSuccess: () => {
             invalidateKeys?.forEach((key) => {
                 queryClient.invalidateQueries({ queryKey: key });

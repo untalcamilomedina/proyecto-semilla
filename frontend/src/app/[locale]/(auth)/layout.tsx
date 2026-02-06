@@ -1,12 +1,22 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-    title: {
-        default: "Autenticación",
-        template: "%s | Autenticación",
-    },
-    description: "Accede a tu cuenta en Proyecto Semilla. Autenticación segura y rápida.",
-};
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "auth" });
+
+    return {
+        title: {
+            default: t("metaTitle"),
+            template: `%s | ${t("metaTitle")}`,
+        },
+        description: t("metaDescription"),
+    };
+}
 
 export default function AuthFlowLayout({
     children,

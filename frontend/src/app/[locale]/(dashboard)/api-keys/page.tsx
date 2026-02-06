@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Key, Plus, Trash2 } from "lucide-react";
-import { apiGet, apiPost, apiDelete } from "@/lib/api";
+import { useResourceQuery, useCreateMutation, useDeleteMutation } from "@/hooks/use-api";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,56 +26,52 @@ interface ApiKey {
     service: string;
 }
 
+interface CreateKeyPayload {
+    name: string;
+    key: string;
+    service: string;
+}
+
 export default function ApiKeysPage() {
     const t = useTranslations("keys");
     const tc = useTranslations("common");
-    const [keys, setKeys] = useState<ApiKey[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const [newKeyName, setNewKeyName] = useState("");
     const [newKeyValue, setNewKeyValue] = useState("");
     const [newKeyService, setNewKeyService] = useState("gemini");
 
-    const fetchKeys = async () => {
-        try {
-            const data = await apiGet<ApiKey[]>("/api/v1/ai/keys/");
-            setKeys(data || []);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
+    const { data: keys, isLoading: loading } = useResourceQuery<ApiKey[]>(
+        ["api-keys"],
+        "/api/v1/ai/keys/"
+    );
+
+    const createMutation = useCreateMutation<CreateKeyPayload>(
+        "/api/v1/ai/keys/",
+        [["api-keys"]]
+    );
+
+    const deleteMutation = useDeleteMutation(
+        (id: string) => `/api/v1/ai/keys/${id}/`,
+        [["api-keys"]]
+    );
+
+    const handleCreate = () => {
+        createMutation.mutate(
+            { name: newKeyName, key: newKeyValue, service: newKeyService },
+            {
+                onSuccess: () => {
+                    setIsCreateOpen(false);
+                    setNewKeyName("");
+                    setNewKeyValue("");
+                },
+            }
+        );
     };
 
-    useEffect(() => {
-        fetchKeys();
-    }, []);
-
-    const handleCreate = async () => {
-        try {
-            await apiPost("/api/v1/ai/keys/", {
-                name: newKeyName,
-                key: newKeyValue,
-                service: newKeyService
-            });
-            setIsCreateOpen(false);
-            setNewKeyName("");
-            setNewKeyValue("");
-            fetchKeys();
-        } catch (e) {
-            console.error("Failed to create key", e);
-        }
-    };
-
-    const handleDelete = async (id: string) => {
+    const handleDelete = (id: string) => {
         if (!confirm(t("confirmDelete"))) return;
-        try {
-            await apiDelete(`/api/v1/ai/keys/${id}/`);
-            fetchKeys();
-        } catch (e) {
-            console.error("Failed to delete key", e);
-        }
+        deleteMutation.mutate(id);
     };
 
     return (
@@ -142,7 +138,7 @@ export default function ApiKeysPage() {
             <div className="grid gap-4">
                 {loading ? (
                     <div className="text-text-secondary">{t("loadingKeys")}</div>
-                ) : keys.length === 0 ? (
+                ) : !keys?.length ? (
                     <GlassCard className="text-center py-12">
                         <Key className="w-12 h-12 text-text-ghost mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-foreground">{t("noKeys")}</h3>
@@ -151,7 +147,7 @@ export default function ApiKeysPage() {
                         </p>
                     </GlassCard>
                 ) : (
-                    keys.map((key) => (
+                    keys?.map((key) => (
                         <GlassCard key={key.id} className="flex items-center justify-between p-4">
                             <div className="flex items-center gap-4">
                                 <div className="p-2 bg-purple-500/10 rounded-lg">

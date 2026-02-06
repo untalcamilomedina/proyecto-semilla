@@ -53,3 +53,18 @@ repos:
       - id: safety
         args: ["check", "--full-report", "-r", "requirements/dev.txt"]
 
+  - repo: local
+    hooks:
+      - id: frontend-lint
+        name: Frontend ESLint
+        entry: bash -c 'cd frontend && npx eslint --max-warnings=0'
+        language: system
+        files: 'frontend/src/.*\.(ts|tsx)$'
+        pass_filenames: false
+      - id: frontend-typecheck
+        name: Frontend TypeScript
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: 'frontend/src/.*\.(ts|tsx)$'
+        pass_filenames: false
+

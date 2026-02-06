@@ -1,6 +1,6 @@
 {
-    "name": "Proyecto Semilla",
-    "short_name": "Semilla",
+    "name": "BlockFlow Platform",
+    "short_name": "BlockFlow",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -17,6 +17,6 @@
     "background_color": "#ffffff",
     "display": "standalone",
     "start_url": "/",
-    "description": "Una plataforma SaaS moderna y potente",
+    "description": "Enterprise SaaS platform for team collaboration and data modeling",
     "orientation": "portrait"
 }

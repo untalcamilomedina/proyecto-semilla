@@ -3,13 +3,13 @@
 // Skip static generation - requires auth
 export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from "react";
 import { Link } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/use-auth";
+import { useResourceQuery } from "@/hooks/use-api";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
+import { StatsSkeleton } from "@/components/ui/stats-skeleton";
 import { Users, Shield, CreditCard, BarChart3, ArrowRight } from "lucide-react";
-import { apiGet } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 interface DashboardData {
@@ -33,30 +33,16 @@ export default function DashboardPage() {
     const t = useTranslations("dashboard");
     const tc = useTranslations("common");
     const { tenant, user } = useAuth();
-    const [data, setData] = useState<DashboardData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await apiGet<DashboardData>("/api/v1/dashboard/");
-                setData(response);
-            } catch (error) {
-                console.error("Error fetching dashboard data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (tenant) {
-            fetchData();
-        }
-    }, [tenant]);
+    const { data, isLoading } = useResourceQuery<DashboardData>(
+        ["dashboard"],
+        "/api/v1/dashboard/",
+        { enabled: !!tenant }
+    );
 
     const stats = [
         { 
             name: t("stats.members"), 
-            value: isLoading ? "..." : data?.stats.total_members.toString() || "0", 
+            value: isLoading ? "..." : data?.stats?.total_members?.toString() || "0",
             icon: Users, 
             color: "text-blue-400",
             bg: "bg-blue-500/10"
@@ -70,7 +56,7 @@ export default function DashboardPage() {
         },
         { 
             name: t("stats.billing"), 
-            value: isLoading ? "..." : `$${data?.stats.mrr || 0}`, 
+            value: isLoading ? "..." : `$${data?.stats?.mrr || 0}`,
             icon: CreditCard, 
             color: "text-purple-400",
             bg: "bg-purple-500/10"
@@ -99,7 +85,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {isLoading ? <StatsSkeleton /> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat) => (
                     <GlassCard key={stat.name} className="p-6 group hover:translate-y-[-4px] transition-all duration-300">
                         <div className="flex items-center gap-4">
@@ -116,7 +102,7 @@ export default function DashboardPage() {
                         </div>
                     </GlassCard>
                 ))}
-            </div>
+            </div>}
 
             {/* Bottom Section */}
             <div className="grid gap-8 lg:grid-cols-3">

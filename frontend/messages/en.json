@@ -1,4 +1,9 @@
 {
+    "meta": {
+        "title": "BlockFlow Platform",
+        "siteName": "BlockFlow",
+        "description": "Enterprise SaaS platform for team collaboration and data modeling."
+    },
     "common": {
         "loading": "Loading...",
         "error": "Error",
@@ -29,6 +34,8 @@
         "user": "User"
     },
     "auth": {
+        "metaTitle": "Authentication",
+        "metaDescription": "Sign in to your BlockFlow account. Secure and fast authentication.",
         "login": "Log in",
         "logout": "Log out",
         "signup": "Sign up",
@@ -90,6 +97,9 @@
     "diagrams": {
         "title": "Diagrams",
         "description": "Visualize and manage your database schemas.",
+        "confirmDelete": "Are you sure you want to delete this diagram?",
+        "deleteSuccess": "Diagram deleted successfully",
+        "deleteError": "Failed to delete diagram",
         "list": {
             "name": "Name",
             "entities": "Entities",

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { enterpriseService } from "@/services/enterprise";
+import { usePaginatedQuery } from "@/hooks/use-api";
 import { ActivityLog } from "@/types";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { DataTable } from "@/components/members/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
@@ -14,22 +14,11 @@ import { Clock } from "lucide-react";
 
 export function AuditLogsTable() {
     const t = useTranslations("audit");
-    const [data, setData] = useState<ActivityLog[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchLogs = async () => {
-            try {
-                const response = await enterpriseService.getAuditLogs();
-                setData(response.results);
-            } catch (error) {
-                console.error("Failed to fetch audit logs:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchLogs();
-    }, []);
+    const { data: paginatedData, isLoading } = usePaginatedQuery<ActivityLog>(
+        ["audit-logs"],
+        "/api/v1/activity-logs/"
+    );
 
     const columns: ColumnDef<ActivityLog>[] = [
         {
@@ -90,8 +79,8 @@ export function AuditLogsTable() {
 
     if (isLoading) {
         return (
-            <GlassCard className="flex items-center justify-center h-64 border-glass-border-subtle">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon" />
+            <GlassCard className="border-glass-border-subtle">
+                <TableSkeleton rows={5} columns={4} />
             </GlassCard>
         );
     }
@@ -99,7 +88,7 @@ export function AuditLogsTable() {
     return (
         <GlassCard className="p-0 overflow-hidden border-glass-border-subtle bg-glass-bg">
             <div className="p-4 md:p-6">
-                <DataTable columns={columns} data={data} />
+                <DataTable columns={columns} data={paginatedData?.results ?? []} />
             </div>
         </GlassCard>
     );

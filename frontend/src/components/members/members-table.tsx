@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Member } from "@/types/member";
-import { memberService } from "@/services/members";
 import { useTranslations } from "next-intl";
 import { DataTable } from "./data-table";
 import { getColumns } from "./columns";
 import { useAuth } from "@/hooks/use-auth";
+import { useResourceQuery } from "@/hooks/use-api";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 
 /**
  * MembersTable
@@ -16,32 +16,18 @@ import { GlassCard } from "@/components/ui/glass/GlassCard";
 export function MembersTable() {
     const t = useTranslations("members");
     const { tenant } = useAuth();
-    const [data, setData] = useState<Member[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
     const columns = getColumns(t);
 
-    useEffect(() => {
-        const fetchMembers = async () => {
-            try {
-                const members = await memberService.getAll();
-                setData(members);
-            } catch (error) {
-                console.error("Failed to fetch members:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (tenant) {
-            fetchMembers();
-        }
-    }, [tenant]);
+    const { data, isLoading } = useResourceQuery<Member[]>(
+        ["members"],
+        "/api/v1/memberships/",
+        { enabled: !!tenant }
+    );
 
     if (isLoading) {
         return (
-            <GlassCard className="flex items-center justify-center h-64 border-glass-border-subtle">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-text" />
+            <GlassCard className="border-glass-border-subtle">
+                <TableSkeleton rows={5} columns={4} />
             </GlassCard>
         );
     }
@@ -49,7 +35,7 @@ export function MembersTable() {
     return (
         <GlassCard className="p-0 overflow-hidden border-glass-border-subtle bg-glass-bg">
             <div className="p-4 md:p-6">
-                <DataTable columns={columns} data={data} />
+                <DataTable columns={columns} data={data ?? []} />
             </div>
         </GlassCard>
     );

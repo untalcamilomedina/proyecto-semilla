@@ -1,45 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { api } from "@/lib/api";
-import DiagramCanvas from "@/components/diagrams/canvas";
+import { useResourceQuery } from "@/hooks/use-api";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { components } from "@/types/api";
 
+const DiagramCanvas = dynamic(
+    () => import("@/components/diagrams/canvas"),
+    {
+        ssr: false,
+        loading: () => <Skeleton className="h-[600px] w-full" />,
+    }
+);
+
 type Diagram = components["schemas"]["Diagram"];
-// ERDSpec definition might be inside Diagram oneOf or separate component
-// Assuming simplest case or using 'any' temporarily if types are strict
-type ERDSpec = any; 
+type ERDSpec = any;
 
 export default function DiagramPage() {
   const { id } = useParams() as { id: string };
-  const [diagram, setDiagram] = useState<Diagram | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch Diagram logic
-    // GET /api/v1/diagrams/{id}/
-    const fetchDiagram = async () => {
-      try {
-        const { data, error } = await api.GET("/api/v1/diagrams/{id}/", {
-            params: { path: { id } }
-        });
-        if (data) {
-            setDiagram(data);
-        }
-      } catch (e) {
-        console.error("Failed to load diagram", e);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: diagram, isLoading } = useResourceQuery<Diagram>(
+    ["diagrams", id],
+    `/api/v1/diagrams/${id}/`,
+    { enabled: !!id }
+  );
 
-    if (id) fetchDiagram();
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -51,7 +40,6 @@ export default function DiagramPage() {
     return <div>Diagram not found</div>;
   }
 
-  // Cast Spec to ERDSpec (assuming type guard in real app)
   const spec = diagram.spec as unknown as ERDSpec;
 
   return (

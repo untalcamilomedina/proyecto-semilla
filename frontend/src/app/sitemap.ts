@@ -1,33 +1,17 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://semilla.automacon.com.mx'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://blockflow.app'
+    const locales = ['en', 'es']
 
-    // En un boilerplate real, aquí podrías fetchear posts de un CMS o productos
-    return [
-        {
-            url: baseUrl,
+    const routes = ['', '/login', '/signup']
+
+    return locales.flatMap((locale) =>
+        routes.map((route) => ({
+            url: `${baseUrl}/${locale}${route}`,
             lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 1,
-        },
-        {
-            url: `${baseUrl}/login`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/signup`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/docs`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-        },
-    ]
+            changeFrequency: route === '' ? 'daily' as const : 'monthly' as const,
+            priority: route === '' ? 1 : 0.8,
+        }))
+    )
 }
