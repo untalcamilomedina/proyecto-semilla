@@ -27,7 +27,7 @@ export const setAuthToken = (token: string | null) => {
 let _csrfToken: string | null = null;
 
 async function fetchCsrfToken(): Promise<string> {
-  const response = await fetch(`${API_URL}/api/v1/csrf/`, {
+  const response = await fetch(`${API_URL}/csrf/`, {
     credentials: "include",
   });
   const data = await response.json();
