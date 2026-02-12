@@ -33,6 +33,6 @@ uvicorn>=0.30
 dj-stripe>=2.9
 django-anymail[sendgrid]>=10.0
 django-redis>=5.4
-django-health-check>=3.18
+django-health-check>=3.18  # v4.0 removed sub-apps; only base app needed in INSTALLED_APPS
 notion-client>=2.0.0
 httpx>=0.27
