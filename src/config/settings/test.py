@@ -21,17 +21,8 @@ PASSWORD_HASHERS = [
 # Use in-memory email backend
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-# SQLite fallback when no DATABASE_URL is set (runs without Docker)
-if not os.environ.get("DATABASE_URL"):
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
-        }
-    }
-    # Disable tenant middleware (schema-based multitenancy requires PostgreSQL)
-    MIDDLEWARE = [m for m in MIDDLEWARE if "TenantMiddleware" not in m]  # noqa: F405
+# PostgreSQL ONLY — this project does not support SQLite.
+# Tests must run inside Docker: docker compose exec web pytest tests/
 
 # Disable Silk profiling in tests
 SILKY_INTERCEPT_PERCENT = 0
-

@@ -13,7 +13,10 @@ def test_healthz(client):
 def test_readyz(client):
     res = client.get("/readyz")
     assert res.status_code == 200
-    assert res.json() == {"status": "ready"}
+    data = res.json()
+    assert data["status"] == "ready"
+    assert "checks" in data
+    assert data["checks"]["database"] == "ok"
 
 
 @pytest.mark.django_db
