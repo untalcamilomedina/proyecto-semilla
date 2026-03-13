@@ -48,7 +48,7 @@ def test_membership_viewset_list():
         {"emails": ["invited1@example.com"]},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["invited"] == 1
@@ -58,7 +58,7 @@ def test_membership_viewset_list():
         {"emails": ["invited2@example.com"], "role_slug": "viewer"},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["invited"] == 1
@@ -66,7 +66,7 @@ def test_membership_viewset_list():
     res = client.get(
         "/api/v1/memberships/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 3
@@ -113,7 +113,7 @@ def test_membership_viewset_update_role():
         {"user": member_user.id, "role_slug": "member"},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     membership_id = res.data["id"]
@@ -125,7 +125,7 @@ def test_membership_viewset_update_role():
         {"role_slug": "viewer"},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["role_slug"] == "viewer"
@@ -169,7 +169,7 @@ def test_permission_viewset_list():
     res = client.get(
         "/api/v1/permissions/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     codenames = {p["codename"] for p in res.data["results"]}
@@ -178,7 +178,7 @@ def test_permission_viewset_list():
     res = client.get(
         "/api/v1/roles/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     role_slugs = {r["slug"] for r in res.data["results"]}
@@ -255,7 +255,7 @@ def test_plan_viewset_list():
     res = client.get(
         "/api/v1/plans/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
@@ -333,7 +333,7 @@ def test_subscription_viewset_operations():
     res = client.get(
         "/api/v1/subscriptions/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
@@ -345,21 +345,21 @@ def test_subscription_viewset_operations():
         {},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 405
 
     res = client.get(
         f"/api/v1/subscriptions/{subscription.id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 404
 
     res = client.get(
         "/api/v1/api-keys/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
@@ -369,7 +369,7 @@ def test_subscription_viewset_operations():
         {"name": "secondary", "scopes": ["billing:read"]},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     assert res.data["name"] == "secondary"
@@ -382,7 +382,7 @@ def test_subscription_viewset_operations():
         {"name": "scopeless"},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     assert res.data["name"] == "scopeless"
@@ -393,7 +393,7 @@ def test_subscription_viewset_operations():
     res = client.get(
         "/api/v1/api-keys/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 3
@@ -405,14 +405,14 @@ def test_subscription_viewset_operations():
         {},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 204
 
     res = client.get(
         "/api/v1/api-keys/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 2
@@ -477,7 +477,7 @@ def test_invoice_viewset_list():
     res = client.get(
         "/api/v1/invoices/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1

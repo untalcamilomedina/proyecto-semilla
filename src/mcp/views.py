@@ -114,3 +114,40 @@ class McpUsageLogViewSet(
 
     def perform_create(self, serializer):
         serializer.save(organization=self.get_organization())
+
+
+# ── MCP Protocol Endpoint ────────────────────────────────────
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from .tool_registry import get_tools_catalog
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def tool_catalog_view(request):
+    """
+    Return all auto-discovered API tools in MCP protocol format.
+
+    This endpoint introspects the DRF router and returns tool definitions
+    that AI agents can use to understand available API capabilities.
+
+    Response format:
+    {
+        "tools": [
+            {
+                "name": "courses_list",
+                "description": "List all courses",
+                "inputSchema": { "type": "object", "properties": {...} }
+            },
+            ...
+        ]
+    }
+    """
+    tools = get_tools_catalog()
+    return Response({
+        "tools": tools,
+        "count": len(tools),
+        "version": "1.0",
+    })

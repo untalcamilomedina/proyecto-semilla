@@ -40,7 +40,7 @@ class StartOnboardingSerializer(serializers.Serializer):
 
 class ModulesSerializer(serializers.Serializer):
     MODULE_CHOICES = [
-        ("cms", "CMS (Wagtail)"),
+        ("cms", "CMS (MDX)"),
         ("lms", "LMS (Courses)"),
         ("community", "Community"),
         ("mcp", "MCP Server"),

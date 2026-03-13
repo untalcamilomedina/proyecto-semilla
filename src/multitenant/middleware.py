@@ -7,6 +7,8 @@ from django.utils.deprecation import MiddlewareMixin
 from .models import Domain, Tenant
 from .schema import PUBLIC_SCHEMA_NAME, schema_context, set_schema
 
+from common.rls import set_rls_bypass, set_tenant_id
+
 
 class TenantMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -44,6 +46,13 @@ class TenantMiddleware(MiddlewareMixin):
                     branding=getattr(tenant_public, "branding", {}) or {},
                 )
             request.tenant = tenant_local
+
+            # RLS: Set tenant_id for Row-Level Security policies
+            set_tenant_id(tenant_local.id)
+
+            # RLS bypass for superusers
+            if hasattr(request, "user") and getattr(request.user, "is_superuser", False):
+                set_rls_bypass(True)
         else:
             set_schema(PUBLIC_SCHEMA_NAME)
             request.tenant = None

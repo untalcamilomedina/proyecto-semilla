@@ -50,7 +50,7 @@ def test_lms_course_crud():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     course_id = res.data["id"]
@@ -59,7 +59,7 @@ def test_lms_course_crud():
     res = client.get(
         "/api/v1/lms/courses/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
@@ -68,7 +68,7 @@ def test_lms_course_crud():
     res = client.get(
         f"/api/v1/lms/courses/{course_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["id"] == course_id
@@ -78,7 +78,7 @@ def test_lms_course_crud():
         {"title": "Course 102", "is_published": True},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["title"] == "Course 102"
@@ -87,14 +87,14 @@ def test_lms_course_crud():
     res = client.delete(
         f"/api/v1/lms/courses/{course_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 204
 
     res = client.get(
         f"/api/v1/lms/courses/{course_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 404
 
@@ -137,7 +137,7 @@ def test_lms_enrollment_create():
         course_payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     course_id = res.data["id"]
@@ -147,7 +147,7 @@ def test_lms_enrollment_create():
         {"user": user.id, "course": course_id},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     assert res.data["user"] == user.id
@@ -224,55 +224,55 @@ def test_community_forum_crud():
     payload = {"name": "General", "description": "General discussion", "is_active": True}
 
     res = client.post(
-        "/api/v1/community/forums/",
+        "/api/v1/community/spaces/",
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
-    forum_id = res.data["id"]
+    space_id = res.data["id"]
     assert res.data["name"] == payload["name"]
 
     res = client.get(
-        "/api/v1/community/forums/",
+        "/api/v1/community/spaces/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
-    assert res.data["results"][0]["id"] == forum_id
+    assert res.data["results"][0]["id"] == space_id
 
     res = client.get(
-        f"/api/v1/community/forums/{forum_id}/",
+        f"/api/v1/community/spaces/{space_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
-    assert res.data["id"] == forum_id
+    assert res.data["id"] == space_id
 
     res = client.patch(
-        f"/api/v1/community/forums/{forum_id}/",
+        f"/api/v1/community/spaces/{space_id}/",
         {"name": "General 2", "is_active": False},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["name"] == "General 2"
     assert res.data["is_active"] is False
 
     res = client.delete(
-        f"/api/v1/community/forums/{forum_id}/",
+        f"/api/v1/community/spaces/{space_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 204
 
     res = client.get(
-        f"/api/v1/community/forums/{forum_id}/",
+        f"/api/v1/community/spaces/{space_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 404
 
@@ -315,10 +315,12 @@ def test_community_post_requires_topic():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 400
-    assert "topic" in res.data
+    # Error may be in data directly or in data["details"]
+    errors = res.data.get("details", res.data)
+    assert "topic" in errors
 
 
 @pytest.mark.django_db(transaction=True)
@@ -365,7 +367,7 @@ def test_mcp_server_crud():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
     server_id = res.data["id"]
@@ -374,7 +376,7 @@ def test_mcp_server_crud():
     res = client.get(
         "/api/v1/mcp/servers/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["count"] == 1
@@ -383,7 +385,7 @@ def test_mcp_server_crud():
     res = client.get(
         f"/api/v1/mcp/servers/{server_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["id"] == server_id
@@ -393,7 +395,7 @@ def test_mcp_server_crud():
         {"description": "Updated", "is_active": False},
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["description"] == "Updated"
@@ -402,14 +404,14 @@ def test_mcp_server_crud():
     res = client.delete(
         f"/api/v1/mcp/servers/{server_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 204
 
     res = client.get(
         f"/api/v1/mcp/servers/{server_id}/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 404
 
@@ -452,8 +454,10 @@ def test_mcp_tool_requires_server():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 400
-    assert "server" in res.data
+    # Error may be in data directly or in data["details"]
+    errors = res.data.get("details", res.data)
+    assert "server" in errors
 

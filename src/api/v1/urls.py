@@ -55,7 +55,18 @@ router.register("integrations/ai", AIIntegrationViewSet, basename="ai-integratio
 router.register("integrations/status", ConnectionStatusViewSet, basename="integration-status")
 router.register("user-keys", UserAPIKeyViewSet, basename="user-keys")
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
 urlpatterns = [
+    # JWT Authentication (stateless)
+    re_path(r"^auth/token/?$", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    re_path(r"^auth/token/refresh/?$", TokenRefreshView.as_view(), name="token_refresh"),
+    re_path(r"^auth/token/verify/?$", TokenVerifyView.as_view(), name="token_verify"),
+    # Legacy session auth (kept for backward compatibility)
     re_path(r"^csrf/?$", csrf, name="csrf"),
     re_path(r"^me/?$", ProfileViewSet.as_view({"get": "retrieve", "patch": "partial_update"}), name="me"),
     re_path(r"^tenant/?$", TenantViewSet.as_view({"get": "retrieve", "patch": "partial_update"}), name="tenant-current"),

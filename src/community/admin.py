@@ -1,30 +1,46 @@
+"""Community Django admin registration."""
+
 from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import Forum, Post, Topic
+from community.models import MemberProfile, Post, Reaction, Space, Topic
 
 
-@admin.register(Forum)
-class ForumAdmin(admin.ModelAdmin):
-    list_display = ("organization", "name", "is_active")
-    list_filter = ("organization", "is_active")
-    search_fields = ("name", "description")
-    list_select_related = ("organization",)
+@admin.register(Space)
+class SpaceAdmin(admin.ModelAdmin):
+    list_display = ["name", "slug", "icon_emoji", "is_active", "is_public", "position", "organization"]
+    list_filter = ["organization", "is_active", "is_public"]
+    search_fields = ["name"]
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ("organization", "forum", "title", "author", "is_pinned", "is_locked")
-    list_filter = ("organization", "forum", "is_pinned", "is_locked")
-    search_fields = ("title", "forum__name", "author__email", "author__username")
-    list_select_related = ("organization", "forum", "author")
+    list_display = ["title", "space", "topic_type", "author", "reply_count", "like_count", "is_pinned", "created_at"]
+    list_filter = ["organization", "space", "topic_type", "is_pinned", "is_answered"]
+    search_fields = ["title"]
+    raw_id_fields = ["author", "organization"]
+    date_hierarchy = "created_at"
 
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ("organization", "topic", "author", "created_at", "updated_at")
-    list_filter = ("organization", "created_at")
-    search_fields = ("topic__title", "author__email", "author__username", "content")
-    list_select_related = ("organization", "topic", "author")
+    list_display = ["topic", "author", "like_count", "is_answer", "created_at"]
+    list_filter = ["organization", "is_answer"]
+    raw_id_fields = ["author", "topic", "parent", "organization"]
 
+
+@admin.register(Reaction)
+class ReactionAdmin(admin.ModelAdmin):
+    list_display = ["user", "reaction_type", "topic", "post", "created_at"]
+    list_filter = ["organization", "reaction_type"]
+    raw_id_fields = ["user", "topic", "post", "organization"]
+
+
+@admin.register(MemberProfile)
+class MemberProfileAdmin(admin.ModelAdmin):
+    list_display = ["user", "level", "points", "topics_created", "posts_created", "likes_received"]
+    list_filter = ["organization", "level"]
+    search_fields = ["user__email", "user__first_name"]
+    raw_id_fields = ["user", "organization"]

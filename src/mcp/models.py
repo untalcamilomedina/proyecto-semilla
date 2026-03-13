@@ -3,6 +3,8 @@ from __future__ import annotations
 from django.conf import settings
 from django.db import models
 
+from common.encryption import EncryptedCharField
+
 
 class McpServer(models.Model):
     """
@@ -15,7 +17,7 @@ class McpServer(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
     endpoint_url = models.URLField()
-    api_key_hash = models.CharField(max_length=128, blank=True, default="")
+    api_key_hash = EncryptedCharField(max_length=512, blank=True, default="")
     is_active = models.BooleanField(default=True)
 
     class Meta:

@@ -43,7 +43,7 @@ def test_api_key_auth_can_access_tenant_endpoint():
     res = client.get(
         "/api/v1/tenant/",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 200
     assert res.data["slug"] == slug
@@ -88,7 +88,7 @@ def test_roles_endpoint_requires_manage_roles_permission():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 403
 
@@ -101,7 +101,7 @@ def test_roles_endpoint_requires_manage_roles_permission():
         payload,
         format="json",
         HTTP_HOST=f"{slug}.acme.dev",
-        HTTP_AUTHORIZATION=f"Bearer {plain}",
+        HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
 

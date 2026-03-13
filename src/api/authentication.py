@@ -9,7 +9,10 @@ from api.models import ApiKey
 
 
 class ApiKeyAuthentication(authentication.BaseAuthentication):
-    keyword = "Bearer"
+    # Use 'Api-Key' prefix to avoid conflict with JWT's 'Bearer' prefix.
+    # Preferred: send API key as 'X-Api-Key: ak_xxx' header.
+    # Alternative: 'Authorization: Api-Key ak_xxx'
+    keyword = "Api-Key"
     header = "X-Api-Key"
 
     def authenticate(self, request) -> Optional[Tuple[object, ApiKey]]:

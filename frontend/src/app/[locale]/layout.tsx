@@ -1,67 +1,42 @@
-import type { Metadata, Viewport } from "next";
-import { getLocale, getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import { Providers } from "@/components/providers";
-import { WebVitals } from "@/components/web-vitals";
-import { Toaster } from "@/components/ui/sonner";
-import "@/app/globals.css";
+import type { Metadata } from "next";
+import { Outfit, Inter } from "next/font/google";
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
+import "../globals.css";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "meta" });
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
-  return {
-    title: {
-      default: t("title"),
-      template: `%s | ${t("siteName")}`,
-    },
-    description: t("description"),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://blockflow.app"),
-    openGraph: {
-      title: t("title"),
-      description: t("description"),
-      siteName: t("siteName"),
-      locale,
-      type: "website",
-    },
-  };
-}
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
 
-export const viewport: Viewport = {
-  themeColor: "#ffffff",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
+export const metadata: Metadata = {
+  title: "Momentum TIC",
+  description: "IA Conversacional para Empresas",
 };
 
-export function generateStaticParams() {
-  return [{ locale: "en" }, { locale: "es" }];
-}
-
-export default async function LocaleLayout({
+export default async function RootLayout({
   children,
-  params,
-}: Readonly<{
+  params
+}: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}>) {
-  const { locale } = await params;
-
-  setRequestLocale(locale);
-
+  params: Promise<{locale: string}>;
+}) {
+  const {locale} = await params;
   const messages = await getMessages();
-
+ 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body>
-        <Providers locale={locale} messages={messages}>
-          <WebVitals />
+    <html lang={locale}>
+      <body className={`${outfit.variable} ${inter.variable}`}>
+        <NextIntlClientProvider messages={messages}>
           {children}
-          <Toaster />
-        </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,24 +1,20 @@
-import type { NextConfig } from "next";
-import withPWA from "@ducanh2912/next-pwa";
-import createNextIntlPlugin from "next-intl/plugin";
+import createNextIntlPlugin from 'next-intl/plugin';
+import createMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-const withNextIntl = createNextIntlPlugin("./i18n.ts");
+const withNextIntl = createNextIntlPlugin();
 
-const nextConfig: NextConfig = {
-  skipTrailingSlashRedirect: true,
-  async rewrites() {
-    const backend = process.env.DJANGO_BASE_URL || "http://localhost:7777";
-    return [
-      { source: "/api", destination: `${backend}/api` },
-      { source: "/api/:path*", destination: `${backend}/api/:path*` },
-    ];
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
   },
+});
+
+const nextConfig = {
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 };
 
-export default withPWA({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  scope: "/",
-  sw: "service-worker.js",
-})(withNextIntl(nextConfig));
+export default withNextIntl(withMDX(nextConfig));

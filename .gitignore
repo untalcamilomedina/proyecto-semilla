@@ -13,16 +13,19 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .tox/
 .venv/
 venv/
+celerybeat-schedule*
+local.env
 
 # Django
 staticfiles/
 media/
 
-# Node / frontend (futuro)
+# Node / frontend
 node_modules/
 dist/
 build/
@@ -33,3 +36,5 @@ out/
 # IDEs
 .idea/
 .vscode/
+*.swp
+*~

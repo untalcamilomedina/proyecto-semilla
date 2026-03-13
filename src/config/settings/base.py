@@ -6,7 +6,7 @@ from pathlib import Path
 import dj_database_url
 from environs import Env
 
-from .plugins import ENABLE_CMS, MULTITENANT_MODE, optional_apps
+from .plugins import MULTITENANT_MODE, optional_apps
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
 SRC_DIR = ROOT_DIR / "src"
@@ -22,25 +22,11 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 DOMAIN_BASE = env.str("DOMAIN_BASE", default="notionapps.dev")
 FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:3000")
 
-WAGTAIL_APPS: list[str] = []
-if ENABLE_CMS:
-    WAGTAIL_APPS = [
-        "wagtail.contrib.forms",
-        "wagtail.contrib.redirects",
-        "wagtail.embeds",
-        "wagtail.sites",
-        "wagtail.users",
-        "wagtail.snippets",
-        "wagtail.documents",
-        "wagtail.images",
-        "wagtail.search",
-        "wagtail.admin",
-        "wagtail",
-        "modelcluster",
-        "taggit",
-    ]
+# Wagtail removed — CMS now uses MDX via Next.js frontend
 
 INSTALLED_APPS = [
+    # Modeltranslation (must be before admin and all translated apps)
+    "modeltranslation",
     # Django
     "django.contrib.admin",
     "django.contrib.auth",
@@ -71,8 +57,9 @@ INSTALLED_APPS = [
     "health_check.cache",
     "health_check.storage",
     "health_check.contrib.migrations",
-    # Wagtail (optional)
-] + WAGTAIL_APPS + [
+    "auditlog",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     # First-party
     "common",
     "core",
@@ -92,6 +79,7 @@ MIDDLEWARE = [
     "csp.middleware.CSPMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 if MULTITENANT_MODE == "schema":
     MIDDLEWARE.append("multitenant.middleware.TenantMiddleware")
@@ -215,6 +203,17 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# i18n — Supported languages for model translation (django-modeltranslation)
+LANGUAGES = [
+    ("en", "English"),
+    ("es", "Español"),
+    ("pt", "Português"),
+]
+
+# Modeltranslation settings
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en"
+MODELTRANSLATION_FALLBACK_LANGUAGES = ("en",)
+
 STATIC_URL = "/static/"
 STATIC_ROOT = ROOT_DIR / "staticfiles"
 STATICFILES_DIRS = [SRC_DIR / "static"]
@@ -247,6 +246,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "common.api.exceptions.custom_exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "api.authentication.ApiKeyAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
@@ -273,6 +273,23 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Versioned DRF API for NotionApps.",
     "VERSION": "v1",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+# JWT Authentication (stateless)
+from datetime import timedelta  # noqa: E402
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "TOKEN_OBTAIN_SERIALIZER": "api.serializers_auth.TenantTokenObtainPairSerializer",
 }
 
 CELERY_BROKER_URL = env.str("REDIS_URL", default="redis://localhost:6379/0")
