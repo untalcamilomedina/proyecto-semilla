@@ -1,0 +1,46 @@
+{
+  "name": "Proyecto Semilla Default",
+  "version": "1.0.0",
+  "colors": {
+    "light": {
+      "background": "0 0% 98%",
+      "foreground": "240 10% 4%",
+      "primary": "199 89% 48%",
+      "primary-foreground": "0 0% 100%",
+      "muted": "240 5% 96%",
+      "muted-foreground": "240 4% 46%",
+      "border": "240 6% 90%",
+      "glass-bg": "0 0% 100% / 0.7",
+      "glass-border": "0 0% 0% / 0.05"
+    },
+    "dark": {
+      "background": "240 10% 4%",
+      "foreground": "0 0% 98%",
+      "primary": "199 89% 48%",
+      "primary-foreground": "0 0% 0%",
+      "muted": "240 4% 16%",
+      "muted-foreground": "240 5% 65%",
+      "border": "240 4% 16%",
+      "glass-bg": "240 10% 10% / 0.5",
+      "glass-border": "0 0% 100% / 0.1"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "heading": "Inter, system-ui, sans-serif",
+      "body": "Inter, system-ui, sans-serif",
+      "mono": "ui-monospace, Consolas, monospace"
+    },
+    "scale": "1.125"
+  },
+  "spacing": {
+    "radius": "0.75rem",
+    "radiusLg": "1rem",
+    "radiusFull": "9999px"
+  },
+  "effects": {
+    "glass": true,
+    "animations": true,
+    "blur": "16px"
+  }
+}

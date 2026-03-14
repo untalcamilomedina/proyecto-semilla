@@ -22,10 +22,11 @@ export default function ImportWizardPage() {
   const handleImport = async () => {
     setLoading(true);
     try {
-        let response;
+        let response: any;
         if (source === "miro") {
             // POST /api/v1/integrations/miro/import_erd/
-            response = await api.POST("/api/v1/integrations/miro/import_erd/", {
+            response = await api("/api/v1/integrations/miro/import_erd/", {
+                method: "POST",
                 body: {
                     board_id: boardId,
                     token: "user-token" // In real app, handle token securely

@@ -31,10 +31,10 @@ export default function PlanSelection() {
       {/* Option Cards */}
       <div className="grid md:grid-cols-2 gap-4">
         <GlassCard
-          variant={!enabled ? "neon" : "default"}
+          variant={!enabled ? "highlight" : "default"}
           className={cn(
             "p-6 cursor-pointer hover:border-glass-border transition-all",
-            !enabled ? "border-neon-border bg-neon-bg" : "opacity-70"
+            !enabled ? "border-primary bg-primary/10" : "opacity-70"
           )}
           onClick={() => setEnabled(false)}
         >
@@ -48,10 +48,10 @@ export default function PlanSelection() {
         </GlassCard>
 
         <GlassCard
-          variant={enabled ? "neon" : "default"}
+          variant={enabled ? "highlight" : "default"}
           className={cn(
             "p-6 cursor-pointer hover:border-glass-border transition-all",
-            enabled ? "border-neon-border bg-neon-bg" : "opacity-70"
+            enabled ? "border-primary bg-primary/10" : "opacity-70"
           )}
           onClick={() => setEnabled(true)}
         >

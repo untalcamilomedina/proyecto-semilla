@@ -108,7 +108,7 @@ async function cacheFirstWithNetwork(request: Request): Promise<Response> {
 
 // ── Background Sync (for offline mutations) ─────────────────
 
-self.addEventListener('sync', ((event: SyncEvent) => {
+self.addEventListener('sync', ((event: any) => {
   if (event.tag === 'offline-mutations') {
     event.waitUntil(replayOfflineMutations());
   }

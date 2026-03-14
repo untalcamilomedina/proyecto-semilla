@@ -1,20 +1,36 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-export interface GlassInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-    label?: string;
-    error?: string;
-    id?: string;
+/**
+ * Props for the GlassInput component.
+ * @extends React.InputHTMLAttributes<HTMLInputElement>
+ */
+export interface GlassInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /**
+   * Optional accessible label displayed above the input.
+   */
+  label?: string;
+  
+  /**
+   * Optional error message. If provided, the input border turns red and the message is displayed below.
+   */
+  error?: string;
 }
 
 /**
- * GlassInput
- * Campo de entrada de datos con estilo glassmorphism y enfoque neón.
- *
- * @vibe Elite - High-end form elements with subtle transparency.
- * @param {string} [props.label] - Etiqueta opcional.
- * @param {string} [props.error] - Mensaje de error opcional.
+ * 🧊 GlassInput
+ * 
+ * Form input field implementing the Glass Minimalist design system.
+ * Uses semantic tokens for focus rings (primary) and error states.
+ * 
+ * @example
+ * \`\`\`tsx
+ * <GlassInput 
+ *   label="Email Address" 
+ *   type="email" 
+ *   placeholder="name@company.com" 
+ * />
+ * \`\`\`
  */
 export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
   ({ className, type, label, error, id, ...props }, ref) => {
@@ -22,22 +38,42 @@ export const GlassInput = React.forwardRef<HTMLInputElement, GlassInputProps>(
     const inputId = id || generatedId;
 
     return (
-      <div className="space-y-1.5 w-full">
-        {label && <label htmlFor={inputId} className="text-xs font-medium text-text-secondary ml-1">{label}</label>}
+      <div className="space-y-2 w-full">
+        {label && (
+          <label htmlFor={inputId} className="text-sm font-medium text-foreground ml-1">
+            {label}
+          </label>
+        )}
         <input
           id={inputId}
           type={type}
           className={cn(
-            "flex h-11 w-full rounded-xl border border-glass-border bg-glass-bg px-4 py-2 text-sm text-foreground placeholder:text-text-secondary transition-all duration-300",
-            "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neon focus-visible:border-neon-border",
+            // Base styles
+            "flex h-11 w-full rounded-xl border border-glass-border bg-glass-bg px-4 py-2",
+            "text-sm text-foreground transition-all duration-300",
+            
+            // Placeholder
+            "placeholder:text-muted-foreground",
+            
+            // Focus state (Primary brand color)
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50",
+            
+            // Disabled state
             "disabled:cursor-not-allowed disabled:opacity-50",
+            
+            // Error state
             error && "border-error-border focus-visible:ring-error-text focus-visible:border-error-border",
+            
             className
           )}
           ref={ref}
           {...props}
         />
-        {error && <p className="text-[10px] text-error-text ml-1 font-medium anonymous-fade-in">{error}</p>}
+        {error && (
+          <p className="text-xs text-error-text ml-1 font-medium animate-in fade-in py-1">
+            {error}
+          </p>
+        )}
       </div>
     )
   }

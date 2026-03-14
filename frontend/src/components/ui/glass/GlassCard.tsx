@@ -2,23 +2,38 @@ import { cn } from "@/lib/utils";
 import React from "react";
 
 /**
- * GlassCardProps
+ * Props for the GlassCard component.
  * @extends React.HTMLAttributes<HTMLDivElement>
  */
 export interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-  variant?: "default" | "neon";
+  /**
+   * The visual variant of the card.
+   * - \`default\`: Standard glassmorphism container.
+   * - \`highlight\`: Uses the primary color for a subtle glow border.
+   * @default "default"
+   */
+  variant?: "default" | "highlight";
+  
+  /**
+   * The HTML element to render the card as.
+   * @default "div"
+   */
   as?: React.ElementType;
 }
 
 /**
- * GlassCard
- * Contenedor principal con efecto de vidrio esmerilado y borde radiante.
- *
- * @vibe Elite - Core container for premium apps.
- * @param {React.ReactNode} props.children - Contenido embebido.
- * @param {string} [props.variant='default'] - 'default' | 'neon'.
- * @param {React.ElementType} [props.as='div'] - Elemento HTML a renderizar.
+ * 🧊 GlassCard
+ * 
+ * Core container component implementing the Glass Minimalist design system.
+ * Built with backdrop-blur, subtle borders, and semantic tokens to support
+ * seamless light/dark mode and tenant theming.
+ * 
+ * @example
+ * \`\`\`tsx
+ * <GlassCard variant="highlight" className="p-6">
+ *   <h3>Card Content</h3>
+ * </GlassCard>
+ * \`\`\`
  */
 export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
   ({ children, className, variant = "default", as: Component = "div", ...props }, ref) => {
@@ -26,9 +41,14 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
       <Component
         ref={ref}
         className={cn(
-          "rounded-2xl backdrop-blur-xl border border-glass-border transition-all duration-300",
+          // Base properties
+          "rounded-2xl backdrop-blur-md border transition-all duration-300",
           "bg-glass-bg",
-          variant === "neon" && "shadow-neon border-neon-border",
+          
+          // Variants
+          variant === "default" && "border-glass-border shadow-sm",
+          variant === "highlight" && "border-primary/50 shadow-md shadow-primary/10",
+          
           className
         )}
         {...props}

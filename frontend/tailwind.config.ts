@@ -6,38 +6,33 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
+      fontFamily: {
+        heading: ["var(--font-heading)"],
+        body: ["var(--font-body)"],
+        mono: ["var(--font-mono)"],
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
-        },
-        secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
         },
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
+          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
+          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
         },
-        accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
+        border: "hsl(var(--border) / <alpha-value>)",
+        glass: {
+          bg: "hsl(var(--glass-bg))",
+          border: "hsl(var(--glass-border))",
         },
-        card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
-        },
-        popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)",
-        },
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
+        // Legacy colors kept for backward compatibility with older components
+        card: "hsl(var(--background) / <alpha-value>)",
+        "card-foreground": "hsl(var(--foreground) / <alpha-value>)",
         neon: {
           DEFAULT: "var(--neon)",
           bg: "var(--neon-bg)",
@@ -45,21 +40,6 @@ const config: Config = {
           border: "var(--neon-border)",
           text: "var(--neon-text)",
         },
-        glass: {
-          bg: "var(--glass-bg)",
-          "bg-hover": "var(--glass-bg-hover)",
-          "bg-strong": "var(--glass-bg-strong)",
-          border: "var(--glass-border)",
-          "border-subtle": "var(--glass-border-subtle)",
-          overlay: "var(--glass-overlay)",
-          "overlay-strong": "var(--glass-overlay-strong)",
-        },
-        "text-secondary": "var(--text-secondary)",
-        "text-tertiary": "var(--text-tertiary)",
-        "text-quaternary": "var(--text-quaternary)",
-        "text-ghost": "var(--text-ghost)",
-        "text-highlight": "var(--text-highlight)",
-        "text-subtle": "var(--text-subtle)",
         error: {
           bg: "var(--error-bg)",
           border: "var(--error-border)",
@@ -80,9 +60,10 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius)",
         sm: "calc(var(--radius) - 4px)",
+        full: "var(--radius-full)",
       },
       boxShadow: {
         neon: "var(--neon-glow)",

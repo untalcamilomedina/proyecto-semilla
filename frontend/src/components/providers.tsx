@@ -1,7 +1,7 @@
 "use client";
 
 import { NextIntlClientProvider } from "next-intl";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { dexiePersister } from "@/lib/persister";
@@ -42,7 +42,7 @@ export function Providers({ children, locale, messages }: ProvidersProps) {
     return (
         <NextIntlClientProvider locale={locale} messages={messages}>
             <QueryClientProvider client={queryClient}>
-                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                <ThemeProvider>
                     {children}
                 </ThemeProvider>
             </QueryClientProvider>
