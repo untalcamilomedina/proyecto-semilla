@@ -127,7 +127,9 @@ def preflight() -> list[tuple[str, bool, str]]:
         try:
             compose_ok = (
                 subprocess.run(
-                    ["docker", "compose", "version"], capture_output=True, timeout=10
+                    ["docker", "compose", "version"],  # noqa: S607 — docker vía PATH
+                    capture_output=True,
+                    timeout=10,
                 ).returncode
                 == 0
             )
@@ -257,7 +259,8 @@ def main() -> int:
     frontend_port = _ask("Puerto del frontend", "3010", interactive, validate=_validate_port)
     if _port_in_use(int(frontend_port)):
         print(
-            f"   {warn('⚠')} El puerto {frontend_port} parece ocupado — recuerda liberarlo o cambiarlo."
+            f"   {warn('⚠')} El puerto {frontend_port} parece ocupado — "
+            "recuerda liberarlo o cambiarlo."
         )
 
     print(f"\n{bold('  Paso 3/4 · Módulos opcionales')} {dim('(CMS siempre activo)')}")
@@ -285,7 +288,7 @@ def main() -> int:
     print(f"   Dominio    {domain}  ·  Frontend  http://localhost:{frontend_port}")
     print(f"   Módulos    CMS + {actives}")
     print(f"   Claves     3 claves criptográficas únicas {dim('(SECRET/cifrado/JWT)')}")
-    print(f"   Archivos   local.env · frontend/.env.local · .env")
+    print("   Archivos   local.env · frontend/.env.local · .env")
     if interactive and not _ask_bool("¿Escribir la configuración?", True, interactive):
         print("  Cancelado. No se escribió nada.")
         return 1
@@ -302,7 +305,7 @@ def main() -> int:
         and _ask_bool("¿Levantar el stack ahora? (make dev)", False, interactive)
     ):
         print(dim("\n  Lanzando docker compose — Ctrl+C para detener.\n"))
-        subprocess.call(["make", "dev"], cwd=ROOT)
+        subprocess.call(["make", "dev"], cwd=ROOT)  # noqa: S607 — make del PATH del usuario
         return 0
 
     print(f"""
