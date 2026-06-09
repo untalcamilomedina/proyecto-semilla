@@ -130,7 +130,9 @@ source = ["src"]
 [tool.coverage.report]
 show_missing = true
 skip_empty = true
-fail_under = 90
+# Gate honesto: 70.16% medido en CI (2026-06). El 90 anterior era aspiracional
+# y nunca se midió. Plan: subir gradualmente (ver docs/auditoria, Fase 2).
+fail_under = 70
 
 [tool.djlint]
 profile = "django"

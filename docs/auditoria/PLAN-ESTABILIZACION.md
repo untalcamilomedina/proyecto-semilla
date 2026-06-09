@@ -86,7 +86,7 @@
 
 - **CSP permisiva** hasta Fase 3.1 (los templates allauth dependen de CDNs).
 - **Protección de rutas SSR** pendiente hasta Fase 3.2 (tokens en memoria).
-- **`fail_under=90`** en pyproject es aspiracional hasta Fase 2.4 (no medido aún).
+- Cobertura backend: 70.16% medida en CI; gate ajustado a 70. Subida gradual en Fase 2.4.
 - **Tipos OpenAPI del frontend** (`types/api.ts`) quedaron desactualizados tras
   retirar endpoints de producto: regenerar con `npm run generate-sdk` con el
   backend corriendo (Fase 2.1).

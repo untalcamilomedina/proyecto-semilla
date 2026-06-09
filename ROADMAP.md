@@ -22,7 +22,7 @@
 
 - [ ] Suite de aislamiento multitenant ampliada (matriz endpoint × rol × tenant)
 - [ ] Lock de dependencias Python (pip-tools/uv) + Renovate/Dependabot
-- [ ] Cobertura backend ≥ 70% medida en CI (gate realista; hoy `fail_under=90` es aspiracional)
+- [ ] Subir cobertura backend gradualmente desde el 70% medido (gate ya ajustado al valor real)
 - [ ] E2E con Playwright: login, onboarding completo, invitación, upgrade de plan
 - [ ] Migrar templates Django (allauth) a assets locales → CSP sin `unsafe-inline` ni CDNs
 
