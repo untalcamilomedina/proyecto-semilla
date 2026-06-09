@@ -19,7 +19,7 @@ interface DashboardData {
         pending_invites: number;
         mrr: number;
     };
-    recent_activity: any[];
+    recent_activity: unknown[];
     modules_status: Record<string, string>;
 }
 
@@ -40,31 +40,31 @@ export default function DashboardPage() {
     );
 
     const stats = [
-        { 
-            name: t("stats.members"), 
+        {
+            name: t("stats.members"),
             value: isLoading ? "..." : data?.stats?.total_members?.toString() || "0",
-            icon: Users, 
+            icon: Users,
             color: "text-blue-400",
             bg: "bg-blue-500/10"
         },
-        { 
-            name: t("stats.roles"), 
-            value: "3", 
-            icon: Shield, 
+        {
+            name: t("stats.activeMembers"),
+            value: isLoading ? "..." : data?.stats?.active_members?.toString() || "0",
+            icon: Shield,
             color: "text-neon-text",
             bg: "bg-neon-bg"
         },
-        { 
-            name: t("stats.billing"), 
+        {
+            name: t("stats.billing"),
             value: isLoading ? "..." : `$${data?.stats?.mrr || 0}`,
-            icon: CreditCard, 
+            icon: CreditCard,
             color: "text-purple-400",
             bg: "bg-purple-500/10"
         },
-        { 
-            name: t("stats.usage"), 
-            value: "12%", 
-            icon: BarChart3, 
+        {
+            name: t("stats.pendingInvites"),
+            value: isLoading ? "..." : data?.stats?.pending_invites?.toString() || "0",
+            icon: BarChart3,
             color: "text-orange-400",
             bg: "bg-orange-500/10"
         },

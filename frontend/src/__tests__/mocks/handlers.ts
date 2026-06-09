@@ -1,32 +1,31 @@
 import { http, HttpResponse } from "msw";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8010";
 
 export const handlers = [
     // Auth
-    http.get(`${API}/api/v1/auth/me/`, () => {
+    http.get(`/api/v1/auth/me/`, () => {
         return HttpResponse.json({
             id: 1,
             username: "testuser",
-            email: "test@blockflow.app",
+            email: "test@example.com",
             first_name: "Test",
             last_name: "User",
         });
     }),
 
     // Tenant
-    http.get(`${API}/api/v1/tenant/`, () => {
+    http.get(`/api/v1/tenant/`, () => {
         return HttpResponse.json({
             id: 1,
             name: "Test Org",
             slug: "test-org",
             plan_code: "pro",
-            enabled_modules: ["diagrams", "members"],
+            enabled_modules: ["cms", "members"],
         });
     }),
 
     // Dashboard
-    http.get(`${API}/api/v1/dashboard/`, () => {
+    http.get(`/api/v1/dashboard/`, () => {
         return HttpResponse.json({
             stats: {
                 total_members: 5,
@@ -40,7 +39,7 @@ export const handlers = [
     }),
 
     // Members
-    http.get(`${API}/api/v1/memberships/`, () => {
+    http.get(`/api/v1/memberships/`, () => {
         return HttpResponse.json([
             {
                 id: 1,
@@ -59,58 +58,58 @@ export const handlers = [
         ]);
     }),
 
-    // Diagrams
-    http.get(`${API}/api/v1/diagrams/`, () => {
+    // Roles (recurso paginado de ejemplo para los tests de hooks)
+    http.get(`/api/v1/roles/`, () => {
         return HttpResponse.json({
             count: 1,
             next: null,
             previous: null,
             results: [
                 {
-                    id: "d1",
-                    name: "Test Diagram",
-                    type: "erd",
-                    description: "A test diagram",
-                    entities_count: 3,
-                    updated_at: "2026-02-01T00:00:00Z",
+                    id: "r1",
+                    name: "Test Role",
+                    slug: "test-role",
+                    description: "A test role",
+                    position: 1,
+                    permissions: [],
                 },
             ],
         });
     }),
 
-    http.delete(`${API}/api/v1/diagrams/:id/`, () => {
+    http.delete(`/api/v1/roles/:id/`, () => {
         return new HttpResponse(null, { status: 204 });
     }),
 
     // API Keys
-    http.get(`${API}/api/v1/ai/keys/`, () => {
+    http.get(`/api/v1/api-keys/`, () => {
         return HttpResponse.json([
             {
                 id: "k1",
-                name: "My Gemini Key",
-                prefix: "AIza***",
-                service: "gemini",
+                name: "CI Key",
+                prefix: "ak_test",
+                scopes: [],
                 created_at: "2026-02-01T00:00:00Z",
             },
         ]);
     }),
 
-    http.post(`${API}/api/v1/ai/keys/`, () => {
+    http.post(`/api/v1/api-keys/`, () => {
         return HttpResponse.json({
             id: "k2",
             name: "New Key",
-            prefix: "sk-***",
-            service: "openai",
+            prefix: "ak_new",
+            scopes: [],
             created_at: "2026-02-05T00:00:00Z",
         });
     }),
 
-    http.delete(`${API}/api/v1/ai/keys/:id/`, () => {
+    http.delete(`/api/v1/api-keys/:id/`, () => {
         return new HttpResponse(null, { status: 204 });
     }),
 
     // Activity Logs
-    http.get(`${API}/api/v1/activity-logs/`, () => {
+    http.get(`/api/v1/activity-logs/`, () => {
         return HttpResponse.json({
             count: 1,
             next: null,
@@ -120,7 +119,7 @@ export const handlers = [
                     id: 1,
                     actor: { email: "admin@test.com" },
                     action: "CREATE",
-                    target: "Diagram: Test",
+                    target: "Role: Test",
                     created_at: "2026-02-01T10:00:00Z",
                 },
             ],
@@ -128,7 +127,7 @@ export const handlers = [
     }),
 
     // CSRF
-    http.get(`${API}/api/v1/csrf/`, () => {
+    http.get(`/api/v1/csrf/`, () => {
         return HttpResponse.json({ csrfToken: "test-csrf-token" });
     }),
 ];

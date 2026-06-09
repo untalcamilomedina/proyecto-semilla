@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { GlassCard } from "@/components/ui/glass/GlassCard";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { useRouter } from "@/lib/navigation";
 import { Check, Loader2 } from "lucide-react";
 
+import { TENANT_DOMAIN_BASE } from "@/lib/branding";
 import { submitOnboarding } from "@/lib/api/onboarding";
 
 export default function ReviewConfirm() {
@@ -43,7 +43,7 @@ export default function ReviewConfirm() {
           <div>
             <div className="text-xs text-text-secondary uppercase tracking-wider">Workspace</div>
             <div className="text-foreground font-medium">{store.organization.name}</div>
-            <div className="text-xs text-text-quaternary">{store.organization.slug}.acme.dev</div>
+            <div className="text-xs text-text-quaternary">{store.organization.slug}.{TENANT_DOMAIN_BASE}</div>
           </div>
           <Check className="w-5 h-5 text-neon-text" />
         </div>

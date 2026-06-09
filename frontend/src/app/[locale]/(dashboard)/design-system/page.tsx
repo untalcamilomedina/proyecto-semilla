@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { GlassButton } from "@/components/ui/glass/GlassButton";
 
 /**
@@ -8,8 +7,6 @@ import { GlassButton } from "@/components/ui/glass/GlassButton";
  * Acts as a live, in-app catalog of the JSON-driven theme.
  */
 export default function DesignSystemPage() {
-  const t = useTranslations("common");
-
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-5xl mx-auto py-10">
       <header className="space-y-2">

@@ -24,11 +24,11 @@ export default function SignupPage() {
     const router = useRouter();
 
     const signupSchema = z.object({
-        email: z.string().email(t("validation.invalidEmail" as any) || "Email inválido"),
-        password1: z.string().min(8, t("validation.minChars" as any, { count: 8 }) || "Mínimo 8 caracteres"),
+        email: z.string().email(t("validation.invalidEmail") || "Email inválido"),
+        password1: z.string().min(8, t("validation.minChars", { count: 8 }) || "Mínimo 8 caracteres"),
         password2: z.string(),
     }).refine((data) => data.password1 === data.password2, {
-        message: t("validation.passwordsMatch" as any) || "Las contraseñas no coinciden",
+        message: t("validation.passwordsMatch") || "Las contraseñas no coinciden",
         path: ["password2"],
     });
 
@@ -57,7 +57,7 @@ export default function SignupPage() {
             if (err instanceof ApiError) {
                 const body = err.body as Record<string, string[]>;
                 const firstError = Object.values(body).flat()[0];
-                setError(firstError || t("errors.startError" as any) || "Error al registrar");
+                setError(firstError || t("errors.startError") || "Error al registrar");
             } else {
                 setError(t("connectionError"));
             }

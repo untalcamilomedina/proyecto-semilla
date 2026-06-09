@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiDelete } from "@/lib/api";
+import { apiGet, apiPost } from "@/lib/api";
 import { ActivityLog, ApiKey, ApiKeyCreate, PaginatedResponse } from "@/types";
 
 /**

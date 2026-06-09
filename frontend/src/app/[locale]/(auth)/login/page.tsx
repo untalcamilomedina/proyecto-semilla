@@ -28,12 +28,12 @@ export default function LoginPage() {
   const loginSchema = z.object({
     email: z
       .string()
-      .email(t("validation.invalidEmail" as any) || "Email inválido"),
+      .email(t("validation.invalidEmail") || "Email inválido"),
     password: z
       .string()
       .min(
         1,
-        t("validation.passwordRequired" as any) || "La contraseña es requerida",
+        t("validation.passwordRequired") || "La contraseña es requerida",
       ),
   });
 

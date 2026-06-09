@@ -1,6 +1,7 @@
 "use client";
 
-import { BlockFlowLogo } from "@/components/ui/logo";
+import { AppLogo } from "@/components/ui/logo";
+import { APP_NAME } from "@/lib/branding";
 import { useState } from "react";
 import { Link, usePathname } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
@@ -33,7 +34,7 @@ export function Sidebar() {
     const tc = useTranslations("common");
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
-    const { user, tenant, logout } = useAuth();
+    const { user, logout } = useAuth();
 
     const navigation = [
         { name: t("dashboard"), href: "/", icon: LayoutDashboard },
@@ -84,10 +85,10 @@ export function Sidebar() {
                         {/* Soft Glow behind logo (dark only) */}
                         <div className="absolute -top-10 -left-10 w-32 h-32 bg-neon-bg rounded-full blur-3xl hidden dark:block" />
 
-                        <BlockFlowLogo className="h-8 w-8 text-neon z-10" />
+                        <AppLogo className="h-8 w-8 text-neon z-10" />
 
                         <span className="text-xl font-bold text-gradient-heading-r truncate z-10">
-                            BlockFlow
+                            {APP_NAME}
                         </span>
                     </div>
 

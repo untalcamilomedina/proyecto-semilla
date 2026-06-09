@@ -9,6 +9,7 @@ import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { useRouter } from "@/lib/navigation";
 import { Label } from "@/components/ui/label";
+import { TENANT_DOMAIN_BASE } from "@/lib/branding";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
@@ -57,7 +58,7 @@ export default function OrganizationForm() {
         <Label htmlFor="name" className="text-foreground">Organization Name</Label>
         <GlassInput
           id="name"
-          placeholder="Acme Corp"
+          placeholder="Mi Organización"
           {...register("name")}
           className={errors.name ? "border-error-border" : ""}
         />
@@ -67,10 +68,10 @@ export default function OrganizationForm() {
       <div className="space-y-2">
         <Label htmlFor="slug" className="text-foreground">Workspace URL</Label>
         <div className="flex items-center">
-          <span className="text-text-secondary text-sm mr-2">acme.dev/</span>
+          <span className="text-text-secondary text-sm mr-2">{TENANT_DOMAIN_BASE}/</span>
           <GlassInput
             id="slug"
-            placeholder="acme-corp"
+            placeholder="mi-organizacion"
             {...register("slug")}
             className={cn(errors.slug ? "border-error-border" : "")}
           />

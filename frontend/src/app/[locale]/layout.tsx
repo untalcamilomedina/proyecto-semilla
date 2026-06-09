@@ -17,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Momentum TIC",
-  description: "IA Conversacional para Empresas",
+  title: "Proyecto Semilla",
+  description: "Boilerplate SaaS multitenant, seguro y AI-first",
 };
 
 export default async function RootLayout({

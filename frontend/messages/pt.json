@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "Momentum TIC: Agentes de IA Conversacional para Empresas"
+    "title": "Proyecto Semilla: Boilerplate SaaS multitenant, seguro e AI-first"
   },
   "Navigation": {
     "about": "Quem Somos",
@@ -9,8 +9,368 @@
     "contact": "Contato"
   },
   "Hero": {
-    "title": "Inteligência em Movimento para o Seu Negócio",
-    "description": "Projetamos agentes de IA que interagem naturalmente por texto e voz, tornando a tecnologia mais próxima, humana e eficiente.",
-    "cta": "Solicitar Demo"
+    "title": "Lance seu SaaS em dias, não em meses",
+    "description": "Proyecto Semilla é um boilerplate SaaS multitenant, seguro e AI-first com autenticação, papéis, cobrança e internacionalização prontos para uso.",
+    "cta": "Começar"
+  },
+  "About": {
+    "title": "Sobre o Projeto",
+    "subtitle": "Uma base aberta para o seu próximo SaaS",
+    "description": "Proyecto Semilla é um ponto de partida aberto e pronto para produção para construir produtos SaaS multitenant. Inclui autenticação, organizações, papéis e permissões, cobrança com Stripe e ferramentas AI-first para você focar no que torna seu produto único."
+  },
+  "Services": {
+    "title": "O Que Está Incluído",
+    "items": {
+      "agents": {
+        "title": "Desenvolvimento AI-First",
+        "description": "Construa mais rápido com fluxos assistidos por IA e integração do Model Context Protocol incorporada à stack."
+      },
+      "labs": {
+        "title": "Núcleo Multitenant",
+        "description": "Organizações, papéis e permissões, cobrança com Stripe e logs de auditoria prontos para uso."
+      }
+    }
+  },
+  "Process": {
+    "title": "Como Funciona",
+    "steps": [
+      {
+        "title": "Clone e Execute",
+        "desc": "Clone o repositório e suba toda a stack com Docker em minutos."
+      },
+      {
+        "title": "Personalize",
+        "desc": "Ajuste a marca, os módulos e os planos de acordo com o seu produto."
+      },
+      {
+        "title": "Lance",
+        "desc": "Implante um SaaS multitenant e seguro e comece a receber clientes."
+      }
+    ]
+  },
+  "Pricing": {
+    "title": "Planos",
+    "items": {
+      "basic": {
+        "name": "Starter",
+        "price": "Grátis",
+        "features": [
+          "1 organização",
+          "Até 5 membros",
+          "Suporte da comunidade"
+        ]
+      },
+      "standard": {
+        "name": "Pro",
+        "price": "US$ 29/mês",
+        "features": [
+          "Até 50 membros",
+          "Todos os módulos incluídos",
+          "Suporte prioritário"
+        ]
+      },
+      "pro": {
+        "name": "Enterprise",
+        "price": "Sob consulta",
+        "features": [
+          "Membros ilimitados",
+          "Domínio personalizado e SSO",
+          "Suporte dedicado"
+        ]
+      }
+    },
+    "Navigation": {
+      "contact": "Contato"
+    }
+  },
+  "Team": {
+    "title": "A Equipe",
+    "members": [
+      {
+        "name": "Seu Nome",
+        "role": "Fundador(a)"
+      },
+      {
+        "name": "Nome do Colega",
+        "role": "Engenheiro(a)"
+      }
+    ]
+  },
+  "Footer": {
+    "contact": "hello@proyectosemilla.dev",
+    "copyright": "© Proyecto Semilla. Todos os direitos reservados."
+  },
+  "common": {
+    "user": "Usuário",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "create": "Criar",
+    "save": "Salvar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "loading": "Carregando...",
+    "export": "Exportar",
+    "table": {
+      "searchPlaceholder": "Buscar por e-mail...",
+      "noResults": "Nenhum resultado encontrado.",
+      "paginationInfo": "Página {current} de {total}"
+    }
+  },
+  "auth": {
+    "metaTitle": "Proyecto Semilla",
+    "metaDescription": "Entre no seu espaço de trabalho do Proyecto Semilla.",
+    "login": "Entrar",
+    "loginDescription": "Bem-vindo de volta. Insira suas credenciais para acessar sua conta.",
+    "signup": "Criar Conta",
+    "signupDescription": "Comece a construir com sua conta gratuita.",
+    "createAccount": "Criar Conta",
+    "email": "E-mail",
+    "emailPlaceholder": "voce@exemplo.com",
+    "password": "Senha",
+    "passwordPlaceholder": "••••••••",
+    "signupPasswordPlaceholder": "Mínimo de 8 caracteres",
+    "confirmPassword": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Repita sua senha",
+    "forgotPassword": "Esqueceu sua senha?",
+    "noAccount": "Não tem uma conta?",
+    "register": "Cadastre-se",
+    "haveAccount": "Já tem uma conta?",
+    "invalidCredentials": "E-mail ou senha incorretos.",
+    "connectionError": "Erro de conexão. Tente novamente.",
+    "resetTitle": "Redefinir Senha",
+    "resetDescription": "Insira seu e-mail e enviaremos um link para redefinir sua senha.",
+    "emailSent": "Se existir uma conta com esse e-mail, enviamos um link de redefinição.",
+    "sendResetLink": "Enviar link",
+    "backToLogin": "Voltar ao login",
+    "logout": "Sair",
+    "validation": {
+      "invalidEmail": "E-mail inválido",
+      "passwordRequired": "A senha é obrigatória",
+      "minChars": "Mínimo de {count} caracteres",
+      "passwordsMatch": "As senhas não coincidem"
+    },
+    "errors": {
+      "startError": "Não foi possível criar a conta. Tente novamente."
+    }
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "members": "Membros",
+    "roles": "Papéis",
+    "billing": "Cobrança",
+    "auditLogs": "Auditoria",
+    "apiKeys": "Chaves de API",
+    "settings": "Configurações"
+  },
+  "dashboard": {
+    "title": "Painel de Controle",
+    "welcome": "Bem-vindo de volta, {name}",
+    "organization": "Organização",
+    "name": "Nome",
+    "slug": "Slug",
+    "modules": "Módulos",
+    "modulesActive": "{count} ativos",
+    "quickActions": "Ações Rápidas",
+    "inviteMembers": "Convidar membros",
+    "manageRoles": "Gerenciar papéis",
+    "viewBilling": "Ver cobrança",
+    "recentActivity": "Atividade Recente",
+    "stats": {
+      "members": "Membros",
+      "activeMembers": "Membros Ativos",
+      "billing": "Faturamento Mensal",
+      "pendingInvites": "Convites Pendentes",
+      "roles": "Papéis",
+      "usage": "Uso",
+      "plan": "Plano"
+    }
+  },
+  "members": {
+    "title": "Membros",
+    "description": "Gerencie os membros e convites da sua organização.",
+    "inviteButton": "Convidar Membros",
+    "inviteTitle": "Convidar Membros",
+    "inviteDescription": "Envie convites por e-mail para adicionar pessoas à sua organização.",
+    "emails": "E-mails",
+    "emailsPlaceholder": "Digite um e-mail e pressione Enter",
+    "emailsHint": "Pressione Enter ou vírgula para adicionar cada e-mail.",
+    "role": "Papel",
+    "selectRole": "Selecione um papel",
+    "roleOwner": "Proprietário",
+    "roleAdmin": "Administrador",
+    "roleMember": "Membro",
+    "invalidEmail": "E-mail inválido",
+    "duplicateEmail": "Esse e-mail já foi adicionado",
+    "minOneEmail": "Adicione pelo menos um e-mail",
+    "inviteSuccess": "{count} convites enviados",
+    "errorInviting": "Não foi possível enviar os convites",
+    "name": "Usuário",
+    "status": "Status",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "since": "Desde",
+    "actions": "Ações",
+    "copyEmail": "Copiar e-mail",
+    "editRole": "Editar papel",
+    "remove": "Remover"
+  },
+  "roles": {
+    "title": "Papéis e Permissões",
+    "description": "Defina o que cada membro pode fazer na sua organização.",
+    "newRole": "Novo Papel",
+    "createRole": "Criar Papel",
+    "editRole": "Editar Papel",
+    "createDescription": "Crie um papel personalizado com permissões específicas.",
+    "editDescription": "Modifique os detalhes e as permissões deste papel.",
+    "name": "Nome",
+    "namePlaceholder": "Ex.: Editor",
+    "roleDescription": "Descrição",
+    "descriptionPlaceholder": "Para que serve este papel?",
+    "permissions": "Permissões",
+    "saveChanges": "Salvar Alterações",
+    "noRoles": "Ainda não há papéis. Crie o primeiro.",
+    "noDescription": "Sem descrição",
+    "system": "Sistema",
+    "errorCreating": "Não foi possível criar o papel",
+    "errorUpdating": "Não foi possível atualizar o papel"
+  },
+  "billing": {
+    "title": "Cobrança",
+    "description": "Gerencie sua assinatura, plano e consumo.",
+    "loadingBilling": "Carregando informações de cobrança...",
+    "checkoutError": "Não foi possível iniciar o checkout. Tente novamente.",
+    "portalError": "Não foi possível abrir o portal de cobrança.",
+    "planLabel": "Plano {plan}",
+    "noSubscription": "Sem assinatura ativa",
+    "noSubscriptionHint": "Escolha um plano abaixo para começar.",
+    "itemsUsed": "Itens utilizados",
+    "apiRequests": "Requisições de API",
+    "manageSubscription": "Gerenciar Assinatura",
+    "portalDescription": "Atualize sua forma de pagamento, baixe faturas ou mude de plano no portal seguro.",
+    "openPortal": "Abrir Portal",
+    "availablePlans": "Planos Disponíveis",
+    "noPlans": "Não há planos disponíveis no momento.",
+    "custom": "Personalizado",
+    "planItems": "{count} itens incluídos",
+    "planRequests": "{count} requisições de API",
+    "planSeats": "Até {count} assentos",
+    "currentPlan": "Plano Atual",
+    "upgrade": "Fazer Upgrade"
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie as preferências da sua conta.",
+    "profile": "Perfil",
+    "security": "Segurança",
+    "notifications": "Notificações",
+    "personalInfo": "Informações Pessoais",
+    "email": "E-mail",
+    "emailCannotChange": "O e-mail não pode ser alterado.",
+    "fullName": "Nome completo",
+    "saveChanges": "Salvar Alterações",
+    "changePassword": "Alterar Senha",
+    "currentPassword": "Senha atual",
+    "newPassword": "Nova senha",
+    "updatePassword": "Atualizar Senha",
+    "notificationsComingSoon": "As preferências de notificações estarão disponíveis em breve."
+  },
+  "keys": {
+    "title": "Chaves de API",
+    "description": "Conecte provedores de IA armazenando suas chaves de API com segurança.",
+    "addKey": "Adicionar Chave",
+    "addTitle": "Adicionar Chave de API",
+    "addDescription": "A chave é armazenada criptografada e não será exibida novamente.",
+    "name": "Nome",
+    "namePlaceholder": "Ex.: Chave de produção",
+    "service": "Serviço",
+    "apiKey": "Chave de API",
+    "apiKeyPlaceholder": "sk-...",
+    "saveKey": "Salvar Chave",
+    "loadingKeys": "Carregando chaves...",
+    "noKeys": "Nenhuma chave de API",
+    "noKeysDescription": "Adicione sua primeira chave para habilitar os recursos de IA.",
+    "startsWith": "Começa com {prefix}...",
+    "confirmDelete": "Excluir esta chave de API? Esta ação não pode ser desfeita."
+  },
+  "audit": {
+    "title": "Logs de Auditoria",
+    "description": "Acompanhe cada ação importante na sua organização.",
+    "actor": "Usuário",
+    "action": "Ação",
+    "target": "Recurso",
+    "date": "Data"
+  },
+  "onboarding": {
+    "errors": {
+      "connectionError": "Erro de conexão. Tente novamente.",
+      "modulesError": "Não foi possível salvar os módulos selecionados.",
+      "stripeError": "Não foi possível atualizar a configuração de pagamentos.",
+      "domainError": "Não foi possível salvar o domínio.",
+      "inviteError": "Não foi possível enviar os convites."
+    },
+    "step2": {
+      "title": "Escolha seus módulos",
+      "description": "Ative os recursos de que sua organização precisa.",
+      "modules": {
+        "cms": {
+          "label": "CMS",
+          "description": "Gestão de conteúdo: páginas, posts e mídia."
+        },
+        "lms": {
+          "label": "LMS",
+          "description": "Cursos on-line e trilhas de aprendizagem."
+        },
+        "community": {
+          "label": "Comunidade",
+          "description": "Fóruns, discussões e espaços para membros."
+        },
+        "mcp": {
+          "label": "MCP",
+          "description": "Integração com IA via Model Context Protocol."
+        }
+      },
+      "changeLater": "Você pode ativar ou desativar módulos depois em Configurações."
+    },
+    "step3": {
+      "title": "Configure os pagamentos",
+      "description": "Conecte o Stripe para cobrar seus clientes.",
+      "connectDescription": "Ao conectar o Stripe, você pode aceitar pagamentos, gerenciar assinaturas e acompanhar a receita pelo painel. Você também pode fazer isso depois.",
+      "connect": "Conectar Stripe",
+      "skipForNow": "Pular por enquanto"
+    },
+    "step4": {
+      "title": "Domínio personalizado",
+      "description": "Use seu próprio domínio para o seu espaço de trabalho.",
+      "leaveEmpty": "Deixe em branco para continuar usando seu subdomínio padrão.",
+      "customDomainPlaceholder": "app.seudominio.com",
+      "skipForNow": "Pular por enquanto"
+    },
+    "step5": {
+      "title": "Convide sua equipe",
+      "description": "Adicione colegas para colaborar desde o primeiro dia.",
+      "memberEmails": "E-mails dos membros",
+      "emailsPlaceholder": "ana@empresa.com, luis@empresa.com",
+      "emailsHint": "Separe vários e-mails com vírgulas ou quebras de linha.",
+      "invitationNotice": "Cada pessoa receberá um convite por e-mail para entrar na sua organização.",
+      "skipForNow": "Pular por enquanto",
+      "sending": "Enviando...",
+      "sendInvitations": "Enviar convites"
+    },
+    "step6": {
+      "title": "Tudo pronto!",
+      "description": "Sua organização está configurada e pronta para uso.",
+      "nextSteps": "Próximos passos",
+      "exploreDashboard": "Explore seu painel",
+      "configureRoles": "Ajuste papéis e permissões",
+      "inviteMore": "Convide mais colegas",
+      "customizePlan": "Revise seu plano e cobrança",
+      "stepCompleted": "Concluído",
+      "orgCreated": "Organização criada",
+      "modulesConfigured": "Módulos configurados",
+      "domainAssigned": "Domínio atribuído",
+      "teamInvited": "Equipe convidada",
+      "goToDashboard": "Ir para o painel",
+      "accessSettings": "Você pode revisar essas configurações depois no seu painel."
+    }
   }
 }

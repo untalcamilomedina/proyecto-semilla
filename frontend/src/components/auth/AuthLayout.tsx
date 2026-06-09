@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { BlockFlowLogo } from "@/components/ui/logo";
+import { AppLogo } from "@/components/ui/logo";
 import { GlassCard } from "@/components/ui/glass/GlassCard";
+import { APP_NAME } from "@/lib/branding";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -30,8 +31,8 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-1 bg-gradient-to-r from-transparent via-neon/50 to-transparent opacity-50 hidden dark:block" />
 
           <div className="space-y-6 mb-8 text-center flex flex-col items-center">
-            <BlockFlowLogo className="h-16 w-16" color="currentColor" />
-            <span className="text-2xl font-bold text-foreground tracking-tight mt-2">BlockFlow Platform</span>
+            <AppLogo className="h-16 w-16" color="currentColor" />
+            <span className="text-2xl font-bold text-foreground tracking-tight mt-2">{APP_NAME}</span>
 
             <div className="space-y-2">
                 <h1 className="text-3xl font-bold text-gradient-heading">

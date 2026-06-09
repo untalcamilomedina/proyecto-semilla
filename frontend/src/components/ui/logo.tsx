@@ -1,10 +1,11 @@
 import React from "react";
 
-export function BlockFlowLogo({ className = "w-8 h-8", color = "currentColor" }: { className?: string; color?: string }) {
+/** Logo del proyecto. Sustituye el SVG por el de tu marca. */
+export function AppLogo({ className = "w-8 h-8", color = "currentColor" }: { className?: string; color?: string }) {
   return (
-    <svg 
-      viewBox="0 0 512 512" 
-      fill="none" 
+    <svg
+      viewBox="0 0 512 512"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >

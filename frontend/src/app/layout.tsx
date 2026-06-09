@@ -3,37 +3,35 @@ import { getLocale, getMessages } from "next-intl/server";
 import { Outfit, Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE, APP_URL } from "@/lib/branding";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Momentum TIC | Inteligencia en Movimiento",
-    template: "%s | Momentum TIC",
+    default: `${APP_NAME} | ${APP_TAGLINE}`,
+    template: `%s | ${APP_NAME}`,
   },
-  description: "Agentes de IA conversacional para empresas. Automatización inteligente con texto y voz.",
-  keywords: ["IA", "Agentes", "Conversacional", "Momentum", "Empresas", "Chatbots"],
-  authors: [{ name: "Momentum Team" }],
-  creator: "Momentum Team",
-  metadataBase: new URL("https://momentumtic.com"),
+  description: APP_DESCRIPTION,
+  authors: [{ name: APP_NAME }],
+  creator: APP_NAME,
+  metadataBase: new URL(APP_URL),
   openGraph: {
     type: "website",
-    locale: "es_MX",
-    url: "https://momentumtic.com",
-    title: "Momentum TIC - Inteligencia en Movimiento",
-    description: "Diseñamos agentes de IA que interactúan de forma natural mediante texto y voz.",
-    siteName: "Momentum TIC",
+    url: APP_URL,
+    title: `${APP_NAME} — ${APP_TAGLINE}`,
+    description: APP_DESCRIPTION,
+    siteName: APP_NAME,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Momentum TIC",
-    description: "Agentes de IA conversacional para empresas",
-    creator: "@momentumtic",
+    title: APP_NAME,
+    description: APP_TAGLINE,
   },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Momentum",
+    title: APP_NAME,
   },
   formatDetection: {
     telephone: false,
@@ -86,29 +84,24 @@ export default async function RootLayout({
           {children}
           <Toaster />
         </Providers>
-        
-        {/* GEO Optimization: JSON-LD for SoftwareApplication */}
+
+        {/* SEO: JSON-LD for SoftwareApplication (valores controlados por branding.ts) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              "name": "Momentum Platform",
+              "name": APP_NAME,
               "operatingSystem": "Web",
               "applicationCategory": "BusinessApplication",
-              "description": "AI Agents Platform for Business.",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-              },
+              "description": APP_DESCRIPTION,
               "author": {
                 "@type": "Organization",
-                "name": "Momentum Team",
-                "url": "https://momentumtic.com"
-              }
-            })
+                "name": APP_NAME,
+                "url": APP_URL,
+              },
+            }),
           }}
         />
       </body>
