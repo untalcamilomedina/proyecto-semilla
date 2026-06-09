@@ -52,7 +52,7 @@ Abre `http://localhost:3010` — login demo: `admin@demo.com` / `password`.
 | **API** | DRF versionada (`/api/v1/`) + OpenAPI (drf-spectacular), throttling, paginación |
 | **Frontend** | Next.js 16 App Router, TypeScript estricto, Tailwind v4, design system "Glass" con Storybook, i18n (es/en/pt), TanStack Query + Zustand |
 | **Onboarding** | Wizard completo: organización → módulos → plan → pago → invitaciones |
-| **Módulos opcionales** | CMS (MDX), LMS, Community, MCP — activables por feature flag |
+| **Módulos opcionales** | CMS (MDX), LMS, Community, MCP, CRM (empresas, contactos, pipeline de deals, actividades) — activables por feature flag |
 | **Observabilidad** | Sentry, Prometheus `/metrics` (protegido), logs JSON, health checks (`/healthz`, `/readyz`, `/ht/`) |
 | **Infra** | Docker multi-stage non-root, compose dev/prod, deploy blue-green con nginx, receta Fly.io |
 | **Calidad** | CI (lint, mypy, tests con Postgres real, build, pip-audit/npm audit, Trivy), pre-commit, 110+ tests backend + vitest |
@@ -79,7 +79,7 @@ proyecto-semilla/
 │   ├── api/                # DRF v1 + auth (JWT/API Keys)
 │   ├── common/             # Permisos, cifrado, métricas, helpers
 │   ├── oauth/              # django-allauth
-│   └── cms|lms|community|mcp/  # Módulos opcionales
+│   └── cms|lms|community|mcp|crm/  # Módulos opcionales
 ├── frontend/               # Next.js 16 (App Router + design system Glass)
 ├── compose/                # Docker Compose dev/prod + nginx + blue-green
 ├── deploy/flyio/           # Receta Fly.io

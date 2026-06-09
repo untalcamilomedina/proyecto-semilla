@@ -23,6 +23,12 @@ SYSTEM_PERMISSIONS = [
         "name": "Manage billing",
         "description": "View and manage subscriptions and invoices.",
     },
+    {
+        "module": "crm",
+        "codename": "crm.manage_crm",
+        "name": "Manage CRM",
+        "description": "Create/update/delete CRM companies, contacts, deals and activities.",
+    },
 ]
 
 
@@ -36,9 +42,19 @@ DEFAULT_ROLES = [
 
 
 ROLE_PERMISSION_MAP = {
-    "owner": ["core.manage_roles", "core.invite_members", "billing.manage_billing"],
-    "admin": ["core.manage_roles", "core.invite_members", "billing.manage_billing"],
-    "editor": ["core.invite_members"],
+    "owner": [
+        "core.manage_roles",
+        "core.invite_members",
+        "billing.manage_billing",
+        "crm.manage_crm",
+    ],
+    "admin": [
+        "core.manage_roles",
+        "core.invite_members",
+        "billing.manage_billing",
+        "crm.manage_crm",
+    ],
+    "editor": ["core.invite_members", "crm.manage_crm"],
     "member": [],
     "viewer": [],
 }

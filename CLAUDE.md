@@ -7,7 +7,7 @@
 
 - **Backend** `src/`: Django 5 con settings por entorno en `src/config/settings/{base,dev,prod,test}.py`.
   - Apps núcleo: `core` (usuarios, RBAC, onboarding), `multitenant` (schema-per-tenant + RLS), `billing` (Stripe/dj-stripe), `api` (DRF v1), `oauth` (allauth), `common` (cifrado, permisos, métricas).
-  - Apps opcionales por feature flag (`ENABLE_LMS`, `ENABLE_COMMUNITY`, `ENABLE_MCP` en env): `cms`, `lms`, `community`, `mcp`.
+  - Apps opcionales por feature flag (`ENABLE_LMS`, `ENABLE_COMMUNITY`, `ENABLE_MCP`, `ENABLE_CRM` en env): `cms`, `lms`, `community`, `mcp`, `crm`.
 - **Frontend** `frontend/`: Next.js App Router + TypeScript estricto + Tailwind v4 + design system "Glass" (`src/components/ui/glass/`). i18n con next-intl (`messages/{es,en,pt}.json` — es es el default). Estado: Zustand + TanStack Query.
 - **Multitenancy**: `multitenant.middleware.TenantMiddleware` resuelve el tenant por dominio y fija el schema de Postgres. El middleware corre ANTES de la autenticación: nunca dependas de `request.user` ahí.
 - **API**: `/api/v1/` (router en `src/api/v1/urls.py`). Auth: JWT (SimpleJWT) + API Keys (`X-Api-Key`) + sesión.

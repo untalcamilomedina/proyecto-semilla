@@ -4,6 +4,7 @@ import os
 os.environ.setdefault("ENABLE_LMS", "true")
 os.environ.setdefault("ENABLE_COMMUNITY", "true")
 os.environ.setdefault("ENABLE_MCP", "true")
+os.environ.setdefault("ENABLE_CRM", "true")
 
 from .dev import *
 

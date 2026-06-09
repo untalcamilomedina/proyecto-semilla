@@ -11,6 +11,20 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 > Nota: las versiones reportadas entre v0.9.x y v0.13.0 eran inconsistentes entre
 > README/pyproject/CHANGELOG; desde esta versión hay una única fuente (pyproject).
 
+### Added (módulo CRM)
+- **CRM opcional** (`ENABLE_CRM`, apagado por defecto): empresas, contactos,
+  deals con pipeline (resumen por etapa en `GET /api/v1/crm/deals/pipeline/`,
+  cierre automático en won/lost) y actividades (notas/llamadas/emails/tareas).
+  Seguridad del seed aplicada: lectura para miembros del tenant, escritura con
+  permiso `crm.manage_crm` (owner/admin/editor lo reciben en el seed de roles),
+  scoping por organización e índices por tenant. Tests de CRUD, RBAC de
+  escritura y aislamiento cross-tenant en `tests/test_crm.py`.
+
+### Security (dependencias, detectado por el nuevo job security-audit)
+- django-allauth 0.63.6 → ≥65.14.1 (PYSEC-2025-110/111, PYSEC-2026-56).
+- cryptography 44.x → ≥46.0.6 (CVE-2026-26007).
+- Next.js 16.0.10 → 16.2.7 (advisories high de middleware bypass/DoS).
+
 ### Removed (limpieza de producto mezclado por error)
 - **Backend**: app `integrations` completa (Notion/Miro/Gemini), endpoints
   `diagrams|jobs|integrations/*|user-keys`, provider notion de allauth,

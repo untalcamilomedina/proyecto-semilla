@@ -12,6 +12,7 @@ ENABLE_CMS = True
 ENABLE_LMS = env.bool("ENABLE_LMS", default=False)
 ENABLE_COMMUNITY = env.bool("ENABLE_COMMUNITY", default=False)
 ENABLE_MCP = env.bool("ENABLE_MCP", default=False)
+ENABLE_CRM = env.bool("ENABLE_CRM", default=False)
 
 
 def optional_apps() -> list[str]:
@@ -24,6 +25,8 @@ def optional_apps() -> list[str]:
         apps.append("community")
     if ENABLE_MCP:
         apps.append("mcp")
+    if ENABLE_CRM:
+        apps.append("crm")
     return apps
 
 
@@ -37,4 +40,6 @@ def optional_api_urls() -> list[tuple[str, str]]:
         urls.append(("community/", "community.urls"))
     if ENABLE_MCP:
         urls.append(("mcp/", "mcp.urls"))
+    if ENABLE_CRM:
+        urls.append(("crm/", "crm.urls"))
     return urls
