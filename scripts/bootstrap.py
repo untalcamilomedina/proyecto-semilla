@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Wizard de instalación de Proyecto Semilla.
 
-De `git clone` a stack corriendo en minutos: configura nombre/branding,
-genera las claves criptográficas dedicadas y escribe los archivos de entorno
-(local.env + frontend/.env.local). Solo usa stdlib — no requiere instalar nada.
+Instalación guiada al estilo de los instaladores de WordPress/Mautic/cal.com:
+comprobación de requisitos, preguntas con validación, resumen con confirmación
+y arranque opcional del stack. Solo stdlib — no requiere instalar nada.
 
 Uso:
-    python3 scripts/bootstrap.py            # interactivo
-    python3 scripts/bootstrap.py --defaults # sin preguntas (valores por defecto)
+    python3 scripts/bootstrap.py            # interactivo (recomendado)
+    python3 scripts/bootstrap.py --defaults # sin preguntas (CI/automatización)
     python3 scripts/bootstrap.py --name "Mi SaaS" --slug mi-saas --defaults
 
 Tras el wizard:
@@ -19,12 +19,42 @@ from __future__ import annotations
 import argparse
 import re
 import secrets
+import shutil
+import socket
+import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-MODULES = ["LMS", "COMMUNITY", "MCP", "CRM"]
+MODULES = {
+    "LMS": "Cursos y certificados (Learning Management)",
+    "COMMUNITY": "Foros y comunidad estilo Skool",
+    "MCP": "Catálogo de tools para agentes de IA",
+    "CRM": "Empresas, contactos y pipeline de ventas",
+}
+
+_USE_COLOR = sys.stdout.isatty()
+
+
+def _c(code: str, text: str) -> str:
+    return f"\033[{code}m{text}\033[0m" if _USE_COLOR else text
+
+
+def ok(text: str) -> str:
+    return _c("32", text)
+
+
+def warn(text: str) -> str:
+    return _c("33", text)
+
+
+def bold(text: str) -> str:
+    return _c("1", text)
+
+
+def dim(text: str) -> str:
+    return _c("2", text)
 
 
 def _slugify(value: str) -> str:
@@ -33,25 +63,82 @@ def _slugify(value: str) -> str:
     return value or "mi-proyecto"
 
 
-def _ask(prompt: str, default: str, interactive: bool) -> str:
+def _ask(prompt: str, default: str, interactive: bool, validate=None) -> str:
     if not interactive:
         return default
-    answer = input(f"{prompt} [{default}]: ").strip()
-    return answer or default
+    while True:
+        answer = input(f"  {prompt} {dim(f'[{default}]')}: ").strip() or default
+        if validate is None:
+            return answer
+        error = validate(answer)
+        if error is None:
+            return answer
+        print(f"  {warn('✗')} {error}")
 
 
 def _ask_bool(prompt: str, default: bool, interactive: bool) -> bool:
     if not interactive:
         return default
     suffix = "S/n" if default else "s/N"
-    answer = input(f"{prompt} [{suffix}]: ").strip().lower()
+    answer = input(f"  {prompt} {dim(f'[{suffix}]')}: ").strip().lower()
     if not answer:
         return default
     return answer in {"s", "si", "sí", "y", "yes"}
 
 
+def _validate_port(value: str) -> str | None:
+    if not value.isdigit() or not (1 <= int(value) <= 65535):
+        return "Debe ser un número de puerto válido (1-65535)."
+    return None
+
+
+def _validate_domain(value: str) -> str | None:
+    if not re.fullmatch(r"[a-z0-9.-]+", value):
+        return "Solo minúsculas, números, puntos y guiones (ej. localhost, miapp.dev)."
+    return None
+
+
+def _port_in_use(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.3)
+        return sock.connect_ex(("127.0.0.1", port)) == 0
+
+
 def _generate_key() -> str:
     return secrets.token_urlsafe(50)
+
+
+def preflight() -> list[tuple[str, bool, str]]:
+    """Comprobación de requisitos (estilo instalador de Mautic)."""
+    checks: list[tuple[str, bool, str]] = []
+    checks.append(
+        (
+            "Python 3.10+",
+            sys.version_info >= (3, 10),
+            f"detectado {sys.version_info.major}.{sys.version_info.minor}",
+        )
+    )
+    docker = shutil.which("docker") is not None
+    checks.append(
+        ("Docker CLI", docker, "instala Docker Desktop o docker-ce" if not docker else "")
+    )
+    compose_ok = False
+    if docker:
+        try:
+            compose_ok = (
+                subprocess.run(
+                    ["docker", "compose", "version"],  # noqa: S607 — docker vía PATH
+                    capture_output=True,
+                    timeout=10,
+                ).returncode
+                == 0
+            )
+        except Exception:
+            compose_ok = False
+    checks.append(
+        ("Docker Compose v2", compose_ok, "incluido en Docker Desktop" if not compose_ok else "")
+    )
+    return checks
 
 
 def build_local_env(config: dict) -> str:
@@ -130,31 +217,56 @@ def main() -> int:
     parser.add_argument("--name", help="Nombre del proyecto (branding)")
     parser.add_argument("--slug", help="Slug del proyecto (BD, identificadores)")
     parser.add_argument("--domain", help="Dominio base para tenants (dev: localhost)")
-    parser.add_argument("--defaults", action="store_true", help="Sin preguntas: usa defaults/flags")
+    parser.add_argument(
+        "--defaults", "--yes", action="store_true", help="Sin preguntas: usa defaults/flags"
+    )
     parser.add_argument("--force", action="store_true", help="Sobrescribe local.env si ya existe")
     args = parser.parse_args()
     interactive = not args.defaults
 
-    print("🌱 Proyecto Semilla — wizard de instalación\n")
+    print()
+    print(bold("  🌱 Proyecto Semilla — instalación guiada"))
+    print(dim("  Boilerplate SaaS multitenant, seguro y AI-first"))
+    print(dim("  ────────────────────────────────────────────────"))
+
+    # Paso 1/4: requisitos
+    print(f"\n{bold('  Paso 1/4 · Requisitos')}")
+    all_ok = True
+    for label, passed, hint in preflight():
+        mark = ok("✔") if passed else warn("✗")
+        extra = dim(f" — {hint}") if hint else ""
+        print(f"   {mark} {label}{extra}")
+        if not passed and label != "Python 3.10+":
+            all_ok = False
+    if not all_ok:
+        print(f"\n  {warn('Docker no está disponible.')} Puedes continuar (se generan los")
+        print("  archivos de entorno) pero necesitarás Docker para `make dev`.")
+        if interactive and not _ask_bool("¿Continuar de todos modos?", True, interactive):
+            return 1
 
     local_env = ROOT / "local.env"
     if local_env.exists() and not args.force:
-        print(f"⚠ {local_env} ya existe. Usa --force para sobrescribir.")
+        print(f"\n  {warn('⚠')} {local_env.name} ya existe. Usa --force para sobrescribir.")
         return 1
 
+    # Paso 2/4: identidad y módulos
+    print(f"\n{bold('  Paso 2/4 · Tu proyecto')}")
     name = args.name or _ask("Nombre del proyecto", "Proyecto Semilla", interactive)
-    slug = args.slug or _ask("Slug", _slugify(name), interactive)
-    slug = _slugify(slug)
-    domain = args.domain or _ask("Dominio base de tenants (dev)", "localhost", interactive)
-    frontend_port = _ask("Puerto del frontend", "3010", interactive)
-
-    modules = {}
-    print("\nMódulos opcionales (CMS siempre activo):")
-    defaults_per_module = {"LMS": True, "COMMUNITY": True, "MCP": True, "CRM": True}
-    for module in MODULES:
-        modules[module] = _ask_bool(
-            f"  ¿Activar {module}?", defaults_per_module[module], interactive
+    slug = _slugify(args.slug or _ask("Slug", _slugify(name), interactive))
+    domain = args.domain or _ask(
+        "Dominio base de tenants (dev)", "localhost", interactive, validate=_validate_domain
+    )
+    frontend_port = _ask("Puerto del frontend", "3010", interactive, validate=_validate_port)
+    if _port_in_use(int(frontend_port)):
+        print(
+            f"   {warn('⚠')} El puerto {frontend_port} parece ocupado — "
+            "recuerda liberarlo o cambiarlo."
         )
+
+    print(f"\n{bold('  Paso 3/4 · Módulos opcionales')} {dim('(CMS siempre activo)')}")
+    modules = {}
+    for module, description in MODULES.items():
+        modules[module] = _ask_bool(f"{module} — {dim(description)}", True, interactive)
 
     config = {
         "name": name,
@@ -168,26 +280,43 @@ def main() -> int:
         "jwt_key": _generate_key(),
     }
 
+    # Paso 4/4: resumen y confirmación (estilo cal.com)
+    actives = ", ".join(m for m, on in modules.items() if on) or "ninguno"
+    slug_info = dim(f"(slug: {slug} · BD: {config['db_name']})")
+    print(f"\n{bold('  Paso 4/4 · Resumen')}")
+    print(f"   Proyecto   {bold(name)}  {slug_info}")
+    print(f"   Dominio    {domain}  ·  Frontend  http://localhost:{frontend_port}")
+    print(f"   Módulos    CMS + {actives}")
+    print(f"   Claves     3 claves criptográficas únicas {dim('(SECRET/cifrado/JWT)')}")
+    print("   Archivos   local.env · frontend/.env.local · .env")
+    if interactive and not _ask_bool("¿Escribir la configuración?", True, interactive):
+        print("  Cancelado. No se escribió nada.")
+        return 1
+
     local_env.write_text(build_local_env(config), encoding="utf-8")
-    print(f"\n✔ {local_env.relative_to(ROOT)} escrito (3 claves únicas generadas).")
+    (ROOT / "frontend" / ".env.local").write_text(build_frontend_env(config), encoding="utf-8")
+    (ROOT / ".env").write_text(build_compose_env(config), encoding="utf-8")
+    print(f"\n  {ok('✔')} Configuración escrita.")
 
-    frontend_env = ROOT / "frontend" / ".env.local"
-    frontend_env.write_text(build_frontend_env(config), encoding="utf-8")
-    print(f"✔ {frontend_env.relative_to(ROOT)} escrito.")
-
-    compose_env = ROOT / ".env"
-    compose_env.write_text(build_compose_env(config), encoding="utf-8")
-    print(f"✔ {compose_env.relative_to(ROOT)} escrito (interpolación de compose).")
+    # Arranque opcional del stack (instalación en un paso, estilo WordPress)
+    if (
+        interactive
+        and all_ok
+        and _ask_bool("¿Levantar el stack ahora? (make dev)", False, interactive)
+    ):
+        print(dim("\n  Lanzando docker compose — Ctrl+C para detener.\n"))
+        subprocess.call(["make", "dev"], cwd=ROOT)  # noqa: S607 — make del PATH del usuario
+        return 0
 
     print(f"""
-Siguientes pasos:
+  {bold('Siguientes pasos:')}
 
-  1. make dev          # levanta el stack Docker completo
-  2. make migrate      # migraciones (en otra terminal)
-  3. make seed         # tenant demo + admin@demo.com/password
+    1. make dev          {dim('# levanta el stack Docker completo')}
+    2. make migrate      {dim('# migraciones (en otra terminal)')}
+    3. make seed         {dim('# tenant demo + admin@demo.com/password')}
 
-  Frontend: http://localhost:{frontend_port} · API docs: http://localhost:8000/api/docs/
-  Guía de operación: docs/runbooks/operacion.md · Para agentes IA: CLAUDE.md
+  Frontend  http://localhost:{frontend_port}  ·  API docs  http://localhost:8000/api/docs/
+  Operación: docs/runbooks/operacion.md  ·  Agentes IA: CLAUDE.md
 """)
     return 0
 
