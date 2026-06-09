@@ -35,4 +35,3 @@ class InvoiceAdmin(admin.ModelAdmin):
 class StripeEventAdmin(admin.ModelAdmin):
     list_display = ("event_id", "event_type", "processed_at")
     search_fields = ("event_id", "event_type")
-

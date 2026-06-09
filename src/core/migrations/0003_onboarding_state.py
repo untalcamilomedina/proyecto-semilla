@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="OnboardingState",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("owner_email", models.EmailField(max_length=254)),
                 ("current_step", models.PositiveSmallIntegerField(default=1)),
                 ("completed_steps", models.JSONField(blank=True, default=list)),
@@ -33,4 +38,3 @@ class Migration(migrations.Migration):
             ],
         ),
     ]
-

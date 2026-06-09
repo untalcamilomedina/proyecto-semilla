@@ -1,6 +1,5 @@
 from rest_framework.views import exception_handler
-from rest_framework.response import Response
-from rest_framework import status
+
 
 def custom_exception_handler(exc, context):
     """
@@ -20,9 +19,13 @@ def custom_exception_handler(exc, context):
             "status": "error",
             "code": getattr(exc, "default_code", "error"),
             "message": str(exc.detail) if hasattr(exc, "detail") else "An error occurred",
-            "details": response.data if isinstance(response.data, dict) else {"non_field_errors": response.data}
+            "details": (
+                response.data
+                if isinstance(response.data, dict)
+                else {"non_field_errors": response.data}
+            ),
         }
-        
+
         # Handle simple string details
         if isinstance(response.data, str):
             custom_data["message"] = response.data

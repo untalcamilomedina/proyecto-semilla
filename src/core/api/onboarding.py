@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from django.contrib.auth import login
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -42,7 +43,7 @@ class OnboardingViewSet(viewsets.ViewSet):
         # For simplicity in this flow, we assume the user just created the tenant in step 1
         # and is logged in. We look up state by the tenant they belong to or email.
         # But OnboardingState is in 'public' schema.
-        
+
         user_email = request.user.email
         with schema_context(PUBLIC_SCHEMA_NAME):
             # Find in-progress state for this user's email
@@ -51,10 +52,15 @@ class OnboardingViewSet(viewsets.ViewSet):
             ).first()
             if not state:
                 # Fallback: maybe completed?
-                state = OnboardingState.objects.filter(owner_email=user_email).order_by("-created_at").first()
-            
+                state = (
+                    OnboardingState.objects.filter(owner_email=user_email)
+                    .order_by("-created_at")
+                    .first()
+                )
+
             return state
 
+    @method_decorator(ratelimit(key="ip", rate="5/h", method="POST", block=True))
     @action(detail=False, methods=["post"])
     def start(self, request):
         serializer = StartOnboardingSerializer(data=request.data)
@@ -64,7 +70,7 @@ class OnboardingViewSet(viewsets.ViewSet):
         try:
             # Check if user is authenticated (post-signup flow)
             source_user = request.user if request.user.is_authenticated else None
-            
+
             result = start_onboarding(
                 org_name=data["org_name"],
                 subdomain=data["subdomain"],
@@ -77,7 +83,7 @@ class OnboardingViewSet(viewsets.ViewSet):
                 stripe_webhook_secret=data.get("stripe_webhook_secret", ""),
                 source_user=source_user,
             )
-            
+
             # Log the user in immediately so they can proceed to next steps
             # Pass backend='django.contrib.auth.backends.ModelBackend' if needed
             # We need to find the user object created in the tenant schema
@@ -85,9 +91,9 @@ class OnboardingViewSet(viewsets.ViewSet):
             # start_onboarding creates the user in the tenant schema.
             # Authentication in this system might be complex with schemas.
             # However, standard login helper needs a user object.
-            # Let's rely on the frontend to login using the credentials, 
+            # Let's rely on the frontend to login using the credentials,
             # OR we can return the user info and token if using token auth.
-            
+
             return Response(
                 {
                     "detail": "Organization created successfully",
@@ -99,27 +105,25 @@ class OnboardingViewSet(viewsets.ViewSet):
             )
         except Exception as e:
             # Handle specific business logic errors (e.g. subdomain taken)
-            return Response(
-                {"detail": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["get"])
     def status(self, request):
         state = self._get_state(request)
         if not state:
             return Response(
-                {"detail": "No active onboarding found"}, 
-                status=status.HTTP_404_NOT_FOUND
+                {"detail": "No active onboarding found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
-        return Response({
-            "current_step": state.current_step,
-            "completed_steps": state.completed_steps,
-            "is_complete": state.is_complete,
-            "data": state.data,
-            "tenant_slug": state.tenant.slug,
-        })
+
+        return Response(
+            {
+                "current_step": state.current_step,
+                "completed_steps": state.completed_steps,
+                "is_complete": state.is_complete,
+                "data": state.data,
+                "tenant_slug": state.tenant.slug,
+            }
+        )
 
     @action(detail=False, methods=["post"])
     def modules(self, request):
@@ -129,7 +133,7 @@ class OnboardingViewSet(viewsets.ViewSet):
 
         serializer = ModulesSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         # MultipleChoiceField in DRF returns a set, ensuring it's a list for JSONField
         modules = list(serializer.validated_data.get("modules", []))
         set_modules(state, modules)
@@ -143,7 +147,7 @@ class OnboardingViewSet(viewsets.ViewSet):
 
         serializer = StripeConnectSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         mark_stripe_connected(state, serializer.validated_data.get("stripe_connected", False))
         return Response({"detail": "Stripe configured", "next_step": 4})
 
@@ -155,7 +159,7 @@ class OnboardingViewSet(viewsets.ViewSet):
 
         serializer = CustomDomainSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         set_custom_domain(state, serializer.validated_data.get("custom_domain"))
         return Response({"detail": "Domain updated", "next_step": 5})
 
@@ -167,6 +171,6 @@ class OnboardingViewSet(viewsets.ViewSet):
 
         serializer = InviteMembersSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         count = invite_members(state, serializer.validated_data.get("emails", []))
         return Response({"detail": f"Invited {count} members", "next_step": 6, "is_complete": True})

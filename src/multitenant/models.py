@@ -5,7 +5,6 @@ import re
 from django.core.exceptions import ValidationError
 from django.db import models
 
-
 SUBDOMAIN_RE = re.compile(r"^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$")
 RESERVED_SUBDOMAINS = {
     "www",

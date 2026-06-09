@@ -4,7 +4,6 @@ from django.db import transaction
 
 from core.models import Permission, Role
 
-
 SYSTEM_PERMISSIONS = [
     {
         "module": "core",
@@ -87,4 +86,3 @@ def seed_default_roles(organization) -> list[Role]:
         role.permissions.set([perms_by_code[c] for c in perm_codes if c in perms_by_code])
         roles.append(role)
     return roles
-

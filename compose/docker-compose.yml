@@ -12,7 +12,7 @@ services:
     ports:
       - "${DJANGO_PORT:-8000}:8000"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-acme_saas}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-proyecto_semilla}
       - REDIS_URL=redis://redis:6379/0
       - S3_ENDPOINT_URL=http://minio:9000
       - EMAIL_HOST=mailpit
@@ -60,7 +60,7 @@ services:
       target: dev
     command: celery -A config.celery worker -l info
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-acme_saas}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-proyecto_semilla}
       - REDIS_URL=redis://redis:6379/0
     volumes:
       - ../src:/app/src:delegated
@@ -80,7 +80,7 @@ services:
       target: dev
     command: celery -A config.celery beat -l info
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-acme_saas}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-proyecto_semilla}
       - REDIS_URL=redis://redis:6379/0
     volumes:
       - ../src:/app/src:delegated
@@ -99,7 +99,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-acme_saas}
+      POSTGRES_DB: ${POSTGRES_DB:-proyecto_semilla}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

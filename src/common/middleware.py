@@ -5,7 +5,6 @@ import time
 from django.utils.deprecation import MiddlewareMixin
 from prometheus_client import Counter, Histogram
 
-
 REQUEST_COUNT = Counter(
     "django_http_requests_total",
     "Total HTTP requests",
@@ -32,7 +31,6 @@ class MetricsMiddleware(MiddlewareMixin):
             route = getattr(match, "route", None) or request.path_info
             REQUEST_LATENCY.labels(request.method, route).observe(duration)
             REQUEST_COUNT.labels(request.method, route, str(response.status_code)).inc()
-        except Exception:
+        except Exception:  # noqa: S110 — las métricas nunca deben romper la respuesta
             pass
         return response
-

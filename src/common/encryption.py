@@ -1,7 +1,10 @@
 """
 Fernet-based field encryption for sensitive data stored in the database.
 
-Uses Django's SECRET_KEY to derive an encryption key via PBKDF2.
+La clave se deriva con PBKDF2 a partir de FIELD_ENCRYPTION_KEY (recomendado)
+o, en su defecto, de SECRET_KEY. Define FIELD_ENCRYPTION_KEY en producción:
+rotar SECRET_KEY no debe dejar ilegibles los datos cifrados.
+
 All encrypted values are stored as base64-encoded strings prefixed with 'enc::'.
 """
 
@@ -9,24 +12,30 @@ from __future__ import annotations
 
 import base64
 import hashlib
-import os
+from functools import lru_cache
 
 from cryptography.fernet import Fernet
 from django.conf import settings
 from django.db import models
 
 
-def _derive_key() -> bytes:
-    """Derive a Fernet key from Django SECRET_KEY using PBKDF2."""
-    salt = hashlib.sha256(settings.SECRET_KEY.encode()).digest()[:16]
+@lru_cache(maxsize=4)
+def _derive_key_from(passphrase: str) -> bytes:
+    """Derive a Fernet key from a passphrase using PBKDF2 (cached)."""
+    salt = hashlib.sha256(passphrase.encode()).digest()[:16]
     key_material = hashlib.pbkdf2_hmac(
         "sha256",
-        settings.SECRET_KEY.encode(),
+        passphrase.encode(),
         salt,
         iterations=100_000,
         dklen=32,
     )
     return base64.urlsafe_b64encode(key_material)
+
+
+def _derive_key() -> bytes:
+    passphrase = getattr(settings, "FIELD_ENCRYPTION_KEY", "") or settings.SECRET_KEY
+    return _derive_key_from(passphrase)
 
 
 def encrypt_value(plaintext: str) -> str:

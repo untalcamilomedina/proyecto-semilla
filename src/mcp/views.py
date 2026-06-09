@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from rest_framework import mixins, viewsets
-from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import mixins
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from common.api.permissions import IsTenantMember
+from common.api.tenancy import TenantScopedViewSet
 
 from .models import McpResource, McpServer, McpTool, McpUsageLog
 from .serializers import (
@@ -11,20 +14,7 @@ from .serializers import (
     McpToolSerializer,
     McpUsageLogSerializer,
 )
-
-
-def request_tenant(request):
-    return getattr(request, "tenant", None)
-
-
-class TenantScopedViewSet(viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def get_organization(self):
-        organization = request_tenant(self.request)
-        if organization is None:
-            raise NotFound("Tenant required.")
-        return organization
+from .tool_registry import get_tools_catalog
 
 
 class McpServerViewSet(
@@ -39,6 +29,7 @@ class McpServerViewSet(
     ViewSet for managing MCP Servers within a tenant.
     Allows CRUD operations on McpServer instances.
     """
+
     serializer_class = McpServerSerializer
 
     def get_queryset(self):
@@ -61,6 +52,7 @@ class McpToolViewSet(
     """
     ViewSet for managing Tools associated with an MCP Server.
     """
+
     serializer_class = McpToolSerializer
 
     def get_queryset(self):
@@ -83,10 +75,13 @@ class McpResourceViewSet(
     """
     ViewSet for managing Resources exposed by an MCP Server.
     """
+
     serializer_class = McpResourceSerializer
 
     def get_queryset(self):
-        return McpResource.objects.filter(organization=self.get_organization()).select_related("server")
+        return McpResource.objects.filter(organization=self.get_organization()).select_related(
+            "server"
+        )
 
     def perform_create(self, serializer):
         serializer.save(organization=self.get_organization())
@@ -105,6 +100,7 @@ class McpUsageLogViewSet(
     ViewSet for tracking usage logs of MCP Tools.
     ReadOnly for most users, but allows creation for logging purposes.
     """
+
     serializer_class = McpUsageLogSerializer
 
     def get_queryset(self):
@@ -118,14 +114,9 @@ class McpUsageLogViewSet(
 
 # ── MCP Protocol Endpoint ────────────────────────────────────
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-
-from .tool_registry import get_tools_catalog
-
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsTenantMember])
 def tool_catalog_view(request):
     """
     Return all auto-discovered API tools in MCP protocol format.
@@ -146,8 +137,10 @@ def tool_catalog_view(request):
     }
     """
     tools = get_tools_catalog()
-    return Response({
-        "tools": tools,
-        "count": len(tools),
-        "version": "1.0",
-    })
+    return Response(
+        {
+            "tools": tools,
+            "count": len(tools),
+            "version": "1.0",
+        }
+    )

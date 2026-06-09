@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -18,7 +18,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Plan",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("code", models.SlugField(max_length=50)),
                 ("name", models.CharField(max_length=120)),
                 ("description", models.TextField(blank=True, default="")),
@@ -47,7 +52,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Price",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("stripe_price_id", models.CharField(blank=True, default="", max_length=120)),
                 ("currency", models.CharField(default="usd", max_length=10)),
                 (
@@ -78,9 +88,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Subscription",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("stripe_customer_id", models.CharField(blank=True, default="", max_length=120)),
-                ("stripe_subscription_id", models.CharField(blank=True, default="", max_length=120)),
+                (
+                    "stripe_subscription_id",
+                    models.CharField(blank=True, default="", max_length=120),
+                ),
                 (
                     "status",
                     models.CharField(
@@ -125,7 +143,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Invoice",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("stripe_invoice_id", models.CharField(max_length=120, unique=True)),
                 ("status", models.CharField(blank=True, default="", max_length=30)),
                 (
@@ -150,7 +173,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="StripeEvent",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("event_id", models.CharField(max_length=255, unique=True)),
                 ("event_type", models.CharField(max_length=255)),
                 ("payload", models.JSONField()),
@@ -159,4 +187,3 @@ class Migration(migrations.Migration):
             options={"ordering": ["-processed_at"]},
         ),
     ]
-

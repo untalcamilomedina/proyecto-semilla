@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      {% block title %}{{ tenant.name|default:"NotionApps" }}{% endblock %}
+      {% block title %}{{ tenant.name|default:"Proyecto Semilla" }}{% endblock title %}
     </title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,7 +59,7 @@
           </div>
           {% endif %}
           <div class="font-semibold truncate">
-            {{ tenant.name|default:"NotionApps" }}
+            {{ tenant.name|default:"Proyecto Semilla" }}
           </div>
         </div>
         <nav class="px-4 py-4 space-y-1 text-sm">
@@ -83,7 +83,7 @@
             href="{% url 'billing:dashboard' %}"
             >Billing</a
           >
-          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="/api/docs/"
+          <a class="block px-3 py-2 rounded hover:bg-gray-50" href="{% url 'swagger-ui' %}"
             >API Docs</a
           >
         </nav>
@@ -108,18 +108,18 @@
           </div>
           <div class="text-sm">
             {% if user.is_authenticated %} {{ user.email }}
-            <a href="/accounts/logout/" class="ml-3 text-brand hover:underline"
+            <a href="{% url 'account_logout' %}" class="ml-3 text-brand hover:underline"
               >Logout</a
             >
             {% else %}
-            <a href="/accounts/login/" class="text-brand hover:underline"
+            <a href="{% url 'account_login' %}" class="text-brand hover:underline"
               >Login</a
             >
             {% endif %}
           </div>
         </header>
 
-        <div class="px-6 py-6">{% block content %}{% endblock %}</div>
+        <div class="px-6 py-6">{% block content %}{% endblock content %}</div>
       </main>
     </div>
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ApiKey",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=120)),
                 ("prefix", models.CharField(max_length=12, unique=True)),
                 ("hashed_key", models.CharField(max_length=128)),
@@ -47,4 +52,3 @@ class Migration(migrations.Migration):
             options={"ordering": ["-created_at"]},
         ),
     ]
-

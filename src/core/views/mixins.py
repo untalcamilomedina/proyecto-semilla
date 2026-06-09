@@ -20,13 +20,17 @@ class TenantPermissionMixin(ContextMixin):
         if organization is None:
             raise Http404("Tenant required.")
 
-        if self.require_membership and not request.user.is_superuser:
-            if get_membership(request.user, organization) is None:
-                raise PermissionDenied
+        if (
+            self.require_membership
+            and not request.user.is_superuser
+            and get_membership(request.user, organization) is None
+        ):
+            raise PermissionDenied
 
-        if self.permission_codename:
-            if not has_permission(request.user, organization, self.permission_codename):
-                raise PermissionDenied
+        if self.permission_codename and not has_permission(
+            request.user, organization, self.permission_codename
+        ):
+            raise PermissionDenied
 
         self.organization = organization
         return super().dispatch(request, *args, **kwargs)
@@ -34,4 +38,3 @@ class TenantPermissionMixin(ContextMixin):
     def get_context_data(self, **kwargs):
         kwargs.setdefault("organization", getattr(self, "organization", None))
         return super().get_context_data(**kwargs)
-

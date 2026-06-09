@@ -3,7 +3,13 @@ from __future__ import annotations
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import McpResourceViewSet, McpServerViewSet, McpToolViewSet, McpUsageLogViewSet, tool_catalog_view
+from .views import (
+    McpResourceViewSet,
+    McpServerViewSet,
+    McpToolViewSet,
+    McpUsageLogViewSet,
+    tool_catalog_view,
+)
 
 router = DefaultRouter()
 router.trailing_slash = "/?"

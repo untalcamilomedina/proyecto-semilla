@@ -5,7 +5,7 @@ Tests Fernet-based encryption/decryption and the EncryptedCharField.
 """
 
 import pytest
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from common.encryption import decrypt_value, encrypt_value
 
@@ -67,14 +67,14 @@ class TestRLS:
     """Test RLS SQL generation (unit tests, no DB needed)."""
 
     def test_enable_rls_generates_statements(self):
-        from common.rls import enable_rls_sql, TENANT_SCOPED_TABLES
+        from common.rls import TENANT_SCOPED_TABLES, enable_rls_sql
 
         statements = enable_rls_sql()
         # Each table generates: ENABLE, FORCE, DROP+CREATE isolation, DROP+CREATE bypass = 6
         assert len(statements) == len(TENANT_SCOPED_TABLES) * 6
 
     def test_disable_rls_generates_statements(self):
-        from common.rls import disable_rls_sql, TENANT_SCOPED_TABLES
+        from common.rls import TENANT_SCOPED_TABLES, disable_rls_sql
 
         statements = disable_rls_sql()
         # Each table generates: DROP isolation, DROP bypass, DISABLE = 3

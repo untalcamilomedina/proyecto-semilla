@@ -16,4 +16,3 @@ class DomainAdmin(admin.ModelAdmin):
     list_display = ("domain", "tenant", "is_primary")
     search_fields = ("domain",)
     list_filter = ("is_primary",)
-

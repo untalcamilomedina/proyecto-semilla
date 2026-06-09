@@ -12,7 +12,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Tenant",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=150)),
                 (
                     "slug",
@@ -31,14 +36,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Domain",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("domain", models.CharField(max_length=255, unique=True)),
                 ("is_primary", models.BooleanField(default=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "tenant",
                     models.ForeignKey(
-                        on_delete=models.deletion.CASCADE, related_name="domains", to="multitenant.tenant"
+                        on_delete=models.deletion.CASCADE,
+                        related_name="domains",
+                        to="multitenant.tenant",
                     ),
                 ),
             ],
@@ -48,4 +60,3 @@ class Migration(migrations.Migration):
             },
         ),
     ]
-

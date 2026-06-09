@@ -20,8 +20,10 @@ def test_readyz(client):
 
 
 @pytest.mark.django_db
-def test_metrics_endpoint(client):
-    res = client.get("/metrics")
+def test_metrics_endpoint(client, settings):
+    # Fuera de DEBUG el endpoint exige METRICS_TOKEN (cerrado por defecto).
+    settings.METRICS_TOKEN = "test-metrics-token"
+    res = client.get("/metrics", HTTP_AUTHORIZATION="Bearer test-metrics-token")
     assert res.status_code == 200
     assert b"django_http_requests_total" in res.content
 

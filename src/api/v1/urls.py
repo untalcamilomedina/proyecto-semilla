@@ -4,33 +4,21 @@ from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
 from config.settings.plugins import optional_api_urls
-
+from core.api.dashboard import DashboardViewSet
 from core.api.onboarding import OnboardingViewSet
-from core.api.dashboard import DashboardViewSet
-from core.api.dashboard import DashboardViewSet
-from integrations.api import (
-    DiagramViewSet, 
-    JobViewSet, 
-    NotionIntegrationViewSet, 
-    MiroIntegrationViewSet,
-    AIIntegrationViewSet,
-    AIIntegrationViewSet,
-    UserAPIKeyViewSet,
-    ConnectionStatusViewSet
-)
-from integrations.oauth.views import OAuthConnectView, OAuthCallbackView
+
 from .views import csrf, login_view, logout_view, signup_view
 from .viewsets import (
+    ActivityLogViewSet,
     ApiKeyViewSet,
     InvoiceViewSet,
     MembershipViewSet,
     PermissionViewSet,
     PlanViewSet,
+    ProfileViewSet,
     RoleViewSet,
     SubscriptionViewSet,
     TenantViewSet,
-    ProfileViewSet,
-    ActivityLogViewSet,
 )
 
 router = DefaultRouter()
@@ -47,15 +35,8 @@ router.register("plans", PlanViewSet, basename="plans")
 router.register("subscriptions", SubscriptionViewSet, basename="subscriptions")
 router.register("invoices", InvoiceViewSet, basename="invoices")
 router.register("api-keys", ApiKeyViewSet, basename="api-keys")
-router.register("diagrams", DiagramViewSet, basename="diagrams")
-router.register("jobs", JobViewSet, basename="jobs")
-router.register("integrations/notion", NotionIntegrationViewSet, basename="notion-integration")
-router.register("integrations/miro", MiroIntegrationViewSet, basename="miro-integration")
-router.register("integrations/ai", AIIntegrationViewSet, basename="ai-integration")
-router.register("integrations/status", ConnectionStatusViewSet, basename="integration-status")
-router.register("user-keys", UserAPIKeyViewSet, basename="user-keys")
 
-from rest_framework_simplejwt.views import (
+from rest_framework_simplejwt.views import (  # noqa: E402
     TokenObtainPairView,
     TokenRefreshView,
     TokenVerifyView,
@@ -68,15 +49,18 @@ urlpatterns = [
     re_path(r"^auth/token/verify/?$", TokenVerifyView.as_view(), name="token_verify"),
     # Legacy session auth (kept for backward compatibility)
     re_path(r"^csrf/?$", csrf, name="csrf"),
-    re_path(r"^me/?$", ProfileViewSet.as_view({"get": "retrieve", "patch": "partial_update"}), name="me"),
-    re_path(r"^tenant/?$", TenantViewSet.as_view({"get": "retrieve", "patch": "partial_update"}), name="tenant-current"),
+    re_path(
+        r"^me/?$", ProfileViewSet.as_view({"get": "retrieve", "patch": "partial_update"}), name="me"
+    ),
+    re_path(
+        r"^tenant/?$",
+        TenantViewSet.as_view({"get": "retrieve", "patch": "partial_update"}),
+        name="tenant-current",
+    ),
     re_path(r"^login/?$", login_view, name="login"),
     re_path(r"^logout/?$", logout_view, name="logout"),
     re_path(r"^signup/?$", signup_view, name="signup"),
     path("", include(router.urls)),
-    # OAuth Routes
-    path("integrations/<str:provider_name>/connect", OAuthConnectView.as_view(), name="oauth-connect"),
-    path("integrations/<str:provider_name>/callback", OAuthCallbackView.as_view(), name="oauth-callback"),
 ]
 
 for prefix, module in optional_api_urls():

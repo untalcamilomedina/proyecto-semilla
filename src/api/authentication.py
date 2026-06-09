@@ -1,11 +1,37 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple
-
 from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, exceptions
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from api.models import ApiKey
+
+
+class TenantJWTAuthentication(JWTAuthentication):
+    """JWT con binding al schema/tenant donde se emitió el token.
+
+    Con usuarios por schema, los IDs colisionan entre tenants: un token del
+    usuario id=N emitido en el schema A no debe autenticar como el usuario
+    id=N del schema B. Si el token trae el claim `schema_name`, debe coincidir
+    con el schema actual de la petición.
+    """
+
+    def authenticate(self, request):
+        result = super().authenticate(request)
+        if result is None:
+            return None
+        user, validated_token = result
+
+        token_schema = validated_token.get("schema_name")
+        if token_schema:
+            from multitenant.schema import get_current_schema
+
+            current = get_current_schema()
+            if token_schema != current:
+                raise exceptions.AuthenticationFailed(
+                    _("Token is not valid for this tenant."), code="tenant_mismatch"
+                )
+        return user, validated_token
 
 
 class ApiKeyAuthentication(authentication.BaseAuthentication):
@@ -15,19 +41,19 @@ class ApiKeyAuthentication(authentication.BaseAuthentication):
     keyword = "Api-Key"
     header = "X-Api-Key"
 
-    def authenticate(self, request) -> Optional[Tuple[object, ApiKey]]:
+    def authenticate(self, request) -> tuple[object, ApiKey] | None:
         raw = self._get_raw_key(request)
         if not raw:
             return None
         try:
             prefix, secret = self._split_key(raw)
         except ValueError:
-            raise exceptions.AuthenticationFailed(_("Invalid API key format."))
+            raise exceptions.AuthenticationFailed(_("Invalid API key format.")) from None
 
         try:
             key = ApiKey.objects.select_related("user", "organization").get(prefix=prefix)
         except ApiKey.DoesNotExist:
-            raise exceptions.AuthenticationFailed(_("Invalid API key."))
+            raise exceptions.AuthenticationFailed(_("Invalid API key.")) from None
 
         if not key.check_secret(secret):
             raise exceptions.AuthenticationFailed(_("Invalid API key."))
@@ -75,7 +101,11 @@ try:  # pragma: no cover
                 "type": "apiKey",
                 "in": "header",
                 "name": ApiKeyAuthentication.header,
-                "description": "Use header `X-Api-Key: ak_<prefix>_<secret>` (or `Authorization: Bearer ak_<prefix>_<secret>`).",
+                "description": (
+                    "Use header `X-Api-Key: ak_<prefix>_<secret>` "
+                    "(or `Authorization: Api-Key ak_<prefix>_<secret>`)."
+                ),
             }
-except Exception:  # pragma: no cover
+
+except Exception:  # pragma: no cover  # noqa: S110
     pass

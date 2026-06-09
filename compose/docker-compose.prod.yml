@@ -28,7 +28,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      POSTGRES_DB: ${POSTGRES_DB:-acme_saas}
+      POSTGRES_DB: ${POSTGRES_DB:-proyecto_semilla}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

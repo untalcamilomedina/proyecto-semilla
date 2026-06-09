@@ -10,4 +10,3 @@ def add_class(field, css: str):
     existing = field.field.widget.attrs.get("class", "")
     merged = f"{existing} {css}".strip()
     return field.as_widget(attrs={"class": merged})
-

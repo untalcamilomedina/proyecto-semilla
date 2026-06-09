@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-from multitenant.models import Tenant, Domain
 from core.models import Membership, Role
+from multitenant.models import Domain, Tenant
 from multitenant.schema import PUBLIC_SCHEMA_NAME, schema_context
 
 User = get_user_model()
@@ -27,15 +27,15 @@ class Command(BaseCommand):
 
             # Create domains based on ALLOWED_HOSTS or defaults to ensure accessibility
             from django.conf import settings
-            
+
             domains_to_create = getattr(settings, "ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
             # Filter out wildcard or special hosts if necessary, or just create them
             # For a demo seed, we usually want localhost availability.
-            
+
             for domain_name in domains_to_create:
                 if domain_name in ["web", "frontend", ".acme.dev", "*"]:
-                   continue 
-                   
+                    continue
+
                 Domain.objects.get_or_create(
                     domain=domain_name,
                     defaults={"tenant": tenant, "is_primary": False},
@@ -50,7 +50,7 @@ class Command(BaseCommand):
         with schema_context(tenant.schema_name):
             tenant_local = Tenant.objects.get(id=tenant.id)
             email = "admin@demo.com"
-            password = "password"
+            password = "password"  # noqa: S105 — credencial demo documentada en README
 
             if not User.objects.filter(email=email).exists():
                 self.stdout.write(f"Creating user {email} in schema {tenant.schema_name}...")

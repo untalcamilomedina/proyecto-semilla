@@ -1,4 +1,4 @@
-app = "acme-saas"
+app = "proyecto-semilla"
 primary_region = "us"
 
 kill_signal = "SIGINT"

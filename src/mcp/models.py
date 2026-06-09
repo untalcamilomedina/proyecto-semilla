@@ -11,6 +11,7 @@ class McpServer(models.Model):
     Represents an external or internal MCP Server configuration.
     Stores connection details and metadata.
     """
+
     organization = models.ForeignKey(
         "multitenant.Tenant", on_delete=models.CASCADE, related_name="mcp_servers"
     )
@@ -33,6 +34,7 @@ class McpTool(models.Model):
     Represents a specific tool exposed by an MCP Server.
     Includes input schema definition.
     """
+
     organization = models.ForeignKey(
         "multitenant.Tenant", on_delete=models.CASCADE, related_name="mcp_tools"
     )
@@ -53,6 +55,7 @@ class McpResource(models.Model):
     """
     Represents a data resource exposed by an MCP Server (e.g. file, database table).
     """
+
     organization = models.ForeignKey(
         "multitenant.Tenant", on_delete=models.CASCADE, related_name="mcp_resources"
     )
@@ -72,9 +75,10 @@ class McpResource(models.Model):
 
 class McpUsageLog(models.Model):
     """
-    Audit log for MCP Tool execution. 
+    Audit log for MCP Tool execution.
     Tracks inputs and outputs for debugging and compliance.
     """
+
     organization = models.ForeignKey(
         "multitenant.Tenant", on_delete=models.CASCADE, related_name="mcp_usage_logs"
     )
@@ -94,4 +98,3 @@ class McpUsageLog(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover
         return f"{self.server_id}:{self.tool_id}:{self.user_id}:{self.created_at:%Y-%m-%d %H:%M:%S}"
-

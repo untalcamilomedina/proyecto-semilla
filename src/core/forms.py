@@ -30,4 +30,3 @@ class RoleImportForm(forms.Form):
             return json.loads(raw)
         except json.JSONDecodeError as exc:
             raise forms.ValidationError("Invalid JSON.") from exc
-

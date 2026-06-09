@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from django.core.exceptions import PermissionDenied
 
 
@@ -23,7 +22,6 @@ def get_membership(user, organization):
         )
     except Membership.DoesNotExist:
         return None
-
 
 
 def has_permission(user, organization, codename: str) -> bool:

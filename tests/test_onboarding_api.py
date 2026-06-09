@@ -1,6 +1,5 @@
 import pytest
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from core.models import OnboardingState
 
@@ -33,7 +32,7 @@ class TestOnboardingAPI:
         # But we need OnboardingState linked to user
         from core.models import OnboardingState
         from multitenant.schema import PUBLIC_SCHEMA_NAME, schema_context
-        
+
         with schema_context(PUBLIC_SCHEMA_NAME):
             OnboardingState.objects.create(
                 tenant=tenant,
@@ -44,7 +43,7 @@ class TestOnboardingAPI:
         payload = {"modules": ["cms", "lms"]}
         response = authenticated_client.post("/api/v1/onboarding/modules/", payload)
         assert response.status_code == status.HTTP_200_OK
-        
+
         # Verify
         with schema_context(PUBLIC_SCHEMA_NAME):
             state = OnboardingState.objects.get(tenant=tenant)

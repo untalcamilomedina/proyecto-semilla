@@ -5,10 +5,9 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.db import transaction
-from django.utils import timezone
 
-from core.services.email import EmailService
 from core.models import Membership, OnboardingState, Role, User
+from core.services.email import EmailService
 from core.services.seed import seed_default_roles
 from core.services.usernames import username_from_email
 from multitenant.models import Domain, Tenant, validate_subdomain
@@ -21,21 +20,19 @@ class OnboardingResult:
     state: OnboardingState
 
 
-from core.services.email import EmailService
-
 def finish_onboarding(tenant: Tenant) -> Tenant:
     """
     Finalize onboarding: ensure tenant is active, owner has access.
     """
     tenant.is_active = True
     tenant.save()
-    
+
     # Send welcome email to owner
     # Assuming owner is the user who triggered this, but we need the user object.
     # The current structure might separate user from tenant creation logic.
     # In 'create_tenant_from_onboarding' we have the user.
     # Let's inspect where finish is called or modify 'create_tenant_from_onboarding' instead.
-    
+
     return tenant
 
 
@@ -93,15 +90,15 @@ def start_onboarding(
             current_step=2,
             completed_steps=[1],
             data={
-                "modules": [], 
-                "stripe_connected": stripe_connected, 
+                "modules": [],
+                "stripe_connected": stripe_connected,
                 "stripe_config": {
                     "public_key": stripe_public_key,
                     "secret_key": stripe_secret_key,
                     "webhook_secret": stripe_webhook_secret,
                 },
                 "language": language,
-                "resume_token": uuid4().hex
+                "resume_token": uuid4().hex,
             },
         )
 
@@ -114,9 +111,10 @@ def start_onboarding(
     with schema_context(tenant_public.schema_name):
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
-        
+
         # Create user in tenant schema
-        # If source_user exists, we copy the password hash directly to avoid re-hashing or requiring text password
+        # Si source_user existe copiamos el hash de contraseña directamente
+        # (evita re-hashear o requerir la contraseña en texto plano)
         user = User(
             username=username_from_email(email),
             email=email,
@@ -129,7 +127,7 @@ def start_onboarding(
             user.set_password(password)
         else:
             raise ValueError("Password or source user required")
-        
+
         user.save()
         Membership.objects.create(user=user, organization=tenant_local, role=owner_role)
 
@@ -169,15 +167,15 @@ def set_custom_domain(state: OnboardingState, custom_domain: str | None) -> None
                 domain=custom_domain.lower().strip(),
                 defaults={"tenant": tenant, "is_primary": True},
             )
-            Domain.objects.filter(tenant=tenant).exclude(domain=custom_domain).update(is_primary=False)
+            Domain.objects.filter(tenant=tenant).exclude(domain=custom_domain).update(
+                is_primary=False
+            )
         state.mark_step_complete(4)
         state.save(update_fields=["current_step", "completed_steps"])
 
 
 @transaction.atomic
-def invite_members(
-    state: OnboardingState, emails: list[str], role_slug: str = "member"
-) -> int:
+def invite_members(state: OnboardingState, emails: list[str], role_slug: str = "member") -> int:
     tenant = state.tenant
     invited = 0
     with schema_context(tenant.schema_name):
@@ -195,9 +193,12 @@ def invite_members(
                 email=email,
                 defaults={"username": username_from_email(email)},
             )
-            membership, _ = Membership.objects.get_or_create(user=user, organization=tenant_local, defaults={"role": role})
+            membership, _ = Membership.objects.get_or_create(
+                user=user, organization=tenant_local, defaults={"role": role}
+            )
             invited += 1
-            invite_url = f"https://{tenant_local.slug}.{settings.DOMAIN_BASE}/join?token=mocked"  # In real app use token
+            # TODO(plan F3): token real de invitación
+            invite_url = f"https://{tenant_local.slug}.{settings.DOMAIN_BASE}/join?token=mocked"
             EmailService.send_invite_email(membership, invite_url)
 
     with schema_context(PUBLIC_SCHEMA_NAME):

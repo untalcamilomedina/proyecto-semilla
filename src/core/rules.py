@@ -27,4 +27,3 @@ def _perm(codename: str):
 # Core RBAC perms
 rules.add_perm("core.manage_roles", _perm("core.manage_roles"))
 rules.add_perm("core.invite_members", _perm("core.invite_members"))
-

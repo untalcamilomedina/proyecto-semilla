@@ -173,7 +173,9 @@ def test_permission_viewset_list():
     )
     assert res.status_code == 200
     codenames = {p["codename"] for p in res.data["results"]}
-    assert {"core.manage_roles", "core.invite_members", "billing.manage_billing"}.issubset(codenames)
+    assert {"core.manage_roles", "core.invite_members", "billing.manage_billing"}.issubset(
+        codenames
+    )
 
     res = client.get(
         "/api/v1/roles/",
@@ -483,4 +485,3 @@ def test_invoice_viewset_list():
     assert res.data["count"] == 1
     assert res.data["results"][0]["id"] == local_invoice.id
     assert res.data["results"][0]["stripe_invoice_id"] == local_invoice.stripe_invoice_id
-

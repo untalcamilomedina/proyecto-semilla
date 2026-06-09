@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.contrib import admin
-from django.db import connection
 from django.core.cache import cache
+from django.db import connection
 from django.http import JsonResponse
 from django.urls import include, path
 
@@ -60,7 +60,7 @@ if settings.DEBUG:
         logger = logging.getLogger(__name__)
         logger.error("Test JSON Logging Error")
         try:
-            1 / 0
+            raise ZeroDivisionError("debug test error")
         except ZeroDivisionError:
             logger.exception("Test Exception Capture")
             if request.GET.get("raise"):

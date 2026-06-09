@@ -3,7 +3,15 @@ from __future__ import annotations
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import Membership, OnboardingState, Permission, Role, RoleAuditLog, RolePermission, User
+from .models import (
+    Membership,
+    OnboardingState,
+    Permission,
+    Role,
+    RoleAuditLog,
+    RolePermission,
+    User,
+)
 
 
 @admin.register(User)

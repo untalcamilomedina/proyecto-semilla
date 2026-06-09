@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -15,7 +15,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Permission",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("module", models.CharField(max_length=50)),
                 ("codename", models.SlugField(max_length=120, unique=True)),
                 ("name", models.CharField(max_length=150)),
@@ -27,7 +32,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Role",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=80)),
                 ("slug", models.SlugField(max_length=80)),
                 ("description", models.TextField(blank=True, default="")),
@@ -52,10 +62,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="RolePermission",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 (
                     "permission",
-                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="core.permission"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.permission"
+                    ),
                 ),
                 (
                     "role",
@@ -67,12 +84,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="role",
             name="permissions",
-            field=models.ManyToManyField(related_name="roles", through="core.RolePermission", to="core.permission"),
+            field=models.ManyToManyField(
+                related_name="roles", through="core.RolePermission", to="core.permission"
+            ),
         ),
         migrations.CreateModel(
             name="Membership",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("is_active", models.BooleanField(default=True)),
                 ("joined_at", models.DateTimeField(auto_now_add=True)),
                 (
@@ -105,14 +129,36 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="RoleAuditLog",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("action", models.CharField(choices=[("created", "created"), ("updated", "updated"), ("deleted", "deleted"), ("perms_changed", "perms_changed"), ("imported", "imported")], max_length=20)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[
+                            ("created", "created"),
+                            ("updated", "updated"),
+                            ("deleted", "deleted"),
+                            ("perms_changed", "perms_changed"),
+                            ("imported", "imported"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
                 ("before", models.JSONField(blank=True, null=True)),
                 ("after", models.JSONField(blank=True, null=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "actor",
-                    models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
                 ),
                 (
                     "organization",
@@ -124,9 +170,13 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "role",
-                    models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="core.role"),
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="core.role",
+                    ),
                 ),
             ],
         ),
     ]
-

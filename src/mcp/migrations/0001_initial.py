@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="McpServer",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=200)),
                 ("description", models.TextField(blank=True, default="")),
                 ("endpoint_url", models.URLField()),
@@ -40,7 +45,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="McpTool",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=200)),
                 ("description", models.TextField(blank=True, default="")),
                 ("input_schema", models.JSONField(blank=True, default=dict)),
@@ -55,7 +65,9 @@ class Migration(migrations.Migration):
                 (
                     "server",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="tools", to="mcp.mcpserver"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tools",
+                        to="mcp.mcpserver",
                     ),
                 ),
             ],
@@ -67,7 +79,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="McpResource",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("uri", models.CharField(max_length=500)),
                 ("name", models.CharField(max_length=200)),
                 ("description", models.TextField(blank=True, default="")),
@@ -97,7 +114,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="McpUsageLog",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("request_data", models.JSONField(blank=True, default=dict)),
                 ("response_data", models.JSONField(blank=True, null=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
@@ -139,4 +161,3 @@ class Migration(migrations.Migration):
             },
         ),
     ]
-
