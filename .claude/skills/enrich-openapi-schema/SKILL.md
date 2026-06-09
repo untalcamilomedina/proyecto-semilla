@@ -1,7 +1,7 @@
 ---
 name: enrich-openapi-schema
 description: Guía para enriquecer la documentación OpenAPI (Swagger) con ejemplos, descripciones y tipos explícitos usando drf-spectacular.
-author: AppNotion Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
@@ -11,19 +11,24 @@ Esta skill transforma una API funcional pero mal documentada en una API "Product
 
 ## Prerrequisitos
 
-- [ ] ViewSet implementado en `integrations/api.py`.
+- [ ] ViewSet implementado en el `api.py` (o `views.py`) de tu app (ej. `src/api/`).
 - [ ] `drf-spectacular` instalado.
 
 ## Proceso
 
 ### Paso 1: Importar Decoradores
 
-En `src/integrations/api.py`, importar las herramientas de `drf-spectacular`.
+En el módulo de tu ViewSet, importar las herramientas de `drf-spectacular`. Para el ejemplo definimos un modelo canónico mínimo; en tu proyecto usa el Serializer o modelo Pydantic real de tu dominio.
 
 ```python
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiTypes
 from drf_spectacular.types import OpenApiTypes
-from .schemas import FlowSpec, ERDSpec
+from pydantic import BaseModel
+
+class ItemSpec(BaseModel):
+    """Modelo canónico de ejemplo — sustituye por el de tu dominio."""
+    name: str
+    fields: list[str] = []
 ```
 
 ### Paso 2: Decorar la Acción
@@ -39,14 +44,14 @@ Aplicar `@extend_schema` sobre el método del ViewSet.
 
 ```python
 @extend_schema(
-    summary="Escanear Workspace de Notion",
+    summary="Sincronizar Items desde el servicio externo",
     description="""
-    Inicia el proceso de escaneo recursivo de un Workspace de Notion.
-    Retorna una especificación canónica (`FlowSpec`) con las bases de datos encontradas.
+    Inicia la sincronización de recursos desde la API externa configurada.
+    Retorna una especificación canónica (`ItemSpec`) con los items encontrados.
     """,
     request=OpenApiTypes.OBJECT, # O un Serializer específico si existe
     responses={
-        200: FlowSpec, # Enlace directo al Pydantic/Serializer
+        200: ItemSpec, # Enlace directo al Pydantic/Serializer
         400: OpenApiTypes.OBJECT,
         401: OpenApiTypes.OBJECT
     },
@@ -54,8 +59,8 @@ Aplicar `@extend_schema` sobre el método del ViewSet.
         OpenApiExample(
             "Respuesta Exitosa",
             value={
-                "nodes": [{"id": "db-1", "type": "database", "name": "Projects"}],
-                "relationships": []
+                "name": "Projects",
+                "fields": ["id", "title", "status"]
             },
             status_codes=["200"]
         ),
@@ -66,7 +71,7 @@ Aplicar `@extend_schema` sobre el método del ViewSet.
         )
     ]
 )
-def scan(self, request):
+def sync(self, request):
     # implementación...
 ```
 

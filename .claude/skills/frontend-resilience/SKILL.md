@@ -1,11 +1,11 @@
 ---
 name: frontend-resilience
 description: Agrega error boundaries, loading states, fix navigation i18n, sanitiza stores y corrige middleware stacking
-author: Mayordomos Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
-# Skill: Frontend Resilience para BlockFlow SaaS
+# Skill: Frontend Resilience para Proyecto Semilla
 
 Esta skill guia la implementacion de patrones de resiliencia en el frontend Next.js 16: error boundaries, loading states, navegacion i18n correcta, store sanitization y correccion de middleware stacking.
 
@@ -129,7 +129,7 @@ import { Link, useRouter, usePathname } from "@/lib/navigation";
 
 **Archivos que requieren correccion:**
 - `src/components/layout/sidebar.tsx`
-- `src/components/diagrams/DiagramsTable.tsx`
+- `src/components/members/members-table.tsx`
 - `src/app/[locale]/(dashboard)/dashboard/page.tsx`
 - `src/app/[locale]/onboarding/done/page.tsx`
 - `src/app/[locale]/(auth)/forgot-password/page.tsx`
@@ -234,8 +234,8 @@ rm frontend/src/test_marker
 ```
 
 **Componentes duplicados a consolidar:**
-- `src/components/diagrams/canvas.tsx` vs `canvas/index.tsx` - Mantener `canvas/index.tsx`
-- `src/components/diagrams/nodes/entity-node.tsx` vs `ERDEntityNode.tsx` - Consolidar en uno
+- Buscar pares duplicados (ej. `componente.tsx` vs `componente/index.tsx`) y mantener una sola versión
+- Consolidar variantes con distinto naming del mismo componente (ej. `entity-node.tsx` vs `EntityNode.tsx`)
 
 ## Checklist de Verificacion
 

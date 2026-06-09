@@ -1,7 +1,7 @@
 ---
 name: scaffold-full-stack-feature
 description: Guía maestra para crear una feature completa (Vertical Slice) desde el Backend hasta el Frontend.
-author: AppNotion Architecture Team
+author: Proyecto Semilla Architecture Team
 version: 1.0.0
 ---
 

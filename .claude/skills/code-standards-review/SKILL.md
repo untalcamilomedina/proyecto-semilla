@@ -1,13 +1,13 @@
 ---
 name: code-standards-review
-description: Audita codigo nuevo/modificado contra los estandares del proyecto BlockFlow (tema, i18n, a11y, navegacion, seguridad).
-author: BlockFlow Dev Team
+description: Audita codigo nuevo/modificado contra los estandares de Proyecto Semilla (tema, i18n, a11y, navegacion, seguridad).
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
 # Skill: Code Standards Review
 
-Audita archivos `.tsx`/`.ts` del frontend contra los estándares de calidad del proyecto BlockFlow. Diseñado para ejecutarse antes de commits o al revisar PRs.
+Audita archivos `.tsx`/`.ts` del frontend contra los estándares de calidad de Proyecto Semilla. Diseñado para ejecutarse antes de commits o al revisar PRs.
 
 ## Cuándo Usar
 
@@ -49,7 +49,7 @@ shadow-[0_0_*rgba(13,242,13*]
 | **Gradientes** | `text-gradient-heading`, `text-gradient-heading-r` |
 
 **Excepciones aceptables**:
-- Colores de feature/marca con opacity: `bg-blue-500/10`, `text-blue-400`, `bg-purple-500/10`, `text-purple-400`, Miro brand colors
+- Colores de feature/marca con opacity: `bg-blue-500/10`, `text-blue-400`, `bg-purple-500/10`, `text-purple-400`
 - `text-white` SOLO sobre fondos de color sólido para contraste (ej. `bg-destructive text-white`, `bg-purple-500 text-white`)
 - Componentes shadcn/ui base (`button.tsx`, `card.tsx`, `input.tsx`, `badge.tsx`, `dialog.tsx`) deben usar tokens de shadcn (`bg-primary`, `text-primary-foreground`, `bg-card`, `border-input`, `bg-accent`, etc.)
 

@@ -1,6 +1,6 @@
-# Catálogo de Skills - AppNotion
+# Catálogo de Skills - Proyecto Semilla
 
-Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas para estandarizar y acelerar el desarrollo del proyecto **AppNotion**, siguiendo la arquitectura **Clean Architecture API-First**.
+Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas para estandarizar y acelerar el desarrollo del proyecto **Proyecto Semilla**, siguiendo la arquitectura **Clean Architecture API-First**.
 
 ## Índice de Skills
 
@@ -10,16 +10,19 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 | ----------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- |
 | [new-integration-module](./new-integration-module/SKILL.md) | Genera el esqueleto estándar (Client-Adapter-Service) para nuevas integraciones. | Al añadir una herramienta nueva (ej. Jira).    |
 | [scaffold-api-endpoint](./scaffold-api-endpoint/SKILL.md)   | Expone servicios de negocio en la API (ViewSet + Router) correctamente.          | Al crear endpoints REST para lógica existente. |
+| [scaffold-full-stack-feature](./scaffold-full-stack-feature/SKILL.md) | Guía maestra para crear una feature completa (Vertical Slice) backend → frontend. | Al agregar funcionalidades nuevas al sistema.  |
 
 ### 🧪 Calidad & Testing
 
 | Skill                                                     | Descripción                                                 | Uso Típico                                           |
 | --------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
 | [generate-audit-test](./generate-audit-test/SKILL.md)     | Crea tests de auditoría para validar "API First" con mocks. | Después de crear lógica de negocio, antes del front. |
-| [canonical-model-check](./canonical-model-check/SKILL.md) | Validación manual de Adaptadores contra Esquemas Pydantic.  | Al escribir lógica de adaptación de datos.           |
 | [test-api-endpoint](./test-api-endpoint/SKILL.md)         | Tests de integración HTTP para endpoints REST.              | Para validar endpoints antes del frontend.           |
 | [test-api-contract](./test-api-contract/SKILL.md)         | Valida que la API cumple con el schema OpenAPI.             | En CI/CD para detectar breaking changes.             |
 | [test-e2e-flow](./test-e2e-flow/SKILL.md)                 | Tests E2E de flujos completos de usuario en la API.         | Para validar flujos críticos de negocio.             |
+| [audit-frontend-ux](./audit-frontend-ux/SKILL.md)         | Auditoría QA visual y funcional del frontend (a11y, i18n, responsive). | Antes de cualquier lanzamiento importante.    |
+| [code-standards-review](./code-standards-review/SKILL.md) | Audita código nuevo contra los estándares del proyecto (tema, i18n, a11y). | Antes de commits o al revisar PRs.        |
+| [debug-protocol](./debug-protocol/SKILL.md)               | Protocolo de depuración con análisis de causa raíz.         | Al corregir bugs sin recurrir a parches.             |
 
 ### 📜 Documentación & API First
 
@@ -35,13 +38,22 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 | [scaffold-page](./scaffold-page/SKILL.md)                         | Genera páginas Next.js App Router con i18n y layout consistente.   | Al crear nuevas secciones del dashboard.       |
 | [create-form-component](./create-form-component/SKILL.md)         | Formularios validados con react-hook-form, Zod e i18n.             | Al crear formularios de entrada de datos.      |
 | [scaffold-offline-repository](./scaffold-offline-repository/SKILL.md) | Repositorio Offline-First con IndexedDB encriptado + Sync.     | Al implementar funcionalidad PWA.              |
+| [frontend-resilience](./frontend-resilience/SKILL.md)             | Error boundaries, loading states, navegación i18n y store sanitization. | Al endurecer la robustez del frontend.    |
+| [optimize-saas-seo](./optimize-saas-seo/SKILL.md)                 | SEO técnico y on-page con Next.js Metadata API para SaaS.          | En landing pages y páginas públicas.           |
 
-### ✨ UX & Micro-Interacciones (Estilo Notion/Google)
+### ✨ UX & Micro-Interacciones
 
 | Skill                                                             | Descripción                                                        | Uso Típico                                     |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------- |
-| [create-micro-interaction](./create-micro-interaction/SKILL.md)   | Animaciones, skeleton loaders, transiciones estilo Notion/Google.  | Al pulir la experiencia visual.                |
-| [scaffold-command-palette](./scaffold-command-palette/SKILL.md)   | Command Palette (⌘K) para navegación rápida estilo Notion.         | Al implementar búsqueda global y acciones.     |
+| [create-micro-interaction](./create-micro-interaction/SKILL.md)   | Animaciones, skeleton loaders y transiciones con pulido profesional. | Al pulir la experiencia visual.              |
+| [scaffold-command-palette](./scaffold-command-palette/SKILL.md)   | Command Palette (⌘K) para navegación rápida y acciones globales.   | Al implementar búsqueda global y acciones.     |
+
+### 🛡️ Infraestructura & Seguridad
+
+| Skill                                                     | Descripción                                                              | Uso Típico                                  |
+| --------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------- |
+| [security-hardening](./security-hardening/SKILL.md)       | Corrige vulnerabilidades: secrets, OAuth, CSRF, auth, encryption.        | Tras una auditoría de seguridad.            |
+| [infra-hardening](./infra-hardening/SKILL.md)             | Hardening de Docker/Compose, Gunicorn, health checks y dependencias.     | Al preparar la infraestructura productiva.  |
 
 ### 🌍 Internacionalización (i18n)
 
@@ -61,15 +73,16 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 
 | Área | Skills | Estado |
 |------|--------|--------|
-| Backend/Integraciones | 2 | ✅ Cubierto |
-| Testing/Calidad | 5 | ✅ Pirámide Completa |
+| Backend/Integraciones | 3 | ✅ Cubierto |
+| Testing/Calidad | 7 | ✅ Pirámide Completa |
 | Documentación API | 1 | ✅ Bueno |
-| Frontend/UI | 4 | ✅ Completo |
-| UX/Micro-Interacciones | 2 | ✅ Estilo Notion/Google |
+| Frontend/UI | 6 | ✅ Completo |
+| UX/Micro-Interacciones | 2 | ✅ Pulido profesional |
+| Infraestructura/Seguridad | 2 | ✅ Cubierto |
 | i18n | 1 | ✅ Cubierto |
 | Meta-Skills | 1 | ✅ Cubierto |
 
-**Total: 16 Skills**
+**Total: 23 Skills**
 
 ---
 
@@ -104,7 +117,7 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 │     └─► create-design-component (componentes UI)                │
 │     └─► create-form-component (si tiene formularios)            │
 │                                                                 │
-│  4. UX POLISH (estilo Notion/Google)                            │
+│  4. UX POLISH                                                   │
 │     └─► create-micro-interaction (animaciones, skeletons)       │
 │     └─► scaffold-command-palette (⌘K navigation)                │
 │                                                                 │
@@ -121,7 +134,7 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 ### Estructura de cada Skill
 
 ```
-.agent/skills/
+.claude/skills/
 └── nombre-skill/
     └── SKILL.md          # Documentación principal
 ```
@@ -140,5 +153,5 @@ Este directorio contiene las "Skills" (capacidades automatizadas) desarrolladas 
 
 ---
 
-_Mantenido por el Equipo de Desarrollo AppNotion._
-_Última actualización: 2025-02-04_
+_Mantenido por el Equipo de Desarrollo Proyecto Semilla._
+_Última actualización: 2026-06-09_

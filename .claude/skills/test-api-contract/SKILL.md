@@ -1,7 +1,7 @@
 ---
 name: test-api-contract
 description: Valida que las respuestas de la API cumplan estrictamente con el esquema OpenAPI y los Modelos Canónicos.
-author: AppNotion Architecture Team
+author: Proyecto Semilla Architecture Team
 version: 2.0.0
 ---
 
@@ -11,11 +11,11 @@ Esta skill se enfoca en la "Integridad" de los datos y el contrato entre Backend
 
 ## Objetivo
 
-Garantizar que si el backend dice retornar un `FlowSpec`, la estructura JSON sea **idéntica** a la definida en Pydantic, sin campos faltantes ni tipos incorrectos.
+Garantizar que si el backend dice retornar un modelo canónico (ej. `ItemSpec`), la estructura JSON sea **idéntica** a la definida en Pydantic, sin campos faltantes ni tipos incorrectos.
 
 ## Prerrequisitos
 
-- Modelos Pydantic definidos en `src/integrations/schemas.py`
+- Modelos Pydantic canónicos definidos en tu app (ej. `src/<tu_app>/schemas.py`)
 - Fixtures de `tests/conftest.py`
 - `drf-spectacular` instalado para validación OpenAPI
 
@@ -25,7 +25,12 @@ Garantizar que si el backend dice retornar un `FlowSpec`, la estructura JSON sea
 
 ```python
 import pytest
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
+
+class ItemSpec(BaseModel):
+    """Modelo canónico de ejemplo — sustituye por el de tu dominio."""
+    name: str
+    fields: list[str] = []
 
 @pytest.mark.django_db
 class TestAPIContract:
@@ -34,35 +39,24 @@ class TestAPIContract:
     Usa fixtures de conftest.py para autenticación.
     """
 
-    def test_diagram_response_matches_schema(self, tenant_client, db):
+    def test_item_response_matches_schema(self, tenant_client, db):
         """
-        GIVEN a stored Diagram in the database
+        GIVEN a stored resource in the database
         WHEN fetched via API
-        THEN the 'spec' field must validate against the Canonical Pydantic Model
+        THEN the payload must validate against the Canonical Pydantic Model
         """
-        from integrations.schemas import FlowSpec, ERDSpec
-        from integrations.models import Diagram  # Ajustar según tu modelo
+        # Setup: crea el recurso con TU modelo y ajusta la ruta a TU endpoint
+        # from <tu_app>.models import Item
+        # item = Item.objects.create(name="Test Item", fields=["id", "title"])
 
-        # Setup: Crear un diagrama de prueba
-        diagram = Diagram.objects.create(
-            name="Test Diagram",
-            type="flow",
-            spec={"nodes": [], "edges": []},
-            # tenant=tenant (si aplica multi-tenant)
-        )
-
-        response = tenant_client.get(f"/api/v1/diagrams/{diagram.id}/")
+        response = tenant_client.get("/api/v1/items/1/")  # ajusta a tu recurso
         assert response.status_code == 200
 
         data = response.json()
-        spec_data = data.get("spec")
 
         # Validar Contrato Estricto
         try:
-            if data["type"] == "flow":
-                FlowSpec(**spec_data)
-            elif data["type"] == "erd":
-                ERDSpec(**spec_data)
+            ItemSpec(**data)
         except ValidationError as e:
             pytest.fail(
                 f"API Contract Breach: Response does not match Canonical Schema.\n"
@@ -75,7 +69,7 @@ class TestAPIContract:
         WHEN fetched
         THEN response has expected pagination structure
         """
-        response = authenticated_client.get("/api/v1/diagrams/")
+        response = authenticated_client.get("/api/v1/roles/")
         assert response.status_code == 200
 
         data = response.json()
@@ -91,7 +85,7 @@ class TestAPIContract:
         WHEN accessing protected endpoint
         THEN error response follows standard format
         """
-        response = api_client.get("/api/v1/diagrams/")
+        response = api_client.get("/api/v1/roles/")
         assert response.status_code == 401
 
         data = response.json()
@@ -132,9 +126,9 @@ def test_openapi_schema_has_required_endpoints():
 
     # Endpoints críticos que DEBEN existir
     required_endpoints = [
-        "/api/v1/integrations/notion/import",
-        "/api/v1/integrations/miro/import",
-        "/api/v1/diagrams/",
+        "/api/v1/roles/",
+        "/api/v1/plans/",
+        "/api/v1/subscriptions/",
     ]
 
     for endpoint in required_endpoints:
@@ -225,7 +219,7 @@ on:
   pull_request:
     paths:
       - 'src/api/**'
-      - 'src/integrations/schemas.py'
+      - 'src/**/schemas.py'
 
 jobs:
   contract-test:
@@ -262,6 +256,6 @@ jobs:
 
 ## Referencias
 
-- `src/integrations/schemas.py` - Modelos Pydantic canónicos
+- `tests/test_api_v1.py` - Ejemplo real de tests contra la API v1
 - `tests/conftest.py` - Fixtures de autenticación
 - `drf-spectacular` docs - https://drf-spectacular.readthedocs.io/

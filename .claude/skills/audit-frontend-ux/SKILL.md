@@ -1,7 +1,7 @@
 ---
 name: audit-frontend-ux
 description: Guía de auditoría profesional para validar calidad, accesibilidad, internacionalización y responsividad.
-author: AppNotion QA Team
+author: Proyecto Semilla QA Team
 version: 1.0.0
 ---
 
@@ -59,9 +59,9 @@ Validar ausencia de errores técnicos.
 Recorrer las páginas principales y tomar capturas para evidencia:
 
 1.  **Dashboard**: `/dashboard`
-2.  **Integrations**: `/integrations`
-3.  **Diagrams**: `/diagrams`
-4.  **Editor**: `/diagrams/[id]` (Interacción básica con Canvas).
+2.  **Members**: `/members`
+3.  **Roles**: `/roles`
+4.  **Billing**: `/billing`
 5.  **Settings**: `/settings`
 
 ### Paso 3: Mobile Check

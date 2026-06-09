@@ -1,7 +1,7 @@
 ---
 name: scaffold-offline-repository
 description: Genera un repositorio frontend Offline-First seguro (IndexedDB Encriptado + Sync).
-author: AppNotion Architecture Team
+author: Proyecto Semilla Architecture Team
 version: 2.0.0
 ---
 
@@ -77,7 +77,7 @@ export interface PendingMutation {
 }
 
 /**
- * AppNotion local database.
+ * Proyecto Semilla local database.
  * Uses Dexie.js as IndexedDB wrapper.
  */
 export class AppDatabase extends Dexie {
@@ -86,7 +86,7 @@ export class AppDatabase extends Dexie {
     pendingMutations!: Table<PendingMutation>;
 
     constructor() {
-        super("AppNotionDB");
+        super("Proyecto SemillaDB");
 
         // Schema versioning
         this.version(1).stores({
@@ -151,7 +151,7 @@ export class CryptoService {
         );
 
         // Use a fixed salt (could be user ID for per-user keys)
-        const salt = encoder.encode("AppNotion-v1-salt");
+        const salt = encoder.encode("Proyecto Semilla-v1-salt");
 
         this.key = await crypto.subtle.deriveKey(
             {

@@ -1,11 +1,11 @@
 ---
 name: security-hardening
 description: Corrige vulnerabilidades de seguridad en Django/Next.js SaaS - secrets, OAuth, CSRF, auth, encryption
-author: Mayordomos Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
-# Skill: Security Hardening para BlockFlow SaaS
+# Skill: Security Hardening para Proyecto Semilla
 
 Esta skill guia la correccion sistematica de vulnerabilidades de seguridad en el stack Django + Next.js, cubriendo secrets management, OAuth flows, CSRF protection, authentication hardening y encryption key isolation.
 
@@ -63,7 +63,7 @@ if SECRET_KEY in ("changeme", "dev-secret-key-12345", ""):
 
 **Problema:** Fernet key derivada de SECRET_KEY[:32] con padding debil.
 
-**Archivo:** `/src/integrations/models.py`
+**Archivo:** `/src/common/encryption.py`
 
 ```python
 import os
@@ -91,7 +91,7 @@ FIELD_ENCRYPTION_KEY=<generated-key>
 
 **Problema:** State predecible `user_{id}` y sin validacion en callback.
 
-**Archivo:** `/src/integrations/oauth/views.py`
+**Archivo:** `/src/oauth/views.py`
 
 ```python
 import secrets

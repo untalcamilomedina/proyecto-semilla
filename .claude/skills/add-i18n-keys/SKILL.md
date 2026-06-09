@@ -1,7 +1,7 @@
 ---
 name: add-i18n-keys
 description: Guía para agregar traducciones i18n consistentemente (es-LA, en-US) usando next-intl.
-author: AppNotion Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 

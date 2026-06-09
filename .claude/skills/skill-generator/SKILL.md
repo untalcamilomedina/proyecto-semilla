@@ -1,7 +1,7 @@
 ---
 name: skill-generator
 description: Meta-skill para crear nuevas skills siguiendo el formato Antigravity. Pregunta si es global o específica de proyecto.
-author: Mayordomos Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: debug-protocol
 description: Protocolo profesional para análisis de raíz, corrección de errores y eliminación de deuda técnica. Evita parches temporales.
-author: AppNotion Engineering
+author: Proyecto Semilla Engineering
 version: 1.0.0
 ---
 

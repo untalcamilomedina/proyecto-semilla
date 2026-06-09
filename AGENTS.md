@@ -1,34 +1,28 @@
 # AGENTS.md
 
-> **Configuración Global para Agentes en este Proyecto (AppNotion)**
+> Configuración para agentes de IA en **Proyecto Semilla**.
+> La guía canónica vive en [`CLAUDE.md`](./CLAUDE.md) — léela primero.
 
-## Contexto del Proyecto
+## Resumen
 
-Este es un proyecto profesional que funciona como un Marketplace de herramientas SaaS.
-El stack base es **Django (Backend)** y **React/Next.js (Frontend)** (Boilerplate Proyecto Semilla).
-El objetivo es mantener un código limpio, minimalista, estilo **Glassmorphism Industrial** y libre de deuda técnica.
+Este repositorio es un **boilerplate SaaS genérico** (Django 5 + DRF + Next.js 16) con
+multitenancy por schema, RBAC, billing con Stripe y tooling AI-first. No contiene
+lógica de producto: los productos se crean en repos derivados de esta semilla.
 
-## Reglas Principales
+## Reglas principales
 
-1.  **Idioma:** Todas las comunicaciones, comentarios y documentación deben estar en **Español**.
-2.  **No Suposiciones:** Si falta información, **pregunta** o audita. Nunca inventes soluciones parche.
-3.  **Buenas Prácticas:**
-    - Uso estricto de **JSDoc** para frontend y **Docstrings** para backend.
-    - Componentes tipados fuertemente con **TypeScript** (si aplica).
-    - Arquitectura modular (Backend: Apps Django, Frontend: Atomic/Feature).
-4.  **Estilo de Código:**
-    - Seguir las reglas de `ESLint`, `Prettier` (JS) y `Black`/`Flake8` (Python).
-    - Nombres de variables en inglés, comentarios en español.
+1. **Idioma:** comunicaciones, comentarios y documentación en **español**; identificadores de código en inglés.
+2. **No suposiciones:** si falta información, pregunta o audita. Nunca inventes soluciones parche.
+3. **Seguridad primero:** respeta las reglas no negociables de `CLAUDE.md` (membresía por tenant, scoping de querysets, rate limiting, secretos por env).
+4. **Calidad:** `make lint && make typecheck && make test` (backend) y `make frontend-test` (frontend) deben pasar antes de dar por terminado un cambio.
 
-## Comandos Útiles (Referencia General)
+## Recursos para agentes
 
-- **Frontend:** Revisar `frontend/package.json`.
-- **Backend:** `python manage.py runserver`.
-- **Docker:** El proyecto usa Docker (`Dockerfile`, `compose/`).
-
-## Flujo de Trabajo
-
-1.  Planificar cambios en `implementation_plan.md`.
-2.  Pedir revisión al usuario.
-3.  Implementar cambios auditablemente.
-4.  Verificar con tests o pruebas manuales documentadas.
+| Recurso | Ubicación |
+| --- | --- |
+| Guía completa del proyecto | `CLAUDE.md` |
+| Skills (23 capacidades reutilizables) | `.claude/skills/` |
+| Hooks de sesión y lint | `.claude/settings.json` + `scripts/ai/` |
+| Servidores MCP (Postgres dev) | `.mcp.json` |
+| Workflow @claude en GitHub | `.github/workflows/claude.yml` |
+| Auditoría y plan vigente | `docs/auditoria/` |

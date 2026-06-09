@@ -1,7 +1,7 @@
 ---
 name: scaffold-api-endpoint
 description: Guía para exponer servicios en la API (ViewSet + URLs) de forma segura y estándar.
-author: AppNotion Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
@@ -12,14 +12,14 @@ Esta skill sistematiza el proceso de exponer lógica de negocio en la API REST, 
 ## Prerrequisitos
 
 - [ ] `Service` implementado.
-- [ ] `integrations/api.py` existente.
+- [ ] Un `api.py` en la app donde vive el servicio (ej. `src/integrations_acme/api.py`).
 - [ ] `api/v1/urls.py` existente.
 
 ## Proceso
 
 ### Paso 1: Definir ViewSet
 
-Editar `src/integrations/api.py`. Crear un `ViewSet` que envuelva el servicio.
+Crear/editar el `api.py` de la app de tu servicio (ej. `src/integrations_acme/api.py`). Crear un `ViewSet` que envuelva el servicio.
 **Nota Importante**: Django REST Framework (DRF) es síncrono por defecto. Si el servicio es asíncrono, usar `asgiref.sync.async_to_sync`.
 
 ```python
@@ -27,7 +27,7 @@ from asgiref.sync import async_to_sync
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .<integration>.services import <Integration>Service
+from .services import <Integration>Service
 
 class <Integration>ViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -53,7 +53,7 @@ Editar `src/api/v1/urls.py`.
 
 1.  **Importar el ViewSet**:
     ```python
-    from integrations.api import <Integration>ViewSet
+    from integrations_<name>.api import <Integration>ViewSet
     ```
 2.  **Registrar en Router**:
     ```python

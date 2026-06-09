@@ -1,7 +1,7 @@
 ---
 name: scaffold-page
-description: Genera páginas Next.js App Router con i18n, tokens semánticos de tema, a11y y patrones del proyecto BlockFlow.
-author: BlockFlow Dev Team
+description: Genera páginas Next.js App Router con i18n, tokens semánticos de tema, a11y y patrones de Proyecto Semilla.
+author: Proyecto Semilla Dev Team
 version: 2.0.0
 ---
 

@@ -1,11 +1,11 @@
 ---
 name: infra-hardening
 description: Hardening de Docker, Compose, health checks, Gunicorn, .dockerignore y dependency management
-author: Mayordomos Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
-# Skill: Infrastructure Hardening para BlockFlow SaaS
+# Skill: Infrastructure Hardening para Proyecto Semilla
 
 Esta skill guia el hardening de la infraestructura Docker/Compose, configuracion de Gunicorn para produccion, health checks de servicios, .dockerignore, y gestion segura de dependencias.
 
@@ -193,7 +193,7 @@ services:
       - ../local.env
     environment:
       # Solo overrides especificos de Docker networking
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/acme_saas
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/proyecto_semilla
       - REDIS_URL=redis://redis:6379/0
       - S3_ENDPOINT_URL=http://minio:9000
       - EMAIL_HOST=mailpit

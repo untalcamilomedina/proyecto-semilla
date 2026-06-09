@@ -1,11 +1,11 @@
 ---
 name: optimize-saas-seo
 description: Guía experta para optimizar SEO técnico, on-page y metadatos en SaaS B2B usando Next.js 14+ y Metadata API.
-author: BlockFlow Team
+author: Proyecto Semilla Team
 version: 1.0.0
 ---
 
-# Skill: Optimización SEO para SaaS (BlockFlow)
+# Skill: Optimización SEO para SaaS (Proyecto Semilla)
 
 Esta skill guía la implementación de estrategias SEO avanzadas enfocadas en productos SaaS, asegurando indexabilidad, performance y estructura semántica correcta en aplicaciones Next.js.
 
@@ -45,23 +45,23 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "features" });
 
   return {
-    title: t("meta.title"), // "Gestión de Roles | BlockFlow"
+    title: t("meta.title"), // "Gestión de Roles | Proyecto Semilla"
     description: t("meta.description"),
     alternates: {
-      canonical: `https://blockflow.so/${locale}/features`,
+      canonical: `https://tu-dominio.com/${locale}/features`,
       languages: {
-        es: `https://blockflow.so/es/features`,
-        en: `https://blockflow.so/en/features`,
+        es: `https://tu-dominio.com/es/features`,
+        en: `https://tu-dominio.com/en/features`,
       },
     },
     openGraph: {
       title: t("meta.title"),
       description: t("meta.description"),
-      url: `https://blockflow.so/${locale}/features`,
-      siteName: "BlockFlow",
+      url: `https://tu-dominio.com/${locale}/features`,
+      siteName: "Proyecto Semilla",
       images: [
         {
-          url: "https://blockflow.so/images/og/features-og.png",
+          url: "https://tu-dominio.com/images/og/features-og.png",
           width: 1200,
           height: 630,
         },
@@ -92,7 +92,7 @@ export function JsonLd({ data }: { data: Record<string, any> }) {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "BlockFlow",
+  "name": "Proyecto Semilla",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "offers": {

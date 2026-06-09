@@ -1,7 +1,7 @@
 ---
 name: create-form-component
 description: Guía para crear formularios validados con react-hook-form, Zod, i18n y componentes Glass.
-author: AppNotion Dev Team
+author: Proyecto Semilla Dev Team
 version: 1.0.0
 ---
 
@@ -28,7 +28,7 @@ Esta skill estandariza la creación de formularios en el frontend usando `react-
 ## Arquitectura de Formularios
 
 ```
-Formulario AppNotion
+Formulario Proyecto Semilla
 ├── Schema Zod (validación)
 ├── react-hook-form (estado)
 ├── GlassInput/GlassButton (UI)

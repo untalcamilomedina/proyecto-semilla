@@ -1,7 +1,7 @@
 ---
 name: create-design-component
 description: Guía para crear componentes UI siguiendo el Design System "Glass Minimalist" con a11y e i18n.
-author: AppNotion Design Team
+author: Proyecto Semilla Design Team
 version: 2.0.0
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: test-api-endpoint
 description: Genera tests unitarios robustos para endpoints de API (DRF), validando Auth, Permisos y Status Codes.
-author: AppNotion Architecture Team
+author: Proyecto Semilla Architecture Team
 version: 2.0.0
 ---
 

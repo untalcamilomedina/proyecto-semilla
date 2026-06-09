@@ -1,7 +1,7 @@
 ---
 name: create-micro-interaction
 description: Guía para crear micro-interacciones, animaciones y skeleton loaders estilo Notion/Google.
-author: AppNotion Design Team
+author: Proyecto Semilla Design Team
 version: 1.0.0
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: scaffold-command-palette
 description: Implementa el Command Palette (⌘K) estilo Notion/Spotlight para navegación rápida.
-author: AppNotion Design Team
+author: Proyecto Semilla Design Team
 version: 1.0.0
 ---
 
