@@ -17,8 +17,10 @@ class Plan(models.Model):
     is_active = models.BooleanField(default=True)
     is_public = models.BooleanField(default=True)
     seat_limit = models.PositiveIntegerField(blank=True, null=True)
-    max_diagrams = models.PositiveIntegerField(default=5, help_text="Max stored diagrams")
-    max_requests = models.PositiveIntegerField(default=10, help_text="Max integration requests per month")
+    max_items = models.PositiveIntegerField(
+        default=5, help_text="Cuota genérica de items almacenados (renombrar según el producto)"
+    )
+    max_requests = models.PositiveIntegerField(default=10, help_text="Max API requests per month")
     trial_days = models.PositiveIntegerField(default=0)
     roles_on_activation = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -80,9 +82,9 @@ class Subscription(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="incomplete")
     quantity = models.PositiveIntegerField(default=1)
-    
+
     # Usage Metering
-    diagrams_used = models.PositiveIntegerField(default=0)
+    items_used = models.PositiveIntegerField(default=0)
     requests_used = models.PositiveIntegerField(default=0)
     usage_reset_at = models.DateTimeField(blank=True, null=True)
 
@@ -132,4 +134,3 @@ class StripeEvent(models.Model):
 
     class Meta:
         ordering = ["-processed_at"]
-

@@ -61,7 +61,3 @@ django-modeltranslation>=0.19,<1.0
 
 # Audit
 django-auditlog>=3.0,<4.0
-
-# Integrations
-notion-client>=2.2,<4.0
-httpx>=0.27,<1.0

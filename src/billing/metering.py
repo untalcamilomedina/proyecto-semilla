@@ -5,6 +5,15 @@ from billing.models import Subscription
 
 
 class MeteringService:
+    """Cuotas de uso por suscripción.
+
+    Features soportadas:
+    - "items": recursos almacenados (Plan.max_items / Subscription.items_used)
+    - "requests": llamadas API mensuales (Plan.max_requests / Subscription.requests_used)
+
+    Renombra "items" al concepto de tu producto (documentos, proyectos, etc.).
+    """
+
     @staticmethod
     def check_and_track_request(tenant, feature="requests"):
         """
@@ -18,11 +27,11 @@ class MeteringService:
                 status__in=["active", "trialing"],
             )
         except Subscription.DoesNotExist:
-            raise PermissionDenied("No active subscription found.")
+            raise PermissionDenied("No active subscription found.") from None
 
-        if feature == "diagrams":
-            limit = subscription.plan.max_diagrams
-            used = subscription.diagrams_used
+        if feature == "items":
+            limit = subscription.plan.max_items
+            used = subscription.items_used
         else:
             limit = subscription.plan.max_requests
             used = subscription.requests_used
@@ -33,7 +42,5 @@ class MeteringService:
             )
 
         # Atomic increment using F() to prevent race conditions under concurrency
-        field = "diagrams_used" if feature == "diagrams" else "requests_used"
-        Subscription.objects.filter(pk=subscription.pk).update(
-            **{field: F(field) + 1}
-        )
+        field = "items_used" if feature == "items" else "requests_used"
+        Subscription.objects.filter(pk=subscription.pk).update(**{field: F(field) + 1})
