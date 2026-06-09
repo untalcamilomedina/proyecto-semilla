@@ -116,6 +116,15 @@ DJANGO_BASE_URL=http://localhost:8000
 """
 
 
+def build_compose_env(config: dict) -> str:
+    """`.env` raíz: variables que docker compose interpola en los YAML
+    (POSTGRES_DB, puertos). Sin esto, el nombre de BD del wizard no aplicaría."""
+    return f"""# Generado por scripts/bootstrap.py — interpolación de docker compose.
+POSTGRES_DB={config['db_name']}
+FRONTEND_PORT={config['frontend_port']}
+"""
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Wizard de instalación de Proyecto Semilla")
     parser.add_argument("--name", help="Nombre del proyecto (branding)")
@@ -165,6 +174,10 @@ def main() -> int:
     frontend_env = ROOT / "frontend" / ".env.local"
     frontend_env.write_text(build_frontend_env(config), encoding="utf-8")
     print(f"✔ {frontend_env.relative_to(ROOT)} escrito.")
+
+    compose_env = ROOT / ".env"
+    compose_env.write_text(build_compose_env(config), encoding="utf-8")
+    print(f"✔ {compose_env.relative_to(ROOT)} escrito (interpolación de compose).")
 
     print(f"""
 Siguientes pasos:
