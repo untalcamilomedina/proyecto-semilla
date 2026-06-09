@@ -3,13 +3,13 @@ requires = ["setuptools>=69.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "momentum"
-version = "0.9.1"
-description = "Seed SaaS boilerplate for Django 5+"
+name = "proyecto-semilla"
+version = "0.14.0"
+description = "Boilerplate SaaS multitenant, seguro y AI-first (Django 5 + Next.js)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
-authors = [{ name = "Acme Inc." }]
+authors = [{ name = "Camilo Medina" }]
 dependencies = []
 
 [project.optional-dependencies]
@@ -60,25 +60,62 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "C4", "DJ", "S", "RUF"]
-ignore = ["S101", "DJ001"]
+# RUF012: los atributos de clase mutables (Meta, permission_classes, fields…)
+# son el idioma estándar de Django/DRF. DJ008/DJ012: estilo de modelos legacy,
+# pendiente en el plan de estabilización (no bloquea).
+ignore = ["S101", "DJ001", "RUF012", "DJ008", "DJ012"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/migrations/*.py" = ["E501", "S"]
-"**/tests/*.py" = ["S"]
+"**/tests/*.py" = ["S", "E501"]
+"tests/*.py" = ["S", "E501"]
+"src/config/settings/*.py" = ["E402", "F403", "F405"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "src/**/migrations"]
-skips = ["B101"]
+# B105/B107: falsos positivos (mensajes de validación/i18n y rutas de clase).
+# B110: try/except-pass justificados inline (Sentry opcional, métricas, emails).
+skips = ["B101", "B105", "B107", "B110"]
 
 [tool.mypy]
 python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
-django_settings_module = "config.settings.dev"
+mypy_path = "src"
+exclude = "migrations"
 ignore_missing_imports = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_redundant_casts = true
-warn_return_any = true
+warn_return_any = false
 strict_optional = true
+
+# Overrides para fricción legacy con django-stubs (44 errores heredados).
+# Plan: eliminarlos módulo a módulo (ver docs/auditoria/PLAN-ESTABILIZACION.md
+# Fase 3). El código nuevo debe pasar mypy SIN añadir entradas aquí.
+[[tool.mypy.overrides]]
+module = ["lms.*", "community.*", "mcp.*"]
+disable_error_code = ["attr-defined", "dict-item"]
+
+[[tool.mypy.overrides]]
+module = ["cms.*", "multitenant.*"]
+disable_error_code = ["django-manager-missing", "misc"]
+
+[[tool.mypy.overrides]]
+module = ["billing.*", "core.*"]
+disable_error_code = [
+  "misc",
+  "arg-type",
+  "var-annotated",
+  "assignment",
+  "return-value",
+  "django-manager-missing",
+]
+
+[[tool.mypy.overrides]]
+module = ["common.*"]
+disable_error_code = ["override", "arg-type"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.test"

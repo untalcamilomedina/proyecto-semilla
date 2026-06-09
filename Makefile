@@ -1,9 +1,9 @@
-PROJECT_SLUG ?= acme_saas
+PROJECT_SLUG ?= proyecto_semilla
 PYTHON ?= python3
 MANAGE ?= $(PYTHON) manage.py
 COMPOSE ?= docker compose -f compose/docker-compose.yml
 
-.PHONY: dev lint fmt typecheck test build migrate seed deploy audit frontend-install frontend-dev
+.PHONY: dev lint fmt typecheck test build migrate seed deploy audit frontend-install frontend-dev frontend-test frontend-build
 
 dev:
 	$(COMPOSE) up --build
@@ -45,7 +45,13 @@ deploy:
 	bash ./deploy/flyio/deploy.sh
 
 frontend-install:
-	cd frontend && npm install
+	cd frontend && npm ci
 
 frontend-dev:
 	cd frontend && npm run dev
+
+frontend-test:
+	cd frontend && npm run lint && npm run type-check && npm run test
+
+frontend-build:
+	cd frontend && npm run build
