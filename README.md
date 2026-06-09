@@ -1,223 +1,144 @@
-# Proyecto Semilla — Acme SaaS Boilerplate
+# 🌱 Proyecto Semilla
 
-[![Version](https://img.shields.io/badge/version-0.9.1-blue.svg)](https://github.com/untalcamilomedina/proyecto-semilla/releases)
+[![Version](https://img.shields.io/badge/version-0.14.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-5.2.9-green.svg)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/django-5.x-green.svg)](https://www.djangoproject.com/)
+[![Next.js](https://img.shields.io/badge/next.js-16-black.svg)](https://nextjs.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Boilerplate SaaS moderno basado en Django 5+, con arquitectura modular, multitenancy opcional (schema/db), RBAC granular estilo Discord, onboarding wizard, Stripe memberships, API DRF + OpenAPI, frontend HTMX/Tailwind/Alpine, seguridad endurecida, observabilidad, CI/CD y despliegues reproducibles.
+**Boilerplate SaaS multitenant, seguro y AI-first.** La base para construir productos
+SaaS en días, no meses: Django 5 + DRF + Next.js 16, multitenancy por schema de
+Postgres, RBAC granular, billing con Stripe, observabilidad, CI/CD, despliegue
+blue-green y un toolkit completo para desarrollar con agentes de IA.
 
-**Versión actual:** `v0.9.2` - Estable y robusta
- 
-> ✅ **Estado:** Sistema estable. Tests passing rate: 100%. (Verificado v0.9.3)
+## Tabla de contenidos
 
-## Table of Contents
-1. [Requisitos](#requisitos)
-2. [Inicio rápido (dev)](#inicio-rápido-dev)
-3. [Frontend (migración a Next.js)](#frontend-migración-a-nextjs)
-4. [Salud y métricas](#salud-y-métricas)
-5. [Variables de entorno](#variables-de-entorno)
-6. [Módulos V1](#módulos-v1)
-7. [Theming por tenant](#theming-por-tenant)
-8. [Estructura del Proyecto](#estructura-del-proyecto)
-9. [Documentación (MkDocs)](#documentación-mkdocs)
-10. [Deploy (Fly.io)](#deploy-flyio)
-11. [Estado del Proyecto](#estado-del-proyecto)
-12. [Comandos Útiles](#comandos-útiles)
-13. [Documentación](#documentación)
-14. [Contribuir](#contribuir)
-15. [Licencia](#licencia)
+1. [Instalación en 3 pasos](#instalación-en-3-pasos)
+2. [Qué incluye](#qué-incluye)
+3. [Desarrollo AI-first](#desarrollo-ai-first)
+4. [Arquitectura](#arquitectura)
+5. [Seguridad](#seguridad)
+6. [Comandos](#comandos)
+7. [Variables de entorno](#variables-de-entorno)
+8. [Deploy](#deploy)
+9. [Estado del proyecto](#estado-del-proyecto)
 
-## Requisitos
+## Instalación en 3 pasos
 
-- Python 3.12+
-- Docker + Docker Compose
-- Postgres, Redis, MinIO (S3-compatible), Mailpit (via compose)
-
-## Inicio rápido (dev)
-
-### 1. Levantar servicios
+Requisitos: Docker + Docker Compose.
 
 ```bash
-make dev
+# 1. Clona y configura
+git clone <tu-fork> mi-proyecto && cd mi-proyecto
+cp local.env.example local.env   # ajusta DJANGO_SECRET_KEY
+
+# 2. Levanta el stack completo
+make dev   # web :8000 · frontend :3010 · postgres · redis · minio · mailpit
+
+# 3. Migra y siembra datos demo (en otra terminal)
+make migrate && make seed
 ```
 
-Esto levantará todos los servicios Docker:
-- **Web:** `http://localhost:7777`
-- **Frontend:** `http://localhost:3000`
-- **Postgres:** `localhost:5433`
-- **Redis:** `localhost:6380`
-- **MinIO:** `http://localhost:9000` (S3) y `http://localhost:9001` (consola)
-- **Mailpit:** `http://localhost:8025` (UI) y `localhost:1025` (SMTP)
+Abre `http://localhost:3010` — login demo: `admin@demo.com` / `password`.
 
-> Si el puerto `3000` está ocupado, usa `FRONTEND_PORT=3001 make dev`.
+## Qué incluye
 
-### 2. Aplicar migraciones
+| Área | Implementación |
+| --- | --- |
+| **Multitenancy** | Schema-per-tenant en Postgres + RLS, resolución por dominio, aislamiento verificado por tests |
+| **Auth** | JWT (con binding por tenant), API Keys por organización, sesión + allauth (Google OAuth), verificación de email |
+| **RBAC** | Roles y permisos granulares estilo Discord, deny-by-default en todo el API |
+| **Billing** | Stripe vía dj-stripe: checkout, portal, webhooks firmados e idempotentes, planes/precios/cuotas de uso |
+| **API** | DRF versionada (`/api/v1/`) + OpenAPI (drf-spectacular), throttling, paginación |
+| **Frontend** | Next.js 16 App Router, TypeScript estricto, Tailwind v4, design system "Glass" con Storybook, i18n (es/en/pt), TanStack Query + Zustand |
+| **Onboarding** | Wizard completo: organización → módulos → plan → pago → invitaciones |
+| **Módulos opcionales** | CMS (MDX), LMS, Community, MCP — activables por feature flag |
+| **Observabilidad** | Sentry, Prometheus `/metrics` (protegido), logs JSON, health checks (`/healthz`, `/readyz`, `/ht/`) |
+| **Infra** | Docker multi-stage non-root, compose dev/prod, deploy blue-green con nginx, receta Fly.io |
+| **Calidad** | CI (lint, mypy, tests con Postgres real, build, pip-audit/npm audit, Trivy), pre-commit, 110+ tests backend + vitest |
 
-```bash
-# Migraciones del schema public
-docker compose -f compose/docker-compose.yml exec web python manage.py migrate
+## Desarrollo AI-first
 
-# Migraciones por tenant schema
-docker compose -f compose/docker-compose.yml exec web python manage.py migrate_tenants
-```
+El seed está diseñado para construir software con agentes de IA desde el día uno:
 
-### 3. Seed demo (opcional)
+- **`CLAUDE.md`** — guía del proyecto para agentes (arquitectura, reglas de seguridad, convenciones).
+- **`.claude/skills/`** — 23 skills reutilizables: scaffolding full-stack, generación de tests, hardening, design system, i18n…
+- **Hooks** (`.claude/settings.json`) — contexto automático al iniciar sesión y lint inmediato tras cada edición Python.
+- **MCP** (`.mcp.json`) — servidor Postgres para que el agente inspeccione el schema en dev; módulo `mcp` opcional para exponer un catálogo de tools del API por tenant.
+- **Workflow `@claude`** (`.github/workflows/claude.yml`) — menciona `@claude` en issues/PRs para que el agente trabaje en GitHub (requiere `ANTHROPIC_API_KEY`).
 
-```bash
-make seed
-# O directamente:
-docker compose -f compose/docker-compose.yml exec web python manage.py seed_demo
-```
-
-Esto creará:
-- Tenant "demo" con dominio `demo.acme.dev`
-- Usuario `admin@demo.com` / `password`
-- Roles y permisos por defecto
-- Planes de billing demo
-
-## Frontend (migración a Next.js)
-
-La migración de HTMX → React + Next.js se documenta en `docs/runbooks/migracion-frontend-nextjs.md` (v0.9.1).
-
-## Salud y métricas
-
-- Liveness: `GET /healthz`
-- Readiness: `GET /readyz`
-- Prometheus: `GET /metrics`
-
-## Variables de entorno
-
-Plantillas en `env/`:
-
-- `DATABASE_URL`
-- `REDIS_URL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `S3_ENDPOINT_URL`
-- `S3_BUCKET_NAME`
-- `S3_ACCESS_KEY`
-- `S3_SECRET_KEY`
-- `SENTRY_DSN`
-- `ALLOWED_HOSTS`
-- `CSRF_TRUSTED_ORIGINS`
-- `DJANGO_SECRET_KEY`
-
-## Módulos V1
-
-- `core`
-- `multitenant` (schema por defecto)
-- `billing`
-- `api`
-- `oauth`
-
-## Theming por tenant
-
-Cada tenant puede definir branding (colores/logo) vía `Tenant.branding`:
-
-```json
-{
-  "primary_color": "#4f46e5",
-  "logo_url": "https://..."
-}
-```
-
-Si no se define, se usan valores por defecto.
-
-Módulos opcionales (apagados por feature flags): `cms`, `lms`, `community`, `mcp`.
-
-## Estructura del Proyecto
+## Arquitectura
 
 ```
 proyecto-semilla/
-├── src/                    # Código fuente
-│   ├── config/             # Settings (base, dev, prod, plugins)
+├── src/                    # Backend Django
+│   ├── config/             # Settings por entorno (base/dev/prod/test)
 │   ├── core/               # Usuarios, RBAC, onboarding
-│   ├── multitenant/        # Multitenancy (schema mode)
-│   ├── billing/            # Stripe, planes, suscripciones
-│   ├── api/                # DRF + OpenAPI
-│   └── oauth/              # django-allauth
-├── compose/                 # Docker Compose
-├── deploy/                 # Recetas de despliegue (Fly.io)
-├── docs/                   # Documentación (MkDocs)
-├── tests/                  # Tests
-└── requirements/           # Dependencias (base, dev, prod)
+│   ├── multitenant/        # Schema-per-tenant + RLS + middleware
+│   ├── billing/            # Stripe, planes, suscripciones, metering
+│   ├── api/                # DRF v1 + auth (JWT/API Keys)
+│   ├── common/             # Permisos, cifrado, métricas, helpers
+│   ├── oauth/              # django-allauth
+│   └── cms|lms|community|mcp/  # Módulos opcionales
+├── frontend/               # Next.js 16 (App Router + design system Glass)
+├── compose/                # Docker Compose dev/prod + nginx + blue-green
+├── deploy/flyio/           # Receta Fly.io
+├── tests/                  # Suite backend (pytest + Postgres)
+├── docs/                   # MkDocs: arquitectura, ADRs, runbooks, auditoría
+└── .claude/                # Skills + hooks para agentes de IA
 ```
 
-Ver más detalles en [docs/architecture.md](docs/architecture.md).
+Detalles en [docs/architecture.md](docs/architecture.md) y los [ADRs](docs/adr/).
 
-## Documentación (MkDocs)
+## Seguridad
 
-La documentación vive en `docs/` y se sirve con MkDocs:
+Modelo completo en [SECURITY.md](SECURITY.md). Garantías clave, todas con tests
+(`tests/test_api_security.py`):
 
-```bash
-pip install -r requirements/dev.txt
-mkdocs serve
-```
+- Ningún endpoint de tenant responde sin **membresía activa** en ese tenant.
+- Un **JWT emitido en un tenant no autentica en otro** (claim de schema).
+- Rate limiting en endpoints públicos (nginx + django-ratelimit + axes).
+- Cifrado de campos sensibles con clave dedicada (`FIELD_ENCRYPTION_KEY`).
+- Webhooks Stripe con firma, validación de metadata e idempotencia.
+- `check --deploy` en CI; HSTS, cookies Secure y CSP en producción.
 
-## Deploy (Fly.io)
-
-Receta E2E en `deploy/flyio/`:
-
-1. Configura `deploy/flyio/fly.toml` con tu `app` y región.
-2. Crea Postgres/Redis y ajusta secretos.
-3. Despliega:
+## Comandos
 
 ```bash
-make deploy
-```
+make dev              # stack Docker completo
+make migrate          # migraciones schema public
+make seed             # tenant demo + usuario + planes
+make lint|fmt         # ruff, black, isort, djlint, bandit
+make typecheck        # mypy
+make test             # pytest (requiere Postgres — usar dentro de Docker)
+make frontend-test    # eslint + tsc + vitest
+make frontend-build   # build de producción Next.js
+make audit            # pip-audit + safety
 
-Detalles en `deploy/flyio/README.md`.
-
-## Estado del Proyecto
-
-### ✅ Funcionalidades V1 (Operativas)
-- ✅ Multitenancy en modo schema
-- ✅ RBAC granular (roles y permisos)
-- ✅ Onboarding wizard
-- ✅ Billing con Stripe (checkout, portal, webhooks) - **Migrado a dj-stripe**
-- ✅ API REST con DRF + OpenAPI
-- ✅ Autenticación (django-allauth)
-- ✅ Health checks y métricas
-
-### 🔄 En Desarrollo
-- ✅ Tests: 100% Pass Rate (35 passed, 7 skipped)
-- ⚠️ Cobertura: En proceso de mejora hacia el 90%
-- ⚠️ Documentación OpenAPI: algunos warnings menores
-
-### 📋 Próximos Pasos
-Ver [ROADMAP.md](ROADMAP.md) y [RESUMEN_PROYECTO.md](RESUMEN_PROYECTO.md) para detalles.
-
-## Comandos Útiles
-
-```bash
-# Desarrollo
-make dev              # Levantar servicios
-make seed             # Seed demo
-make lint             # Linting
-make fmt              # Formatear código
-make typecheck        # Type checking
-make test             # Ejecutar tests
-
-# Gestión de tenants
+# Tenants
 docker compose -f compose/docker-compose.yml exec web python manage.py create_tenant "Nombre" slug
-docker compose -f compose/docker-compose.yml exec web python manage.py list_tenants
 docker compose -f compose/docker-compose.yml exec web python manage.py migrate_tenants
 ```
 
-## Documentación
+## Variables de entorno
 
-- **Arquitectura:** [docs/architecture.md](docs/architecture.md)
-- **Multitenancy:** [docs/multitenancy.md](docs/multitenancy.md)
-- **Billing:** [docs/billing.md](docs/billing.md)
-- **RBAC:** [docs/rbac.md](docs/rbac.md)
-- **Runbooks:** [docs/runbooks/](docs/runbooks/)
-- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+Plantillas: [`local.env.example`](local.env.example) (dev) y
+[`production.env.example`](production.env.example) (prod, con checklist de claves
+dedicadas: `FIELD_ENCRYPTION_KEY`, `JWT_SIGNING_KEY`, `METRICS_TOKEN`).
+
+## Deploy
+
+- **Blue-green con nginx** (VPS/Docker): `compose/deploy.sh blue|green` — build del
+  color inactivo, migraciones, health checks y switch de upstream sin downtime.
+  Runbook en [docs/runbooks/](docs/runbooks/).
+- **Fly.io**: receta en [`deploy/flyio/`](deploy/flyio/) (`make deploy`).
+
+## Estado del proyecto
+
+`v0.14.0` — ver [CHANGELOG.md](CHANGELOG.md). Auditoría de seguridad completa y plan
+de estabilización vigente en [`docs/auditoria/`](docs/auditoria/). Roadmap en
+[ROADMAP.md](ROADMAP.md).
 
 ## Contribuir
 
-Ver [CONTRIBUTING.md](CONTRIBUTING.md) para guías de contribución.
-
-## Licencia
-
-MIT. Ver [LICENSE](LICENSE).
+Ver [CONTRIBUTING.md](CONTRIBUTING.md). Licencia [MIT](LICENSE).

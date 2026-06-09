@@ -1,58 +1,41 @@
-# Roadmap - AppNotion Marketplace (Unified Architecture)
+# Roadmap — Proyecto Semilla
 
-> **Documento Base**: [UNIFIED_TECHNICAL_DOC.md](./docs/UNIFIED_TECHNICAL_DOC.md)
+> Boilerplate SaaS multitenant, seguro y AI-first. Este roadmap cubre la SEMILLA,
+> no productos derivados. El plan detallado de cada fase vive en
+> [docs/auditoria/PLAN-ESTABILIZACION.md](docs/auditoria/PLAN-ESTABILIZACION.md).
 
-## Fase 1: Base & Core (API-First)
+## ✅ v0.14 — Estabilización y saneamiento (actual)
 
-- [x] **Arquitectura**
-  - [x] Refactor de estructura folders (`integrations/`, `api/`, `canonical/`).
-  - [x] Definición de Modelos Canónicos (`FlowSpec`, `ERDSpec`) en JSON Schema/Pydantic.
-  - [x] Sistema de Jobs Asíncronos (Celery) para tareas largas.
-- [x] **API Core (OpenAPI)**
-  - [x] Endpoints Autenticación (Existentes).
-  - [x] Endpoint `POST /diagrams` (CRUD de diagramas).
-  - [x] Endpoint `GET /jobs/{jobId}` (Consistencia de estado).
+- [x] Extirpado el código de producto (integraciones Notion/Miro/IA) que se mezcló en el seed
+- [x] Marca unificada: Proyecto Semilla (configurable vía `PROJECT_NAME` / `frontend/src/lib/branding.ts`)
+- [x] Hardening crítico: membresía obligatoria por tenant, JWT con binding de schema,
+      logout con blacklist, signup con validadores + rate limit, `/metrics` protegido,
+      webhooks validados e idempotentes, claves dedicadas (cifrado/JWT)
+- [x] Frontend real: rutas API corregidas (proxy en dev), billing conectado a Stripe
+      checkout/portal, catálogo i18n completo (es/en/pt), datos fake eliminados
+- [x] Build estable: lockfile npm limpio (sin `--legacy-peer-deps`), Storybook 10,
+      Dockerfile frontend con stage de producción, límites de recursos en compose
+- [x] CI reforzado: `check --deploy`, pip-audit/npm audit, Trivy, tests frontend
+- [x] Toolkit AI-first: CLAUDE.md, 23 skills en `.claude/`, hooks, `.mcp.json`, workflow `@claude`
 
-## Fase 2: Integración Notion (Deep Dive)
+## v0.15 — Confianza verificable
 
-- [ ] **Conexión**
-  - [ ] OAuth Flow para Notion (`/integrations/notion/connect`).
-  - [ ] Gestión de Tokens por Tenant.
-- [x] **Funcionalidad Escaneo**
-  - [x] `POST /notion/workspaces/scan`: Escaneo de DBs Notion -> ERD Canónico.
-- [x] **Escritura en Notion**
-  - [x] `POST /notion/workspaces/apply-erd`: ERD Canónico -> Crear DBs en Notion.
-  - [ ] Modo `dryRun` para validación antes de escritura.
+- [ ] Suite de aislamiento multitenant ampliada (matriz endpoint × rol × tenant)
+- [ ] Lock de dependencias Python (pip-tools/uv) + Renovate/Dependabot
+- [ ] Cobertura backend ≥ 70% medida en CI (gate realista; hoy `fail_under=90` es aspiracional)
+- [ ] E2E con Playwright: login, onboarding completo, invitación, upgrade de plan
+- [ ] Migrar templates Django (allauth) a assets locales → CSP sin `unsafe-inline` ni CDNs
 
-## Fase 3: Integración Miro - Export
+## v0.16 — Experiencia de adopción
 
-- [ ] **Conexión Miro**
-  - [ ] OAuth Flow para Miro.
-- [ ] **Exportación**
-  - [ ] Converter: Canonical ERD -> Miro Shapes (JSON Payload).
-  - [ ] `POST /miro/boards/{boardId}/export`.
+- [ ] Script `scripts/bootstrap.py`: renombra proyecto, genera claves, configura branding en un paso
+- [ ] Tokens de auth en cookies httpOnly + middleware SSR de protección de rutas
+- [ ] Documentación de extensión: "cómo añadir un módulo" end-to-end con skill asociada
+- [ ] Demo pública desplegada + capturas en README
 
-## Fase 4: Integración Miro - Import
+## v1.0 — Producto vendible
 
-- [ ] **Miro App (Plugin)**
-  - [ ] UI embebida (Sidebar en Miro).
-  - [ ] Leer selección de frames/shapes.
-- [ ] **Backend Import**
-  - [ ] `POST /miro/boards/import`: Miro JSON -> Canonical Flow/ERD.
-
-## Fase 5: IA Assist (Gemini 3)
-
-- [ ] **Traducción Semántica**
-  - [ ] `POST /translate/flow-to-erd`: Inferencia de entidades desde diagramas de flujo.
-  - [ ] `POST /translate/notion-to-erd`: Mejora de nombres y relaciones.
-- [ ] **Validación**
-  - [ ] Sugerencias de normalización de datos.
-
----
-
-## Estado Actual
-
-- [x] Configuración Inicial Docker/Django.
-- [x] Autenticación Base (Allauth).
-- [x] **Refactor hacia Estructura Unificada** (Completado).
-- [x] **Fase 2: Integración Notion** (Lógica Core Completada).
+- [ ] Versionado semántico estricto + releases firmados + CHANGELOG automatizado
+- [ ] Guía de migración entre versiones del seed para proyectos derivados
+- [ ] Plantilla de repositorio GitHub ("Use this template") + cookiecutter opcional
+- [ ] Auditoría de seguridad externa

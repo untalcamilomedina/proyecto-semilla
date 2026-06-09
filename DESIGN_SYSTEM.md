@@ -2,7 +2,7 @@
 
 > **Estilo Gráfico: Minimalismo Industrial (Notion-esque)**
 
-Este documento define los lineamientos para la interfaz de usuario de **AppNotion**.
+Este documento define los lineamientos para la interfaz de usuario de **Proyecto Semilla**.
 Basado en "Glassmorphism Industrial" pero adaptado a una paleta estricta de **Blanco y Negro**.
 
 ## 1. Principios de Diseño
