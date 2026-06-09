@@ -3,7 +3,10 @@ PYTHON ?= python3
 MANAGE ?= $(PYTHON) manage.py
 COMPOSE ?= docker compose -f compose/docker-compose.yml
 
-.PHONY: dev lint fmt typecheck test build migrate seed deploy audit frontend-install frontend-dev frontend-test frontend-build
+.PHONY: init dev lint fmt typecheck test build migrate seed deploy audit frontend-install frontend-dev frontend-test frontend-build api-schema
+
+init:
+	$(PYTHON) scripts/bootstrap.py
 
 dev:
 	$(COMPOSE) up --build
@@ -40,6 +43,10 @@ seed:
 audit:
 	pip-audit -r requirements/dev.txt
 	safety check -r requirements/dev.txt
+
+api-schema:
+	$(COMPOSE) exec web python manage.py spectacular --file openapi.yaml
+	@echo "Esquema OpenAPI exportado a openapi.yaml"
 
 deploy:
 	bash ./deploy/flyio/deploy.sh

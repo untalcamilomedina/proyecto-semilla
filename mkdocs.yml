@@ -19,6 +19,8 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Architecture: architecture.md
+  - API: api.md
+  - MCP: mcp.md
   - Multitenancy: multitenancy.md
   - RBAC: rbac.md
   - Billing: billing.md
@@ -37,5 +39,6 @@ nav:
       - adr/0013-frontend-nextjs.md
   - Runbooks:
       - runbooks/local-dev.md
+      - runbooks/operacion.md
       - runbooks/flyio.md
       - runbooks/migracion-frontend-nextjs.md

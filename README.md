@@ -25,12 +25,12 @@ blue-green y un toolkit completo para desarrollar con agentes de IA.
 
 ## Instalación en 3 pasos
 
-Requisitos: Docker + Docker Compose.
+Requisitos: Docker + Docker Compose (y Python 3 para el wizard).
 
 ```bash
-# 1. Clona y configura
+# 1. Clona y corre el wizard (nombre, módulos, claves únicas, env files)
 git clone <tu-fork> mi-proyecto && cd mi-proyecto
-cp local.env.example local.env   # ajusta DJANGO_SECRET_KEY
+make init        # o: python3 scripts/bootstrap.py --defaults
 
 # 2. Levanta el stack completo
 make dev   # web :8000 · frontend :3010 · postgres · redis · minio · mailpit
@@ -40,6 +40,7 @@ make migrate && make seed
 ```
 
 Abre `http://localhost:3010` — login demo: `admin@demo.com` / `password`.
+API interactiva en `http://localhost:8000/api/docs/`.
 
 ## Qué incluye
 
@@ -126,12 +127,16 @@ Plantillas: [`local.env.example`](local.env.example) (dev) y
 [`production.env.example`](production.env.example) (prod, con checklist de claves
 dedicadas: `FIELD_ENCRYPTION_KEY`, `JWT_SIGNING_KEY`, `METRICS_TOKEN`).
 
-## Deploy
+## Deploy y operación
 
+- **Stateless por diseño** (12-factor): estado en Postgres/Redis/S3, JWT sin
+  estado de servidor, logs a stdout — escala horizontal sin fricción. Guía
+  completa: [docs/runbooks/operacion.md](docs/runbooks/operacion.md).
 - **Blue-green con nginx** (VPS/Docker): `compose/deploy.sh blue|green` — build del
   color inactivo, migraciones, health checks y switch de upstream sin downtime.
-  Runbook en [docs/runbooks/](docs/runbooks/).
 - **Fly.io**: receta en [`deploy/flyio/`](deploy/flyio/) (`make deploy`).
+- **API documentada**: [docs/api.md](docs/api.md) + Swagger/Redoc generados del
+  código. **MCP documentado**: [docs/mcp.md](docs/mcp.md).
 
 ## Estado del proyecto
 
