@@ -4,8 +4,9 @@ import os
 os.environ.setdefault("ENABLE_LMS", "true")
 os.environ.setdefault("ENABLE_COMMUNITY", "true")
 os.environ.setdefault("ENABLE_MCP", "true")
+os.environ.setdefault("ENABLE_CRM", "true")
 
-from .dev import *  # noqa: F403, F401
+from .dev import *
 
 # Allow all hosts during testing to support dynamic tenant domains
 ALLOWED_HOSTS = ["*"]
@@ -20,6 +21,10 @@ PASSWORD_HASHERS = [
 
 # Use in-memory email backend
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# Sin rate limiting en tests: el contador (Redis real) persiste entre tests
+# y produce 403 espurios. El comportamiento de ratelimit se cubre aparte.
+RATELIMIT_ENABLE = False
 
 # PostgreSQL ONLY — this project does not support SQLite.
 # Tests must run inside Docker: docker compose exec web pytest tests/

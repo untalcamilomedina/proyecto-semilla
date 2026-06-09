@@ -8,7 +8,6 @@ import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { DataTable } from "@/components/members/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock } from "lucide-react";
 

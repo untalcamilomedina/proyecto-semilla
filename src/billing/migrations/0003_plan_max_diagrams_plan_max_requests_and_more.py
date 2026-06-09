@@ -13,9 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="plan",
             name="max_diagrams",
-            field=models.PositiveIntegerField(
-                default=5, help_text="Max stored diagrams"
-            ),
+            field=models.PositiveIntegerField(default=5, help_text="Max stored diagrams"),
         ),
         migrations.AddField(
             model_name="plan",

@@ -7,7 +7,6 @@ from django.db import transaction
 
 from billing.models import Plan, Price
 
-
 DEMO_PLANS = [
     {
         "code": "free",
@@ -68,4 +67,3 @@ def seed_demo_plans(organization) -> list[Plan]:
         )
         plans.append(plan)
     return plans
-

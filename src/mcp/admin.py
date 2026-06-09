@@ -37,4 +37,3 @@ class McpUsageLogAdmin(admin.ModelAdmin):
     search_fields = ("server__name", "tool__name", "user__email", "user__username")
     readonly_fields = ("created_at",)
     list_select_related = ("organization", "server", "tool", "user")
-

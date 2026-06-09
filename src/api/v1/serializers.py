@@ -3,8 +3,8 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from api.models import ApiKey
-from billing.models import Invoice, Plan, Subscription
-from core.models import User, Membership, Permission, Role, ActivityLog
+from billing.models import Invoice, Plan, Price, Subscription
+from core.models import ActivityLog, Membership, Permission, Role, User
 from multitenant.models import Tenant
 
 
@@ -52,7 +52,7 @@ class TenantSerializer(serializers.ModelSerializer):
     def get_domain_base(self, _obj: Tenant) -> str:
         from django.conf import settings
 
-        return getattr(settings, "DOMAIN_BASE", "notionapps.dev")
+        return getattr(settings, "DOMAIN_BASE", "localhost")
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -85,10 +85,29 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ["joined_at"]
 
 
+class PriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Price
+        fields = ["id", "currency", "amount", "interval", "interval_count", "is_active"]
+
+
 class PlanSerializer(serializers.ModelSerializer):
+    prices = PriceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Plan
-        fields = ["id", "code", "name", "description", "seat_limit", "trial_days", "roles_on_activation"]
+        fields = [
+            "id",
+            "code",
+            "name",
+            "description",
+            "seat_limit",
+            "max_items",
+            "max_requests",
+            "trial_days",
+            "roles_on_activation",
+            "prices",
+        ]
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

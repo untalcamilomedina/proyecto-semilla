@@ -15,15 +15,14 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from django.urls import URLPattern, URLResolver
 from rest_framework.routers import DefaultRouter
 from rest_framework.serializers import Serializer
-from rest_framework.viewsets import ViewSetMixin
 
 logger = logging.getLogger(__name__)
 
 
 # ── Tool Definition ──────────────────────────────────────────
+
 
 class ToolDefinition:
     """MCP-compatible tool definition."""
@@ -108,7 +107,7 @@ def serializer_to_json_schema(serializer_class: type[Serializer]) -> dict[str, A
             prop["maxLength"] = field.max_length
 
         if hasattr(field, "choices") and field.choices:
-            prop["enum"] = [str(k) for k in field.choices.keys()]
+            prop["enum"] = [str(k) for k in field.choices]
 
         properties[field_name] = prop
 
@@ -143,6 +142,7 @@ def discover_tools(router: DefaultRouter | None = None) -> list[ToolDefinition]:
     if router is None:
         try:
             from api.v1.urls import router as api_router
+
             router = api_router
         except ImportError:
             logger.warning("Could not import API v1 router")
@@ -154,7 +154,9 @@ def discover_tools(router: DefaultRouter | None = None) -> list[ToolDefinition]:
         # Get the serializer class for schema extraction
         serializer_class = getattr(viewset_class, "serializer_class", None)
         input_schema = (
-            serializer_to_json_schema(serializer_class) if serializer_class else {"type": "object", "properties": {}}
+            serializer_to_json_schema(serializer_class)
+            if serializer_class
+            else {"type": "object", "properties": {}}
         )
 
         # Standard CRUD actions
@@ -171,7 +173,10 @@ def discover_tools(router: DefaultRouter | None = None) -> list[ToolDefinition]:
                 action_schema = {
                     "type": "object",
                     "properties": {
-                        "id": {"type": "integer", "description": f"ID of the {basename} to {action}"},
+                        "id": {
+                            "type": "integer",
+                            "description": f"ID of the {basename} to {action}",
+                        },
                         **(input_schema.get("properties", {}) if action != "destroy" else {}),
                     },
                     "required": ["id"],
@@ -181,7 +186,11 @@ def discover_tools(router: DefaultRouter | None = None) -> list[ToolDefinition]:
                     "type": "object",
                     "properties": {
                         "page": {"type": "integer", "description": "Page number", "default": 1},
-                        "page_size": {"type": "integer", "description": "Results per page", "default": 50},
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Results per page",
+                            "default": 50,
+                        },
                     },
                 }
 
@@ -208,7 +217,7 @@ def discover_tools(router: DefaultRouter | None = None) -> list[ToolDefinition]:
                         description=f"Custom action '{attr_name}' on {basename}",
                         input_schema={"type": "object", "properties": {}},
                         endpoint=f"/api/v1/{prefix}/{attr_name}/",
-                        method=list(attr.mapping.keys())[0].upper() if attr.mapping else "POST",
+                        method=next(iter(attr.mapping.keys())).upper() if attr.mapping else "POST",
                         viewset_class=viewset_class,
                         action=attr_name,
                     )
@@ -253,6 +262,7 @@ def _generate_description(basename: str, action: str, viewset_class: type) -> st
 
 
 # ── Tool Listing Endpoint Helper ─────────────────────────────
+
 
 def get_tools_catalog() -> list[dict[str, Any]]:
     """Return all discovered tools in MCP protocol format."""

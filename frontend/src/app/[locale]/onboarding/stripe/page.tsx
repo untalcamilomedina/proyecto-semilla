@@ -5,7 +5,7 @@ import { useRouter } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, CreditCard } from "lucide-react";
 
-import { apiPost, ApiError } from "@/lib/api";
+import { apiPost } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 
@@ -22,7 +22,7 @@ export default function OnboardingStripePage() {
         try {
             await apiPost("/onboarding/stripe/", { stripe_connected: false });
             router.push("/onboarding/domain");
-        } catch (err) {
+        } catch {
             setError(te("stripeError"));
             setIsLoading(false);
         }
@@ -33,7 +33,7 @@ export default function OnboardingStripePage() {
         try {
             await apiPost("/onboarding/stripe/", { stripe_connected: true });
             router.push("/onboarding/domain");
-        } catch (err) {
+        } catch {
             setError(te("stripeError"));
             setIsLoading(false);
         }

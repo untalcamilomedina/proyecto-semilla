@@ -86,4 +86,3 @@ def create_billing_portal_session(*, organization, return_url: str) -> str:
         customer=subscription.stripe_customer_id, return_url=return_url
     )
     return portal.url
-

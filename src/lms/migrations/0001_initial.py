@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Course",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("title", models.CharField(max_length=200)),
                 ("description", models.TextField(blank=True, default="")),
                 ("is_published", models.BooleanField(default=False)),
@@ -37,7 +42,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Enrollment",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("enrolled_at", models.DateTimeField(auto_now_add=True)),
                 ("progress", models.PositiveSmallIntegerField(default=0)),
                 (
@@ -73,7 +83,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Lesson",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("title", models.CharField(max_length=200)),
                 ("order", models.PositiveIntegerField(default=0)),
                 ("content", models.TextField(blank=True, default="")),
@@ -102,7 +117,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LessonProgress",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("completed_at", models.DateTimeField(blank=True, null=True)),
                 (
                     "enrollment",
@@ -134,4 +154,3 @@ class Migration(migrations.Migration):
             },
         ),
     ]
-

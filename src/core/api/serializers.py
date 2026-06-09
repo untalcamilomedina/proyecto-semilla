@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from django.core.validators import validate_email as django_validate_email
 from rest_framework import serializers
 
 from multitenant.models import validate_subdomain
@@ -34,7 +33,7 @@ class StartOnboardingSerializer(serializers.Serializer):
                 raise serializers.ValidationError({"password": "This field is required."})
             if data.get("password") != data.get("confirm_password"):
                 raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
-        
+
         return data
 
 
@@ -57,9 +56,7 @@ class CustomDomainSerializer(serializers.Serializer):
 
 
 class InviteMembersSerializer(serializers.Serializer):
-    emails = serializers.ListField(
-        child=serializers.EmailField(), required=False, allow_empty=True
-    )
+    emails = serializers.ListField(child=serializers.EmailField(), required=False, allow_empty=True)
 
     def to_internal_value(self, data):
         # Allow sending a string of emails separated by newlines or commas

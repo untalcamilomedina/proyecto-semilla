@@ -1,6 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import type { useTranslations } from "next-intl";
 import { Member } from "@/types/member";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,9 @@ import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-export const getColumns = (t: any): ColumnDef<Member>[] => [
+type Translator = ReturnType<typeof useTranslations>;
+
+export const getColumns = (t: Translator): ColumnDef<Member>[] => [
     {
         accessorKey: "user_email",
         header: t("name") || "Usuario",

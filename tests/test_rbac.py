@@ -46,6 +46,7 @@ def test_membership_unique_per_user_org():
 
     user = User.objects.create_user(username="u2", email="u2@example.com", password="pass1234")
     Membership.objects.create(user=user, organization=tenant, role=role)
-    with pytest.raises(Exception):
-        Membership.objects.create(user=user, organization=tenant, role=role)
+    from django.db import IntegrityError
 
+    with pytest.raises(IntegrityError):
+        Membership.objects.create(user=user, organization=tenant, role=role)

@@ -51,6 +51,11 @@ export const db = new OfflineDatabase();
 
 // ── Mutation Queue API ──────────────────────────────────────
 
+/** ServiceWorkerRegistration with the (non-standard) Background Sync API. */
+interface SyncCapableRegistration extends ServiceWorkerRegistration {
+  sync: { register(tag: string): Promise<void> };
+}
+
 export async function queueMutation(mutation: Omit<OfflineMutation, 'id' | 'retryCount' | 'status'>): Promise<void> {
   await db.mutations.add({
     ...mutation,
@@ -61,7 +66,7 @@ export async function queueMutation(mutation: Omit<OfflineMutation, 'id' | 'retr
   // Request background sync if available
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     const reg = await navigator.serviceWorker.ready;
-    await (reg as any).sync.register('offline-mutations');
+    await (reg as SyncCapableRegistration).sync.register('offline-mutations');
   }
 }
 

@@ -6,7 +6,7 @@ import { GlassButton } from "@/components/ui/glass/GlassButton";
 import { GlassInput } from "@/components/ui/glass/GlassInput";
 import { useOnboardingStore } from "@/stores/onboarding";
 import { useRouter } from "@/lib/navigation";
-import { Check, CreditCard, Lock, Ban } from "lucide-react";
+import { CreditCard, Lock, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
@@ -43,7 +43,7 @@ export default function PlanSelection() {
              <h3 className="text-lg font-bold text-foreground">No Payments</h3>
           </div>
           <p className="text-sm text-text-subtle">
-            I don't need to charge users right now. I will manually manage access or use this for internal tools.
+            I don&apos;t need to charge users right now. I will manually manage access or use this for internal tools.
           </p>
         </GlassCard>
 

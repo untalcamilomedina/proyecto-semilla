@@ -38,9 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="post",
             name="is_answer",
-            field=models.BooleanField(
-                default=False, help_text="Accepted answer for Q topics"
-            ),
+            field=models.BooleanField(default=False, help_text="Accepted answer for Q topics"),
         ),
         migrations.AddField(
             model_name="post",
@@ -66,9 +64,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="topic",
             name="created_at",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -79,9 +75,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="topic",
             name="last_activity_at",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -286,9 +280,7 @@ class Migration(migrations.Migration):
                 ("is_active", models.BooleanField(default=True)),
                 (
                     "is_default",
-                    models.BooleanField(
-                        default=False, help_text="Default space for new members"
-                    ),
+                    models.BooleanField(default=False, help_text="Default space for new members"),
                 ),
                 ("position", models.PositiveIntegerField(default=0)),
                 ("is_public", models.BooleanField(default=True)),

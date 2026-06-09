@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from django.utils import timezone
-from rest_framework import mixins, viewsets
+from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from common.api.tenancy import TenantScopedViewSet
 
 from .models import POINTS_CONFIG, MemberProfile, Post, Reaction, Space, Topic
 from .serializers import (
@@ -19,20 +19,6 @@ from .serializers import (
     TopicDetailSerializer,
     TopicListSerializer,
 )
-
-
-def request_tenant(request):
-    return getattr(request, "tenant", None)
-
-
-class TenantScopedViewSet(viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def get_organization(self):
-        organization = request_tenant(self.request)
-        if organization is None:
-            raise NotFound("Tenant required.")
-        return organization
 
 
 class SpaceViewSet(
@@ -70,9 +56,8 @@ class TopicViewSet(
         return TopicDetailSerializer
 
     def get_queryset(self):
-        qs = (
-            Topic.objects.filter(organization=self.get_organization())
-            .select_related("author", "space")
+        qs = Topic.objects.filter(organization=self.get_organization()).select_related(
+            "author", "space"
         )
         return qs
 
@@ -81,9 +66,7 @@ class TopicViewSet(
         serializer.save(organization=org, author=self.request.user)
 
         # Award points for creating a topic
-        profile, _ = MemberProfile.objects.get_or_create(
-            organization=org, user=self.request.user
-        )
+        profile, _ = MemberProfile.objects.get_or_create(organization=org, user=self.request.user)
         profile.topics_created += 1
         profile.save(update_fields=["topics_created"])
         profile.add_points(POINTS_CONFIG["create_topic"])
@@ -108,9 +91,8 @@ class PostViewSet(
     filterset_fields = ["topic"]
 
     def get_queryset(self):
-        return (
-            Post.objects.filter(organization=self.get_organization())
-            .select_related("author", "topic")
+        return Post.objects.filter(organization=self.get_organization()).select_related(
+            "author", "topic"
         )
 
     def perform_create(self, serializer):
@@ -124,9 +106,7 @@ class PostViewSet(
         )
 
         # Award points
-        profile, _ = MemberProfile.objects.get_or_create(
-            organization=org, user=self.request.user
-        )
+        profile, _ = MemberProfile.objects.get_or_create(organization=org, user=self.request.user)
         profile.posts_created += 1
         profile.save(update_fields=["posts_created"])
         profile.add_points(POINTS_CONFIG["create_post"])
@@ -211,9 +191,8 @@ class MemberProfileViewSet(
     serializer_class = MemberProfileSerializer
 
     def get_queryset(self):
-        return (
-            MemberProfile.objects.filter(organization=self.get_organization())
-            .select_related("user")
+        return MemberProfile.objects.filter(organization=self.get_organization()).select_related(
+            "user"
         )
 
     @action(detail=False, methods=["get"], url_path="me")

@@ -1,5 +1,5 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from allauth.socialaccount.models import SocialAccount
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
@@ -18,11 +18,4 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         Called when a user is being saved during the signup flow.
         """
-        user = super().save_user(request, sociallogin, form)
-        
-        # If connecting Notion, we might want to store extra data from extra_data
-        if sociallogin.account.provider == 'notion':
-            # Example: Store workspace_name or workspace_icon if available in extra_data
-            pass
-            
-        return user
+        return super().save_user(request, sociallogin, form)

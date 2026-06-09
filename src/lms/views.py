@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from django.utils import timezone
-from rest_framework import mixins, viewsets
+from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from common.api.tenancy import TenantScopedViewSet
 
 from .models import Certificate, Course, Enrollment, Lesson, LessonProgress, Review, Section
 from .serializers import (
@@ -21,20 +21,6 @@ from .serializers import (
     ReviewSerializer,
     SectionSerializer,
 )
-
-
-def request_tenant(request):
-    return getattr(request, "tenant", None)
-
-
-class TenantScopedViewSet(viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def get_organization(self):
-        organization = request_tenant(self.request)
-        if organization is None:
-            raise NotFound("Tenant required.")
-        return organization
 
 
 class CourseViewSet(
@@ -100,9 +86,8 @@ class LessonViewSet(
         return LessonSerializer
 
     def get_queryset(self):
-        return (
-            Lesson.objects.filter(organization=self.get_organization())
-            .select_related("course", "section")
+        return Lesson.objects.filter(organization=self.get_organization()).select_related(
+            "course", "section"
         )
 
     def perform_create(self, serializer):
@@ -121,9 +106,8 @@ class EnrollmentViewSet(
     serializer_class = EnrollmentSerializer
 
     def get_queryset(self):
-        return (
-            Enrollment.objects.filter(organization=self.get_organization())
-            .select_related("course", "user")
+        return Enrollment.objects.filter(organization=self.get_organization()).select_related(
+            "course", "user"
         )
 
     def perform_create(self, serializer):
@@ -142,16 +126,18 @@ class EnrollmentViewSet(
         import secrets
 
         cert_number = f"CERT-{secrets.token_hex(6).upper()}"
-        cert, created = Certificate.objects.get_or_create(
+        cert, _created = Certificate.objects.get_or_create(
             organization=self.get_organization(),
             enrollment=enrollment,
             defaults={"certificate_number": cert_number},
         )
 
-        return Response({
-            "status": "completed",
-            "certificate_number": cert.certificate_number,
-        })
+        return Response(
+            {
+                "status": "completed",
+                "certificate_number": cert.certificate_number,
+            }
+        )
 
 
 class LessonProgressViewSet(
@@ -164,9 +150,8 @@ class LessonProgressViewSet(
     serializer_class = LessonProgressSerializer
 
     def get_queryset(self):
-        return (
-            LessonProgress.objects.filter(organization=self.get_organization())
-            .select_related("enrollment", "lesson")
+        return LessonProgress.objects.filter(organization=self.get_organization()).select_related(
+            "enrollment", "lesson"
         )
 
     def perform_create(self, serializer):
@@ -184,9 +169,8 @@ class CertificateViewSet(
     serializer_class = CertificateSerializer
 
     def get_queryset(self):
-        return (
-            Certificate.objects.filter(organization=self.get_organization())
-            .select_related("enrollment__course", "enrollment__user")
+        return Certificate.objects.filter(organization=self.get_organization()).select_related(
+            "enrollment__course", "enrollment__user"
         )
 
 
@@ -201,9 +185,8 @@ class ReviewViewSet(
     filterset_fields = ["course", "rating"]
 
     def get_queryset(self):
-        return (
-            Review.objects.filter(organization=self.get_organization())
-            .select_related("user", "course")
+        return Review.objects.filter(organization=self.get_organization()).select_related(
+            "user", "course"
         )
 
     def perform_create(self, serializer):

@@ -12,7 +12,7 @@ describe("GlassButton", () => {
     it("applies primary variant by default", () => {
         render(<GlassButton>Primary</GlassButton>);
         const btn = screen.getByRole("button");
-        expect(btn.className).toContain("bg-neon-bg-strong");
+        expect(btn.className).toContain("bg-primary/90");
     });
 
     it("applies secondary variant", () => {

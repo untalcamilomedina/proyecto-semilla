@@ -22,4 +22,3 @@ class Command(BaseCommand):
                     continue
                 seed_demo_plans(tenant_local)
                 self.stdout.write(self.style.SUCCESS(f"Seeded billing for {tenant_local.slug}"))
-

@@ -8,7 +8,7 @@
 import { compile, run } from '@mdx-js/mdx';
 import * as runtime from 'react/jsx-runtime';
 import remarkGfm from 'remark-gfm';
-import { useMDXComponents } from '../../../mdx-components';
+import { useMDXComponents as getMDXComponents } from '../../../mdx-components';
 import { Callout, VideoPlayer, CodeTabs, StepGuide, FeatureCard } from '@/components/mdx';
 
 interface MdxRendererProps {
@@ -33,6 +33,7 @@ export async function MdxRenderer({ source }: MdxRendererProps) {
     );
   }
 
+  let MdxContent: Awaited<ReturnType<typeof run>>['default'];
   try {
     // Compile MDX source to JavaScript
     const compiled = await compile(source, {
@@ -41,26 +42,11 @@ export async function MdxRenderer({ source }: MdxRendererProps) {
     });
 
     // Run compiled code with React runtime
-    const { default: MdxContent } = await run(String(compiled), {
+    const mod = await run(String(compiled), {
       ...runtime,
       baseUrl: import.meta.url,
     });
-
-    // Get global MDX component overrides
-    const components = useMDXComponents({
-      // Inject custom interactive components
-      Callout,
-      VideoPlayer,
-      CodeTabs,
-      StepGuide,
-      FeatureCard,
-    });
-
-    return (
-      <article className="prose-dark max-w-none">
-        <MdxContent components={components} />
-      </article>
-    );
+    MdxContent = mod.default;
   } catch (error) {
     console.error('MDX render error:', error);
     return (
@@ -72,4 +58,20 @@ export async function MdxRenderer({ source }: MdxRendererProps) {
       </div>
     );
   }
+
+  // Get global MDX component overrides
+  const components = getMDXComponents({
+    // Inject custom interactive components
+    Callout,
+    VideoPlayer,
+    CodeTabs,
+    StepGuide,
+    FeatureCard,
+  });
+
+  return (
+    <article className="prose-dark max-w-none">
+      <MdxContent components={components} />
+    </article>
+  );
 }

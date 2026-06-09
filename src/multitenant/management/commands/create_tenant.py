@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
-from django.db import transaction, connection
+from django.core.management.base import BaseCommand, CommandError
+from django.db import connection, transaction
 
 from multitenant.models import Domain, Tenant
 from multitenant.schema import PUBLIC_SCHEMA_NAME, create_schema, drop_schema, schema_context
@@ -38,11 +38,10 @@ class Command(BaseCommand):
         tenant.full_clean()
 
         # Phase 1: Create tenant, schema, and domain in public (atomic DML)
-        with transaction.atomic():
-            with schema_context(PUBLIC_SCHEMA_NAME):
-                tenant.save()
-                create_schema(schema_name)
-                Domain.objects.create(tenant=tenant, domain=domain, is_primary=True)
+        with transaction.atomic(), schema_context(PUBLIC_SCHEMA_NAME):
+            tenant.save()
+            create_schema(schema_name)
+            Domain.objects.create(tenant=tenant, domain=domain, is_primary=True)
 
         # Phase 2: Run migrations in new schema (DDL - must be outside transaction)
         # PostgreSQL cannot run ALTER TABLE with pending trigger events in same transaction
@@ -62,25 +61,25 @@ class Command(BaseCommand):
             raise CommandError(f"Migration failed, tenant rolled back: {e}") from e
 
         # Phase 3: Create tenant copy in new schema (atomic DML)
-        with transaction.atomic():
-            with schema_context(schema_name):
-                # Restore search path to include public
-                with connection.cursor() as cursor:
-                    cursor.execute(f'SET search_path TO "{schema_name}", {PUBLIC_SCHEMA_NAME}')
-                Tenant.objects.create(
-                    id=tenant.id,
-                    name=tenant.name,
-                    slug=tenant.slug,
-                    schema_name=tenant.schema_name,
-                    is_active=tenant.is_active,
-                    plan_code=tenant.plan_code,
-                    trial_ends_at=tenant.trial_ends_at,
-                    enabled_modules=tenant.enabled_modules,
-                    branding=getattr(tenant, "branding", {}) or {},
-                )
+        with transaction.atomic(), schema_context(schema_name):
+            # Restore search path to include public
+            with connection.cursor() as cursor:
+                cursor.execute(f'SET search_path TO "{schema_name}", {PUBLIC_SCHEMA_NAME}')
+            Tenant.objects.create(
+                id=tenant.id,
+                name=tenant.name,
+                slug=tenant.slug,
+                schema_name=tenant.schema_name,
+                is_active=tenant.is_active,
+                plan_code=tenant.plan_code,
+                trial_ends_at=tenant.trial_ends_at,
+                enabled_modules=tenant.enabled_modules,
+                branding=getattr(tenant, "branding", {}) or {},
+            )
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Created tenant '{tenant.slug}' with schema '{tenant.schema_name}' and domain '{domain}'."
+                f"Created tenant '{tenant.slug}' with schema "
+                f"'{tenant.schema_name}' and domain '{domain}'."
             )
         )

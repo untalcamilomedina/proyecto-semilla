@@ -11,13 +11,13 @@ class EmailService:
         """
         subject = "Welcome to Acme SaaS!"
         context = {
-            "user": user, 
+            "user": user,
             "site_name": "Acme SaaS",
-            "frontend_url": getattr(settings, "FRONTEND_URL", "http://localhost:3000")
+            "frontend_url": getattr(settings, "FRONTEND_URL", "http://localhost:3000"),
         }
         html_message = render_to_string("emails/welcome.html", context)
         plain_message = render_to_string("emails/welcome.txt", context)
-        
+
         send_mail(
             subject=subject,
             message=plain_message,
@@ -36,7 +36,7 @@ class EmailService:
             "inviter": inviter,
             "organization": membership.organization,
             "invite_url": invite_url,
-            "site_name": "Acme SaaS"
+            "site_name": "Acme SaaS",
         }
         html_message = render_to_string("emails/invite.html", context)
         plain_message = render_to_string("emails/invite.txt", context)

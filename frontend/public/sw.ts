@@ -108,7 +108,12 @@ async function cacheFirstWithNetwork(request: Request): Promise<Response> {
 
 // ── Background Sync (for offline mutations) ─────────────────
 
-self.addEventListener('sync', ((event: any) => {
+/** Background Sync API event (not yet in lib.webworker). */
+interface SyncEvent extends ExtendableEvent {
+  readonly tag: string;
+}
+
+self.addEventListener('sync', ((event: SyncEvent) => {
   if (event.tag === 'offline-mutations') {
     event.waitUntil(replayOfflineMutations());
   }

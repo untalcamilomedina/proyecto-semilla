@@ -1,16 +1,24 @@
 from __future__ import annotations
 
-from .base import *  # noqa: F403
+from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = env.list(  # type: ignore[name-defined]  # noqa: F405
+ALLOWED_HOSTS = env.list(  # type: ignore[name-defined]
     "ALLOWED_HOSTS",
-    default=["localhost", "127.0.0.1", "web", "frontend", ".acme.dev"],
+    default=["localhost", "127.0.0.1", "web", "frontend", ".localhost"],
+)
+
+# Silk (profiler) solo en desarrollo — urls.py monta silk.urls cuando DEBUG=True.
+INSTALLED_APPS = [*INSTALLED_APPS, "silk"]
+MIDDLEWARE = list(MIDDLEWARE)
+MIDDLEWARE.insert(
+    MIDDLEWARE.index("django.middleware.gzip.GZipMiddleware") + 1,
+    "silk.middleware.SilkyMiddleware",
 )
 
 
 # Needed when running behind a reverse proxy (e.g. Next.js rewrites in Docker).
-USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=True)  # type: ignore[name-defined]  # noqa: F405
+USE_X_FORWARDED_HOST = env.bool("USE_X_FORWARDED_HOST", default=True)  # type: ignore[name-defined]
 
 CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS",
@@ -43,8 +51,6 @@ CORS_ALLOWED_ORIGINS = env.list(
 )
 
 CORS_ALLOW_CREDENTIALS = True
-
-
 
 
 # Disable manifest storage in dev/test to avoid running collectstatic

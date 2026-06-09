@@ -135,6 +135,13 @@ export async function refreshAccessToken(): Promise<TokenPair | null> {
 }
 
 export async function logout(): Promise<void> {
+  const refresh = tokens?.refresh;
+  try {
+    // Invalida la sesión y blacklistea el refresh token en el backend.
+    await api('/api/v1/logout/', { method: 'POST', body: refresh ? { refresh } : undefined });
+  } catch {
+    // El logout local debe completarse aunque el backend no responda.
+  }
   clearTokens();
 }
 
@@ -232,6 +239,7 @@ export async function api<T>(
 }
 
 async function parseResponse(res: Response): Promise<unknown> {
+  if (res.status === 204) return null;
   const contentType = res.headers.get('content-type') || '';
   if (contentType.includes('application/json')) return res.json();
   return res.text();

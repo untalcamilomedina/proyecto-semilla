@@ -45,4 +45,4 @@ def test_tenant_middleware_sets_request_tenant(client):
 
     res = client.get("/healthz", HTTP_HOST="baz.acme.dev")
     assert res.status_code == 200
-    assert getattr(res.wsgi_request, "tenant") == tenant
+    assert res.wsgi_request.tenant == tenant

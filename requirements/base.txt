@@ -5,7 +5,9 @@ django-filter>=24.0,<25.0
 drf-spectacular>=0.28,<1.0
 
 # Authentication & Authorization
-django-allauth>=0.61,<1.0
+# >=65.14.1 corrige PYSEC-2025-110/111 y PYSEC-2026-56 (los settings ya usan
+# el formato moderno: ACCOUNT_LOGIN_METHODS / ACCOUNT_SIGNUP_FIELDS).
+django-allauth>=65.14.1,<66.0
 django-guardian>=2.4,<3.0
 djangorestframework-simplejwt>=5.3,<6.0
 rules>=3.3,<4.0
@@ -30,7 +32,8 @@ django-cors-headers>=4.3,<5.0
 django-csp>=3.8,<4.0
 django-ratelimit>=4.1,<5.0
 django-axes>=6.5,<7.0
-cryptography>=44.0,<45.0
+# >=46.0.6 corrige CVE-2026-26007 / PYSEC-2026-35
+cryptography>=46.0.6,<47.0
 
 # Observability
 sentry-sdk>=2.0,<3.0
@@ -61,7 +64,3 @@ django-modeltranslation>=0.19,<1.0
 
 # Audit
 django-auditlog>=3.0,<4.0
-
-# Integrations
-notion-client>=2.2,<4.0
-httpx>=0.27,<1.0

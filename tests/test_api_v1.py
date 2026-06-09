@@ -1,6 +1,6 @@
-import pytest
 import uuid
 
+import pytest
 from django.db import connection
 from rest_framework.test import APIClient
 
@@ -29,7 +29,7 @@ def test_api_key_auth_can_access_tenant_endpoint():
                 "name": tenant_public.name,
                 "slug": tenant_public.slug,
                 "schema_name": tenant_public.schema_name,
-            }
+            },
         )
         seed_default_roles(tenant_local)
         owner_role = Role.objects.get(organization=tenant_local, slug="owner")
@@ -67,7 +67,7 @@ def test_roles_endpoint_requires_manage_roles_permission():
                 "name": tenant_public.name,
                 "slug": tenant_public.slug,
                 "schema_name": tenant_public.schema_name,
-            }
+            },
         )
         seed_default_roles(tenant_local)
         viewer_role = Role.objects.get(organization=tenant_local, slug="viewer")
@@ -104,4 +104,3 @@ def test_roles_endpoint_requires_manage_roles_permission():
         HTTP_AUTHORIZATION=f"Api-Key {plain}",
     )
     assert res.status_code == 201
-

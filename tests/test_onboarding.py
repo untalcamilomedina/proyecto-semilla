@@ -8,8 +8,9 @@ from multitenant.schema import PUBLIC_SCHEMA_NAME, schema_context
 @pytest.mark.django_db(transaction=True)
 def test_start_onboarding_creates_public_state_and_local_seed(monkeypatch):
     from core.services.email import EmailService
+
     monkeypatch.setattr(EmailService, "send_welcome_email", lambda *a, **k: 1)
-    result = onboarding_service.start_onboarding(
+    onboarding_service.start_onboarding(
         org_name="Org A",
         subdomain="orga",
         admin_email="admin@orga.dev",
@@ -28,12 +29,15 @@ def test_start_onboarding_creates_public_state_and_local_seed(monkeypatch):
 
         assert Role.objects.filter(organization=tenant_local, slug="owner").exists()
         assert User.objects.filter(email="admin@orga.dev").exists()
-        assert Membership.objects.filter(organization=tenant_local, user__email="admin@orga.dev").exists()
+        assert Membership.objects.filter(
+            organization=tenant_local, user__email="admin@orga.dev"
+        ).exists()
 
 
 @pytest.mark.django_db(transaction=True)
 def test_modules_syncs_to_public_and_local(monkeypatch):
     from core.services.email import EmailService
+
     monkeypatch.setattr(EmailService, "send_welcome_email", lambda *a, **k: 1)
     result = onboarding_service.start_onboarding(
         org_name="Org B",
@@ -56,6 +60,7 @@ def test_modules_syncs_to_public_and_local(monkeypatch):
 @pytest.mark.django_db(transaction=True)
 def test_invite_members_marks_complete(monkeypatch):
     from core.services.email import EmailService
+
     monkeypatch.setattr(EmailService, "send_welcome_email", lambda *a, **k: 1)
     monkeypatch.setattr(EmailService, "send_invite_email", lambda *a, **k: 1)
     result = onboarding_service.start_onboarding(
@@ -72,6 +77,3 @@ def test_invite_members_marks_complete(monkeypatch):
         state = result.state.__class__.objects.get(id=result.state.id)
         assert state.is_complete is True
         assert 5 in state.completed_steps
-
-
-

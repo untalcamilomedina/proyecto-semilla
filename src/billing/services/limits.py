@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from core.models import Membership
-
 from billing.models import Subscription
+from core.models import Membership
 
 
 def get_active_subscription(organization):
@@ -29,4 +28,3 @@ def can_add_seat(organization, additional: int = 1) -> bool:
     if limit is None:
         return True
     return seats_used(organization) + additional <= limit
-

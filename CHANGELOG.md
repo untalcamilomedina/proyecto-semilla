@@ -5,6 +5,95 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.14.0 - (2026-06-09) - Auditoría, saneamiento y estabilización
+
+> Release de saneamiento tras auditoría completa (informe en `docs/auditoria/`).
+> Nota: las versiones reportadas entre v0.9.x y v0.13.0 eran inconsistentes entre
+> README/pyproject/CHANGELOG; desde esta versión hay una única fuente (pyproject).
+
+### Added (módulo CRM)
+- **CRM opcional** (`ENABLE_CRM`, apagado por defecto): empresas, contactos,
+  deals con pipeline (resumen por etapa en `GET /api/v1/crm/deals/pipeline/`,
+  cierre automático en won/lost) y actividades (notas/llamadas/emails/tareas).
+  Seguridad del seed aplicada: lectura para miembros del tenant, escritura con
+  permiso `crm.manage_crm` (owner/admin/editor lo reciben en el seed de roles),
+  scoping por organización e índices por tenant. Tests de CRUD, RBAC de
+  escritura y aislamiento cross-tenant en `tests/test_crm.py`.
+
+### Security (dependencias, detectado por el nuevo job security-audit)
+- django-allauth 0.63.6 → ≥65.14.1 (PYSEC-2025-110/111, PYSEC-2026-56).
+- cryptography 44.x → ≥46.0.6 (CVE-2026-26007).
+- Next.js 16.0.10 → 16.2.7 (advisories high de middleware bypass/DoS).
+
+### Removed (limpieza de producto mezclado por error)
+- **Backend**: app `integrations` completa (Notion/Miro/Gemini), endpoints
+  `diagrams|jobs|integrations/*|user-keys`, provider notion de allauth,
+  dependencias `notion-client`/`httpx`, tests `audit_*` del producto.
+- **Frontend**: páginas diagrams/integrations/tools/admin-settings (esta última
+  tenía un email de admin hardcodeado y un formulario que simulaba guardar),
+  componentes ReactFlow, scaffolding demo de Storybook, deps muertas
+  (`reactflow`, `crypto-js`, `@capacitor/*`, `next-pwa`, `openapi-fetch`).
+- Marcas mezcladas eliminadas: Acme, NotionApps, BlockFlow, AppNotion, Momentum →
+  **Proyecto Semilla** (configurable: `PROJECT_NAME` y `frontend/src/lib/branding.ts`).
+
+### Security
+- **Aislamiento multitenant deny-by-default**: `PolicyPermission` ahora exige
+  membresía activa; nuevo `IsTenantMember` aplicado a CMS/LMS/Community/MCP/Dashboard
+  (antes, cualquier usuario autenticado de otro tenant podía listar miembros y
+  acceder a módulos de un tenant ajeno).
+- **JWT con binding de schema**: claim `schema_name` + `TenantJWTAuthentication`;
+  un token emitido en un tenant ya no autentica en otro (los IDs de usuario
+  colisionan entre schemas — suplantación posible antes del fix).
+- Logout exige autenticación y blacklistea el refresh token; signup aplica
+  `AUTH_PASSWORD_VALIDATORS`, usa el email como username (colisión que daba 500)
+  y envía verificación de email; rate limiting en login/signup/onboarding.
+- `/metrics` protegido con `METRICS_TOKEN` (cerrado por defecto fuera de DEBUG).
+- Claves dedicadas: `FIELD_ENCRYPTION_KEY` (cifrado de campos, con cache de
+  derivación) y `JWT_SIGNING_KEY`; CORS explícito en producción; verificación de
+  email `mandatory` en prod; sesiones en `cached_db` (Redis caído ya no desloguea).
+- Webhooks Stripe: metadata validada contra BD (nunca se usa `tenant_schema` del
+  payload directamente) + idempotencia por `StripeEvent.event_id`.
+- Middleware multitenant: 503 ante BD caída (antes caía silenciosamente al schema
+  público), código muerto de RLS-bypass eliminado; validación de subida de
+  archivos en CMS (extensión + tamaño); nginx con rate limiting y HSTS.
+
+### Fixed
+- **Frontend funcionaba contra endpoints inexistentes**: rutas `/me/`, `/tenant/`,
+  `/logout/`, `/onboarding/start/` corregidas a `/api/v1/...` y proxy dev añadido
+  (`next.config.ts` rewrites — no existía, todo daba 404 en dev).
+- **Billing real**: nuevas acciones API `subscriptions/current|checkout|portal`
+  conectadas a los servicios Stripe existentes; la página de billing ya no usa
+  un endpoint inexistente ni planes hardcodeados.
+- **i18n**: catálogo completo reconstruido (275 claves × es/en/pt; antes solo
+  existían 3 namespaces y el dashboard mostraba claves crudas).
+- Dashboard sin datos fake (roles "3" y usage "12%" hardcodeados); `console.log`
+  del onboarding que filtraba contraseña y claves Stripe eliminado.
+- `local.env.example` usaba nombres `AWS_*` que settings nunca leyó → `S3_*`.
+- Metering genérico: `max_diagrams/diagrams_used` → `max_items/items_used`
+  (migración `billing/0004`).
+
+### Changed
+- Lockfile npm regenerado limpio: sin `--legacy-peer-deps` (Storybook 8→10
+  compatible con Next 16, fuera `experimental-addon-test`); deps de test añadidas
+  (vitest corre por primera vez: 15/15 ✅) y `happy-dom` actualizado.
+- Dockerfile frontend multi-stage con stage `runner` de producción (standalone,
+  non-root) — el deploy blue-green referenciaba un stage inexistente.
+- CI: `permissions: contents: read`, concurrencia, job `security-audit`
+  (pip-audit + npm audit), scan Trivy de imágenes, build del frontend runner,
+  scripts `type-check`/`test` que el CI invocaba pero no existían.
+- Compose: límites de recursos en stacks blue/green; BD por defecto
+  `proyecto_semilla`.
+
+### Added
+- **Toolkit AI-first**: `CLAUDE.md`, 24 skills migradas a `.claude/skills/`
+  (rebrandeadas y genericizadas), hooks SessionStart/PostToolUse
+  (`.claude/settings.json` + `scripts/ai/`), `.mcp.json` (Postgres dev) y
+  workflow `@claude` para GitHub.
+- `tests/test_api_security.py`: barrido de auth anónima por endpoint, aislamiento
+  cross-tenant, binding JWT por schema, permisos de billing, protección de
+  métricas y validadores de signup.
+- `docs/auditoria/`: informe completo de auditoría + plan de estabilización.
+
 ## v0.13.0 - (2025-12-30) - Docs & MCP Systematization
 - **Documentation**: Added Table of Contents (ToC) to all core Markdown files to facilitate AI navigation.
 - **Standards**: Enforced JSDoc/Docstrings on programmatic files.

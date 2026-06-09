@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from django.db import transaction
 
-from core.services.email import EmailService
 from core.models import Membership, Role, User
+from core.services.email import EmailService
 from core.services.usernames import username_from_email
 
 
 @transaction.atomic
-def invite_members_to_org(organization, emails: list[str], role_slug: str = "member", inviter=None) -> int:
+def invite_members_to_org(
+    organization, emails: list[str], role_slug: str = "member", inviter=None
+) -> int:
     if not emails:
         return 0
 
@@ -31,7 +33,10 @@ def invite_members_to_org(organization, emails: list[str], role_slug: str = "mem
             user=user, organization=organization, defaults={"role": role}
         )
         from django.conf import settings
-        invite_url = f"https://{organization.slug}.{getattr(settings, 'DOMAIN_BASE', 'acme.dev')}/join"
+
+        invite_url = (
+            f"https://{organization.slug}.{getattr(settings, 'DOMAIN_BASE', 'acme.dev')}/join"
+        )
         EmailService.send_invite_email(membership, invite_url, inviter=inviter)
         invited += 1
     return invited

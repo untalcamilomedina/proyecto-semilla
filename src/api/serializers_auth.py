@@ -2,11 +2,18 @@
 
 Includes tenant_id and role in JWT claims so the frontend
 can resolve tenant context without extra API calls.
+
+SEGURIDAD: el claim `schema_name` ata el token al schema donde se emitió.
+Con usuarios por schema, los IDs de usuario colisionan entre tenants; sin
+este claim, un token del usuario id=N del tenant A autenticaría como el
+usuario id=N del tenant B. `TenantJWTAuthentication` lo verifica.
 """
 
 from __future__ import annotations
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from multitenant.schema import get_current_schema
 
 
 class TenantTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -20,6 +27,9 @@ class TenantTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["first_name"] = getattr(user, "first_name", "")
         token["last_name"] = getattr(user, "last_name", "")
+
+        # Binding del token al schema donde se autenticó el usuario.
+        token["schema_name"] = get_current_schema()
 
         # Attach tenant info from first active membership
         from core.models import Membership

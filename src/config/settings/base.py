@@ -17,9 +17,16 @@ env.read_env(os.environ.get("ENV_FILE"))  # optional explicit path
 SECRET_KEY = env.str("DJANGO_SECRET_KEY", default="dev-only-insecure-key-do-not-use-in-production")
 DEBUG = env.bool("DEBUG", default=False)
 
+# Clave dedicada para cifrado de campos (common.encryption). Si no se define,
+# se deriva de SECRET_KEY (no recomendado en producción: impide rotar SECRET_KEY).
+FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY", default="")
+
+# Token Bearer para proteger /metrics fuera de DEBUG (vacío = endpoint cerrado).
+METRICS_TOKEN = env.str("METRICS_TOKEN", default="")
+
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
-DOMAIN_BASE = env.str("DOMAIN_BASE", default="notionapps.dev")
+DOMAIN_BASE = env.str("DOMAIN_BASE", default="localhost")
 FRONTEND_URL = env.str("FRONTEND_URL", default="http://localhost:3000")
 
 # Wagtail removed — CMS now uses MDX via Next.js frontend
@@ -40,7 +47,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    "allauth.socialaccount.providers.notion",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
     "waffle",
@@ -67,12 +73,11 @@ INSTALLED_APPS = [
     "billing",
     "multitenant",
     "oauth",
-    "integrations",
-] + optional_apps()
+    *optional_apps(),
+]
 
-# Silk profiler only in development
-if DEBUG:
-    INSTALLED_APPS.insert(-1, "silk")
+# Silk (profiler) se añade en dev.py — debe estar instalado si y solo si
+# DEBUG final es True (urls.py monta silk.urls según settings.DEBUG).
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -95,13 +100,6 @@ MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-# Silk middleware only in development
-if DEBUG:
-    MIDDLEWARE.insert(
-        MIDDLEWARE.index("django.middleware.gzip.GZipMiddleware") + 1,
-        "silk.middleware.SilkyMiddleware",
-    )
-
 AXES_ENABLED = env.bool("ENABLE_AXES", default=not DEBUG)
 
 ROOT_URLCONF = "config.urls"
@@ -128,7 +126,9 @@ ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {
     "default": dj_database_url.parse(
-        env.str("DATABASE_URL", default="postgresql://postgres:postgres@localhost:5432/notionapps"),
+        env.str(
+            "DATABASE_URL", default="postgresql://postgres:postgres@localhost:5432/proyecto_semilla"
+        ),
         conn_max_age=600,
     )
 }
@@ -148,7 +148,10 @@ AUTH_USER_MODEL = "core.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 10}},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 10},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
@@ -164,7 +167,6 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 
-
 # Email Configuration
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = env.str("EMAIL_HOST", default="mailpit")
@@ -172,8 +174,8 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=1025)
 EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="noreply@notionapps.dev")
-SERVER_EMAIL = env.str("SERVER_EMAIL", default="server@notionapps.dev")
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="noreply@localhost")
+SERVER_EMAIL = env.str("SERVER_EMAIL", default="server@localhost")
 
 ANYMAIL = {
     "SENDGRID_API_KEY": env.str("ANYMAIL_API_KEY", default=""),
@@ -185,7 +187,8 @@ SILKY_PYTHON_PROFILER = True
 SILKY_AUTHENTICATION = True  # User must be logged in
 SILKY_AUTHORISATION = True  # User must be staff
 
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+# "optional" en dev; producción la fuerza a "mandatory" (ver prod.py, env-overridable)
+ACCOUNT_EMAIL_VERIFICATION = env.str("ACCOUNT_EMAIL_VERIFICATION", default="optional")
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 LOGIN_REDIRECT_URL = "/"
@@ -193,7 +196,9 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = env.str("SESSION_COOKIE_SAMESITE", default="Lax")
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# cached_db: lectura rápida vía Redis con persistencia en Postgres.
+# Un Redis caído no debe invalidar todas las sesiones (IGNORE_EXCEPTIONS=True arriba).
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_CACHE_ALIAS = "default"
 CSRF_COOKIE_HTTPONLY = env.bool("CSRF_COOKIE_HTTPONLY", default=True)
 CSRF_COOKIE_SAMESITE = env.str("CSRF_COOKIE_SAMESITE", default="Lax")
@@ -217,7 +222,8 @@ MODELTRANSLATION_FALLBACK_LANGUAGES = ("en",)
 STATIC_URL = "/static/"
 STATIC_ROOT = ROOT_DIR / "staticfiles"
 STATICFILES_DIRS = [SRC_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# El storage de staticfiles se configura vía STORAGES (Django 5+); el antiguo
+# STATICFILES_STORAGE fue eliminado en Django 5.1.
 
 # Social Account Providers
 SOCIALACCOUNT_PROVIDERS = {
@@ -230,10 +236,6 @@ SOCIALACCOUNT_PROVIDERS = {
             "access_type": "online",
         },
     },
-    "notion": {  # Using generic OpenID/OAuth2 provider if specific notion provider is not available in allauth yet, or custom adapter
-        "SCOPE": ["public"],
-        "VERIFIED_EMAIL": True,
-    }
 }
 SOCIALACCOUNT_ADAPTER = "oauth.adapters.CustomSocialAccountAdapter"
 
@@ -246,7 +248,8 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "common.api.exceptions.custom_exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # JWT con binding al schema emisor (ver api.authentication)
+        "api.authentication.TenantJWTAuthentication",
         "api.authentication.ApiKeyAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
@@ -268,15 +271,17 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
 }
 
+PROJECT_NAME = env.str("PROJECT_NAME", default="Proyecto Semilla")
+
 SPECTACULAR_SETTINGS = {
-    "TITLE": "NotionApps API",
-    "DESCRIPTION": "Versioned DRF API for NotionApps.",
+    "TITLE": f"{PROJECT_NAME} API",
+    "DESCRIPTION": f"Versioned DRF API for {PROJECT_NAME}.",
     "VERSION": "v1",
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
 # JWT Authentication (stateless)
-from datetime import timedelta  # noqa: E402
+from datetime import timedelta
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
@@ -285,15 +290,20 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
+    # Clave dedicada para JWT: permite rotar SECRET_KEY sin invalidar tokens
+    # y evita que un default inseguro de SECRET_KEY firme tokens en prod.
+    "SIGNING_KEY": env.str("JWT_SIGNING_KEY", default=SECRET_KEY),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "TOKEN_OBTAIN_SERIALIZER": "api.serializers_auth.TenantTokenObtainPairSerializer",
 }
 
-CELERY_BROKER_URL = env.str("REDIS_URL", default="redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+# Broker de Celery separable del cache (por defecto comparte la URL de Redis).
+CELERY_BROKER_URL = env.str(
+    "CELERY_BROKER_URL", default=env.str("REDIS_URL", default="redis://localhost:6379/0")
+)
+CELERY_RESULT_BACKEND = env.str("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
 
 STORAGES = {
     "default": {
@@ -312,6 +322,13 @@ STORAGES = {
 
 SENTRY_DSN = env.str("SENTRY_DSN", default="")
 
+# Subidas de archivos del CMS (allowlist de extensiones + tamaño máximo)
+CMS_ALLOWED_UPLOAD_EXTENSIONS = env.list(
+    "CMS_ALLOWED_UPLOAD_EXTENSIONS",
+    default=["jpg", "jpeg", "png", "gif", "webp", "svg", "pdf", "mp4", "webm", "mp3"],
+)
+CMS_MAX_UPLOAD_SIZE_MB = env.int("CMS_MAX_UPLOAD_SIZE_MB", default=20)
+
 STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY", default="")
 STRIPE_WEBHOOK_SECRET = env.str("STRIPE_WEBHOOK_SECRET", default="")
 STRIPE_DEFAULT_CURRENCY = env.str("STRIPE_DEFAULT_CURRENCY", default="usd")
@@ -328,6 +345,9 @@ AXES_CACHE = "default"
 
 CONTENT_SECURITY_POLICY_REPORT_ONLY_ENABLED = env.bool("CSP_REPORT_ONLY", default=DEBUG)
 
+# NOTA: 'unsafe-inline' y los CDNs existen porque los templates Django
+# (allauth/base.html) aún cargan Tailwind/HTMX desde CDN. Endurecer esta CSP
+# requiere migrar esos templates a assets compilados (ver docs/auditoria).
 CONTENT_SECURITY_POLICY_DIRECTIVES = {
     "default-src": ("'self'",),
     "script-src": (
@@ -338,7 +358,12 @@ CONTENT_SECURITY_POLICY_DIRECTIVES = {
         "https://js.stripe.com",
         "https://cdn.jsdelivr.net",
     ),
-    "style-src": ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"),
+    "style-src": (
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://cdn.jsdelivr.net",
+    ),
     "font-src": ("'self'", "https://fonts.gstatic.com"),
     "img-src": ("'self'", "data:", "https://cdn.jsdelivr.net"),
     "connect-src": (
@@ -356,7 +381,6 @@ else:
 
 # Additional security headers (prod overrides allowed via env)
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = env.str("X_FRAME_OPTIONS", default="DENY")
 SECURE_REFERRER_POLICY = env.str("SECURE_REFERRER_POLICY", default="same-origin")
 
@@ -382,13 +406,9 @@ LOGGING = {
 }
 
 # Sentry (optional)
-SENTRY_ENVIRONMENT = env.str(
-    "SENTRY_ENVIRONMENT", default="dev" if DEBUG else "prod"
-)
+SENTRY_ENVIRONMENT = env.str("SENTRY_ENVIRONMENT", default="dev" if DEBUG else "prod")
 SENTRY_RELEASE = env.str("SENTRY_RELEASE", default="")
-SENTRY_TRACES_SAMPLE_RATE = env.float(
-    "SENTRY_TRACES_SAMPLE_RATE", default=0.0 if DEBUG else 0.1
-)
+SENTRY_TRACES_SAMPLE_RATE = env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0 if DEBUG else 0.1)
 
 if SENTRY_DSN:
     try:  # pragma: no cover
@@ -404,7 +424,5 @@ if SENTRY_DSN:
             send_default_pii=False,
             integrations=[DjangoIntegration(), CeleryIntegration()],
         )
-    except Exception:
+    except Exception:  # noqa: S110 — Sentry es opcional; no debe impedir el arranque
         pass
-
-MULTITENANT_MODE = MULTITENANT_MODE

@@ -13,7 +13,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--schema", dest="schema_name", help="Only migrate a given schema.")
-        parser.add_argument("--skip-public", action="store_true", help="Skip migrating public schema.")
+        parser.add_argument(
+            "--skip-public", action="store_true", help="Skip migrating public schema."
+        )
         parser.add_argument("--noinput", action="store_true")
 
     def handle(self, *args, **options):

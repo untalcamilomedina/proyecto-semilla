@@ -13,9 +13,18 @@ class SpaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Space
         fields = [
-            "id", "name", "slug", "description", "icon_emoji",
-            "is_active", "is_default", "is_public", "requires_level",
-            "position", "topic_count", "created_at",
+            "id",
+            "name",
+            "slug",
+            "description",
+            "icon_emoji",
+            "is_active",
+            "is_default",
+            "is_public",
+            "requires_level",
+            "position",
+            "topic_count",
+            "created_at",
         ]
         read_only_fields = ["slug", "created_at"]
 
@@ -25,21 +34,37 @@ class SpaceSerializer(serializers.ModelSerializer):
 
 class TopicListSerializer(serializers.ModelSerializer):
     """Lightweight topic serializer for listings."""
+
     author_name = serializers.SerializerMethodField()
     space_name = serializers.CharField(source="space.name", read_only=True)
 
     class Meta:
         model = Topic
         fields = [
-            "id", "space", "space_name", "title", "slug", "topic_type",
-            "is_pinned", "is_locked", "is_answered",
-            "reply_count", "like_count", "view_count",
-            "author", "author_name",
-            "created_at", "last_activity_at",
+            "id",
+            "space",
+            "space_name",
+            "title",
+            "slug",
+            "topic_type",
+            "is_pinned",
+            "is_locked",
+            "is_answered",
+            "reply_count",
+            "like_count",
+            "view_count",
+            "author",
+            "author_name",
+            "created_at",
+            "last_activity_at",
         ]
         read_only_fields = [
-            "slug", "reply_count", "like_count", "view_count",
-            "created_at", "last_activity_at",
+            "slug",
+            "reply_count",
+            "like_count",
+            "view_count",
+            "created_at",
+            "last_activity_at",
         ]
 
     def get_author_name(self, obj: Topic) -> str:
@@ -48,20 +73,38 @@ class TopicListSerializer(serializers.ModelSerializer):
 
 class TopicDetailSerializer(serializers.ModelSerializer):
     """Full topic serializer with MDX content."""
+
     author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Topic
         fields = [
-            "id", "space", "title", "slug", "content_mdx", "topic_type",
-            "is_pinned", "is_locked", "is_answered",
-            "reply_count", "like_count", "view_count",
-            "author", "author_name",
-            "created_at", "updated_at", "last_activity_at",
+            "id",
+            "space",
+            "title",
+            "slug",
+            "content_mdx",
+            "topic_type",
+            "is_pinned",
+            "is_locked",
+            "is_answered",
+            "reply_count",
+            "like_count",
+            "view_count",
+            "author",
+            "author_name",
+            "created_at",
+            "updated_at",
+            "last_activity_at",
         ]
         read_only_fields = [
-            "slug", "reply_count", "like_count", "view_count",
-            "created_at", "updated_at", "last_activity_at",
+            "slug",
+            "reply_count",
+            "like_count",
+            "view_count",
+            "created_at",
+            "updated_at",
+            "last_activity_at",
         ]
 
     def get_author_name(self, obj: Topic) -> str:
@@ -75,9 +118,17 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            "id", "topic", "author", "author_name", "parent",
-            "content", "like_count", "is_answer",
-            "reply_count", "created_at", "updated_at",
+            "id",
+            "topic",
+            "author",
+            "author_name",
+            "parent",
+            "content",
+            "like_count",
+            "is_answer",
+            "reply_count",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["author", "like_count", "created_at", "updated_at"]
 
@@ -119,14 +170,32 @@ class MemberProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberProfile
         fields = [
-            "id", "user", "user_email", "user_name", "bio", "avatar_url",
-            "points", "level", "level_name",
-            "topics_created", "posts_created", "likes_received", "likes_given",
-            "joined_community_at", "last_active_at",
+            "id",
+            "user",
+            "user_email",
+            "user_name",
+            "bio",
+            "avatar_url",
+            "points",
+            "level",
+            "level_name",
+            "topics_created",
+            "posts_created",
+            "likes_received",
+            "likes_given",
+            "joined_community_at",
+            "last_active_at",
         ]
         read_only_fields = [
-            "user", "points", "level", "topics_created", "posts_created",
-            "likes_received", "likes_given", "joined_community_at", "last_active_at",
+            "user",
+            "points",
+            "level",
+            "topics_created",
+            "posts_created",
+            "likes_received",
+            "likes_given",
+            "joined_community_at",
+            "last_active_at",
         ]
 
     def get_user_name(self, obj: MemberProfile) -> str:
@@ -135,6 +204,7 @@ class MemberProfileSerializer(serializers.ModelSerializer):
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     """Lightweight serializer for leaderboard display."""
+
     user_name = serializers.SerializerMethodField()
     level_name = serializers.ReadOnlyField()
 

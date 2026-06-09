@@ -1,6 +1,6 @@
-import pytest
 import uuid
 
+import pytest
 from django.db import connection
 from rest_framework.test import APIClient
 
@@ -460,4 +460,3 @@ def test_mcp_tool_requires_server():
     # Error may be in data directly or in data["details"]
     errors = res.data.get("details", res.data)
     assert "server" in errors
-

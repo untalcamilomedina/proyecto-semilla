@@ -37,7 +37,9 @@ class ApiKey(models.Model):
         self.save(update_fields=["last_used_at"])
 
     @classmethod
-    def generate(cls, *, organization, user, name: str, scopes: list[str] | None = None) -> tuple["ApiKey", str]:
+    def generate(
+        cls, *, organization, user, name: str, scopes: list[str] | None = None
+    ) -> tuple[ApiKey, str]:
         prefix = secrets.token_hex(4)
         secret = secrets.token_urlsafe(32)
         plain = f"ak_{prefix}_{secret}"
@@ -50,4 +52,3 @@ class ApiKey(models.Model):
             scopes=scopes or [],
         )
         return obj, plain
-

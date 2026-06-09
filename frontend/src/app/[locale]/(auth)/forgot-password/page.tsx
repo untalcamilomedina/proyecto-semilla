@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
     const [error, setError] = useState<string | null>(null);
 
     const resetSchema = z.object({
-        email: z.string().email(t("validation.invalidEmail" as any) || "Email inválido"),
+        email: z.string().email(t("validation.invalidEmail") || "Email inválido"),
     });
 
     type ResetForm = z.infer<typeof resetSchema>;

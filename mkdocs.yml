@@ -1,7 +1,7 @@
-site_name: Proyecto Semilla — Acme SaaS
-site_description: Boilerplate SaaS modular en Django.
-repo_name: proyecto-semilla
-repo_url: https://github.com/your-org/proyecto-semilla
+site_name: Proyecto Semilla
+site_description: Boilerplate SaaS multitenant, seguro y AI-first (Django 5 + Next.js).
+repo_name: untalcamilomedina/proyecto-semilla
+repo_url: https://github.com/untalcamilomedina/proyecto-semilla
 
 theme:
   name: material
@@ -19,10 +19,15 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Architecture: architecture.md
+  - API: api.md
+  - MCP: mcp.md
   - Multitenancy: multitenancy.md
   - RBAC: rbac.md
   - Billing: billing.md
   - Observability: observability.md
+  - Auditoría:
+      - auditoria/2026-06-informe-auditoria.md
+      - auditoria/PLAN-ESTABILIZACION.md
   - ADRs:
       - adr/0001-repo-root.md
       - adr/0002-tooling.md
@@ -34,5 +39,6 @@ nav:
       - adr/0013-frontend-nextjs.md
   - Runbooks:
       - runbooks/local-dev.md
+      - runbooks/operacion.md
       - runbooks/flyio.md
       - runbooks/migracion-frontend-nextjs.md

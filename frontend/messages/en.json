@@ -1,16 +1,376 @@
 {
-    "Metadata": {
-        "title": "Momentum TIC: Conversational AI Agents for Business"
+  "Metadata": {
+    "title": "Proyecto Semilla: Secure, AI-first multitenant SaaS boilerplate"
+  },
+  "Navigation": {
+    "about": "Who We Are",
+    "services": "Solutions",
+    "pricing": "Pricing",
+    "contact": "Contact"
+  },
+  "Hero": {
+    "title": "Launch your SaaS in days, not months",
+    "description": "Proyecto Semilla is a secure, AI-first multitenant SaaS boilerplate with authentication, roles, billing, and internationalization ready out of the box.",
+    "cta": "Get Started"
+  },
+  "About": {
+    "title": "About the Project",
+    "subtitle": "An open foundation for your next SaaS",
+    "description": "Proyecto Semilla is an open, production-ready starting point for building multitenant SaaS products. It ships with authentication, organizations, roles and permissions, Stripe billing, and AI-first tooling so you can focus on what makes your product unique."
+  },
+  "Services": {
+    "title": "What’s Included",
+    "items": {
+      "agents": {
+        "title": "AI-First Development",
+        "description": "Build faster with AI-assisted workflows and Model Context Protocol integration baked into the stack."
+      },
+      "labs": {
+        "title": "Multitenant Core",
+        "description": "Organizations, roles and permissions, Stripe billing, and audit logs ready out of the box."
+      }
+    }
+  },
+  "Process": {
+    "title": "How It Works",
+    "steps": [
+      {
+        "title": "Clone & Run",
+        "desc": "Clone the repository and bring the whole stack up with Docker in minutes."
+      },
+      {
+        "title": "Customize",
+        "desc": "Adjust branding, modules, and plans to match your product."
+      },
+      {
+        "title": "Launch",
+        "desc": "Deploy a secure, multitenant SaaS and start onboarding customers."
+      }
+    ]
+  },
+  "Pricing": {
+    "title": "Plans",
+    "items": {
+      "basic": {
+        "name": "Starter",
+        "price": "Free",
+        "features": [
+          "1 organization",
+          "Up to 5 members",
+          "Community support"
+        ]
+      },
+      "standard": {
+        "name": "Pro",
+        "price": "$29/mo",
+        "features": [
+          "Up to 50 members",
+          "All modules included",
+          "Priority support"
+        ]
+      },
+      "pro": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "features": [
+          "Unlimited members",
+          "Custom domain & SSO",
+          "Dedicated support"
+        ]
+      }
     },
     "Navigation": {
-        "about": "Who We Are",
-        "services": "Solutions",
-        "pricing": "Pricing",
-        "contact": "Contact"
-    },
-    "Hero": {
-        "title": "Intelligence in Motion for Your Business",
-        "description": "We design AI agents that interact naturally via text and voice, making technology feel closer, more human, and efficient.",
-        "cta": "Request Demo"
+      "contact": "Contact"
     }
+  },
+  "Team": {
+    "title": "The Team",
+    "members": [
+      {
+        "name": "Your Name",
+        "role": "Founder"
+      },
+      {
+        "name": "Teammate Name",
+        "role": "Engineer"
+      }
+    ]
+  },
+  "Footer": {
+    "contact": "hello@proyectosemilla.dev",
+    "copyright": "© Proyecto Semilla. All rights reserved."
+  },
+  "common": {
+    "user": "User",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "create": "Create",
+    "save": "Save",
+    "back": "Back",
+    "continue": "Continue",
+    "loading": "Loading...",
+    "export": "Export",
+    "table": {
+      "searchPlaceholder": "Search by email...",
+      "noResults": "No results found.",
+      "paginationInfo": "Page {current} of {total}"
+    }
+  },
+  "auth": {
+    "metaTitle": "Proyecto Semilla",
+    "metaDescription": "Sign in to your Proyecto Semilla workspace.",
+    "login": "Sign In",
+    "loginDescription": "Welcome back. Enter your credentials to access your account.",
+    "signup": "Create Account",
+    "signupDescription": "Start building with your free account.",
+    "createAccount": "Create Account",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "signupPasswordPlaceholder": "At least 8 characters",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Repeat your password",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don’t have an account?",
+    "register": "Sign up",
+    "haveAccount": "Already have an account?",
+    "invalidCredentials": "Invalid email or password.",
+    "connectionError": "Connection error. Please try again.",
+    "resetTitle": "Reset Password",
+    "resetDescription": "Enter your email and we will send you a link to reset your password.",
+    "emailSent": "If an account exists for that email, we have sent a reset link.",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to sign in",
+    "logout": "Log Out",
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "minChars": "At least {count} characters",
+      "passwordsMatch": "Passwords do not match"
+    },
+    "errors": {
+      "startError": "Could not create the account. Please try again."
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "roles": "Roles",
+    "billing": "Billing",
+    "auditLogs": "Audit Logs",
+    "apiKeys": "API Keys",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {name}",
+    "organization": "Organization",
+    "name": "Name",
+    "slug": "Slug",
+    "modules": "Modules",
+    "modulesActive": "{count} active",
+    "quickActions": "Quick Actions",
+    "inviteMembers": "Invite members",
+    "manageRoles": "Manage roles",
+    "viewBilling": "View billing",
+    "recentActivity": "Recent Activity",
+    "stats": {
+      "members": "Members",
+      "activeMembers": "Active Members",
+      "billing": "Monthly Billing",
+      "pendingInvites": "Pending Invites",
+      "roles": "Roles",
+      "usage": "Usage",
+      "plan": "Plan"
+    }
+  },
+  "members": {
+    "title": "Members",
+    "description": "Manage your organization’s members and invitations.",
+    "inviteButton": "Invite Members",
+    "inviteTitle": "Invite Members",
+    "inviteDescription": "Send email invitations to add people to your organization.",
+    "emails": "Emails",
+    "emailsPlaceholder": "Type an email and press Enter",
+    "emailsHint": "Press Enter or comma to add each email.",
+    "role": "Role",
+    "selectRole": "Select a role",
+    "roleOwner": "Owner",
+    "roleAdmin": "Admin",
+    "roleMember": "Member",
+    "invalidEmail": "Invalid email",
+    "duplicateEmail": "That email was already added",
+    "minOneEmail": "Add at least one email",
+    "inviteSuccess": "{count} invitations sent",
+    "errorInviting": "Could not send the invitations",
+    "name": "User",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "since": "Since",
+    "actions": "Actions",
+    "copyEmail": "Copy email",
+    "editRole": "Edit role",
+    "remove": "Remove"
+  },
+  "roles": {
+    "title": "Roles & Permissions",
+    "description": "Define what each member can do in your organization.",
+    "newRole": "New Role",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "createDescription": "Create a custom role with specific permissions.",
+    "editDescription": "Update this role’s details and permissions.",
+    "name": "Name",
+    "namePlaceholder": "e.g. Editor",
+    "roleDescription": "Description",
+    "descriptionPlaceholder": "What is this role for?",
+    "permissions": "Permissions",
+    "saveChanges": "Save Changes",
+    "noRoles": "No roles yet. Create the first one.",
+    "noDescription": "No description",
+    "system": "System",
+    "errorCreating": "Could not create the role",
+    "errorUpdating": "Could not update the role"
+  },
+  "billing": {
+    "title": "Billing",
+    "description": "Manage your subscription, plan, and usage.",
+    "loadingBilling": "Loading billing information...",
+    "checkoutError": "Could not start checkout. Please try again.",
+    "portalError": "Could not open the billing portal.",
+    "planLabel": "{plan} Plan",
+    "noSubscription": "No active subscription",
+    "noSubscriptionHint": "Choose a plan below to get started.",
+    "itemsUsed": "Items used",
+    "apiRequests": "API requests",
+    "manageSubscription": "Manage Subscription",
+    "portalDescription": "Update your payment method, download invoices, or change your plan from the secure portal.",
+    "openPortal": "Open Portal",
+    "availablePlans": "Available Plans",
+    "noPlans": "No plans available right now.",
+    "custom": "Custom",
+    "planItems": "{count} items included",
+    "planRequests": "{count} API requests",
+    "planSeats": "Up to {count} seats",
+    "currentPlan": "Current Plan",
+    "upgrade": "Upgrade"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account preferences.",
+    "profile": "Profile",
+    "security": "Security",
+    "notifications": "Notifications",
+    "personalInfo": "Personal Information",
+    "email": "Email",
+    "emailCannotChange": "Your email cannot be changed.",
+    "fullName": "Full name",
+    "saveChanges": "Save Changes",
+    "changePassword": "Change Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "updatePassword": "Update Password",
+    "notificationsComingSoon": "Notification preferences are coming soon."
+  },
+  "keys": {
+    "title": "API Keys",
+    "description": "Connect AI providers by storing your API keys securely.",
+    "addKey": "Add Key",
+    "addTitle": "Add API Key",
+    "addDescription": "The key is stored encrypted and will not be shown again.",
+    "name": "Name",
+    "namePlaceholder": "e.g. Production key",
+    "service": "Service",
+    "apiKey": "API Key",
+    "apiKeyPlaceholder": "sk-...",
+    "saveKey": "Save Key",
+    "loadingKeys": "Loading keys...",
+    "noKeys": "No API keys",
+    "noKeysDescription": "Add your first key to enable AI-powered features.",
+    "startsWith": "Starts with {prefix}...",
+    "confirmDelete": "Delete this API key? This action cannot be undone."
+  },
+  "audit": {
+    "title": "Audit Logs",
+    "description": "Track every important action in your organization.",
+    "actor": "User",
+    "action": "Action",
+    "target": "Target",
+    "date": "Date"
+  },
+  "onboarding": {
+    "errors": {
+      "connectionError": "Connection error. Please try again.",
+      "modulesError": "Could not save the selected modules.",
+      "stripeError": "Could not update the payments configuration.",
+      "domainError": "Could not save the domain.",
+      "inviteError": "Could not send the invitations."
+    },
+    "step2": {
+      "title": "Choose your modules",
+      "description": "Enable the features your organization needs.",
+      "modules": {
+        "cms": {
+          "label": "CMS",
+          "description": "Content management: pages, posts, and media."
+        },
+        "lms": {
+          "label": "LMS",
+          "description": "Online courses and learning paths."
+        },
+        "community": {
+          "label": "Community",
+          "description": "Forums, discussions, and member spaces."
+        },
+        "mcp": {
+          "label": "MCP",
+          "description": "AI integration via the Model Context Protocol."
+        }
+      },
+      "changeLater": "You can enable or disable modules later in Settings."
+    },
+    "step3": {
+      "title": "Set up payments",
+      "description": "Connect Stripe to charge your customers.",
+      "connectDescription": "By connecting Stripe you can accept payments, manage subscriptions, and track revenue from your dashboard. You can also do this later.",
+      "connect": "Connect Stripe",
+      "skipForNow": "Skip for now"
+    },
+    "step4": {
+      "title": "Custom domain",
+      "description": "Use your own domain for your workspace.",
+      "leaveEmpty": "Leave it empty to keep using your default subdomain.",
+      "customDomainPlaceholder": "app.yourdomain.com",
+      "skipForNow": "Skip for now"
+    },
+    "step5": {
+      "title": "Invite your team",
+      "description": "Add teammates so you can collaborate from day one.",
+      "memberEmails": "Member emails",
+      "emailsPlaceholder": "ana@company.com, luis@company.com",
+      "emailsHint": "Separate multiple emails with commas or line breaks.",
+      "invitationNotice": "Each person will receive an email invitation to join your organization.",
+      "skipForNow": "Skip for now",
+      "sending": "Sending...",
+      "sendInvitations": "Send invitations"
+    },
+    "step6": {
+      "title": "All set!",
+      "description": "Your organization is configured and ready to go.",
+      "nextSteps": "Next steps",
+      "exploreDashboard": "Explore your dashboard",
+      "configureRoles": "Fine-tune roles and permissions",
+      "inviteMore": "Invite more teammates",
+      "customizePlan": "Review your plan and billing",
+      "stepCompleted": "Completed",
+      "orgCreated": "Organization created",
+      "modulesConfigured": "Modules configured",
+      "domainAssigned": "Domain assigned",
+      "teamInvited": "Team invited",
+      "goToDashboard": "Go to dashboard",
+      "accessSettings": "You can revisit any of these settings later from your dashboard."
+    }
+  }
 }

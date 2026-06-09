@@ -46,7 +46,8 @@ class Course(models.Model):
     slug = models.SlugField(max_length=255)
     description = models.TextField(blank=True, default="")
     description_mdx = models.TextField(
-        blank=True, default="",
+        blank=True,
+        default="",
         help_text="Rich course description in MDX format",
     )
     thumbnail_url = models.URLField(blank=True, default="")
@@ -227,9 +228,7 @@ class LessonProgress(models.Model):
     enrollment = models.ForeignKey(
         Enrollment, on_delete=models.CASCADE, related_name="lesson_progress"
     )
-    lesson = models.ForeignKey(
-        Lesson, on_delete=models.CASCADE, related_name="lesson_progress"
-    )
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="lesson_progress")
     completed_at = models.DateTimeField(blank=True, null=True)
     time_spent_seconds = models.PositiveIntegerField(default=0)
 

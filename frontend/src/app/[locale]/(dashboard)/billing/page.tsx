@@ -1,57 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CreditCard, CheckCircle } from "lucide-react";
-import { apiGet } from "@/lib/api";
+import { CreditCard, CheckCircle, ExternalLink, Loader2 } from "lucide-react";
+import { apiPost } from "@/lib/api";
+import { useResourceQuery } from "@/hooks/use-api";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
+
+interface PlanPrice {
+    id: number;
+    currency: string;
+    amount: string;
+    interval: string;
+    interval_count: number;
+    is_active: boolean;
+}
+
+interface Plan {
+    id: number;
+    code: string;
+    name: string;
+    description: string;
+    seat_limit: number | null;
+    max_items: number;
+    max_requests: number;
+    trial_days: number;
+    prices: PlanPrice[];
+}
 
 interface SubscriptionData {
-    plan_code: string;
+    id: number;
+    plan: Plan;
     status: string;
-    diagrams_used: number;
-    diagrams_limit: number;
-    requests_used: number;
-    requests_limit: number;
+    quantity: number;
+    cancel_at_period_end: boolean;
+    current_period_end: string | null;
+    trial_end: string | null;
+    usage?: {
+        items_used: number;
+        max_items: number;
+        requests_used: number;
+        max_requests: number;
+    };
+}
+
+interface PaginatedPlans {
+    results: Plan[];
 }
 
 export default function BillingPage() {
     const t = useTranslations("billing");
-    const tc = useTranslations("common");
-    const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [redirecting, setRedirecting] = useState(false);
 
-    useEffect(() => {
-        const fetchBilling = async () => {
-            try {
-                const data = await apiGet<SubscriptionData>("/api/v1/billing/subscription/");
-                setSubscription(data);
-            } catch (error) {
-                console.error("Failed to load billing", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchBilling();
-    }, []);
+    const { data: subscription, isLoading: subLoading, error: subError } = useResourceQuery<SubscriptionData>(
+        ["billing", "subscription"],
+        "/api/v1/subscriptions/current/"
+    );
+    const { data: plansData, isLoading: plansLoading } = useResourceQuery<PaginatedPlans>(
+        ["billing", "plans"],
+        "/api/v1/plans/"
+    );
 
-    const handleUpgrade = (plan: string) => {
-        // TODO: Integrate with Stripe checkout
-        console.log(`Upgrade to ${plan}`);
+    const handleCheckout = async (priceId: number) => {
+        setRedirecting(true);
+        try {
+            const { url } = await apiPost<{ url: string }>("/api/v1/subscriptions/checkout/", {
+                price_id: priceId,
+            });
+            window.location.href = url;
+        } catch {
+            toast.error(t("checkoutError"));
+            setRedirecting(false);
+        }
     };
 
-    if (loading) {
+    const handlePortal = async () => {
+        setRedirecting(true);
+        try {
+            const { url } = await apiPost<{ url: string }>("/api/v1/subscriptions/portal/");
+            window.location.href = url;
+        } catch {
+            toast.error(t("portalError"));
+            setRedirecting(false);
+        }
+    };
+
+    if (subLoading || plansLoading) {
         return <div className="p-8 text-foreground">{t("loadingBilling")}</div>;
     }
 
-    if (!subscription) {
-        return <div className="p-8 text-error-text">{t("failedToLoad")}</div>;
-    }
-
-    const diagramsPercent = Math.min((subscription.diagrams_used / subscription.diagrams_limit) * 100, 100);
-    const requestsPercent = (subscription.requests_used / subscription.requests_limit) * 100;
+    const usage = subscription?.usage;
+    const itemsPercent = usage && usage.max_items > 0
+        ? Math.min((usage.items_used / usage.max_items) * 100, 100)
+        : 0;
+    const requestsPercent = usage && usage.max_requests > 0
+        ? Math.min((usage.requests_used / usage.max_requests) * 100, 100)
+        : 0;
+    const plans = plansData?.results ?? [];
 
     return (
         <div className="container max-w-5xl py-10 space-y-10">
@@ -68,88 +116,117 @@ export default function BillingPage() {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-foreground uppercase tracking-wider">
-                                {t("planLabel", { plan: subscription.plan_code.toUpperCase() })}
+                                {subscription
+                                    ? t("planLabel", { plan: subscription.plan.name })
+                                    : t("noSubscription")}
                             </h2>
-                            <div className="flex items-center gap-2 text-sm text-success-text mt-1">
-                                <CheckCircle className="w-4 h-4" />
-                                <span className="uppercase">{t(`status.${subscription.status}`)}</span>
-                            </div>
+                            {subscription && (
+                                <div className="flex items-center gap-2 text-sm text-success-text mt-1">
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span className="uppercase">{subscription.status}</span>
+                                </div>
+                            )}
+                            {subError != null && !subscription && (
+                                <p className="text-sm text-text-subtle mt-1">{t("noSubscriptionHint")}</p>
+                            )}
                         </div>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-text-subtle">{t("diagramsUsed")}</span>
-                                <span className="text-foreground font-mono">{subscription.diagrams_used} / {subscription.diagrams_limit}</span>
+                    {usage && (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-text-subtle">{t("itemsUsed")}</span>
+                                    <span className="text-foreground font-mono">{usage.items_used} / {usage.max_items}</span>
+                                </div>
+                                <Progress value={itemsPercent} className="h-2" />
                             </div>
-                            <Progress value={diagramsPercent} className="h-2" />
-                        </div>
-                        <div className="space-y-2">
-                             <div className="flex justify-between text-sm">
-                                <span className="text-text-subtle">{t("aiRequests")}</span>
-                                <span className="text-foreground font-mono">{subscription.requests_used} / {subscription.requests_limit}</span>
+                            <div className="space-y-2">
+                                 <div className="flex justify-between text-sm">
+                                    <span className="text-text-subtle">{t("apiRequests")}</span>
+                                    <span className="text-foreground font-mono">{usage.requests_used} / {usage.max_requests}</span>
+                                </div>
+                                <Progress value={requestsPercent} className="h-2" />
                             </div>
-                            <Progress value={requestsPercent} className="h-2" />
                         </div>
-                    </div>
+                    )}
                 </GlassCard>
 
                 <GlassCard className="flex flex-col justify-center items-center text-center space-y-4 bg-gradient-to-br from-glass-bg to-purple-500/5">
-                     <h2 className="text-2xl font-bold text-foreground">{t("needMorePower")}</h2>
+                     <h2 className="text-2xl font-bold text-foreground">{t("manageSubscription")}</h2>
                      <p className="text-text-subtle max-w-xs">
-                        {t("upgradeDescription")}
+                        {t("portalDescription")}
                      </p>
                      <Button
                         className="bg-purple-500 hover:bg-purple-600 text-foreground px-8"
-                        onClick={() => handleUpgrade('pro')}
+                        onClick={handlePortal}
+                        disabled={redirecting || !subscription}
                     >
-                        {t("upgradeNow")}
+                        {redirecting
+                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                            : <span className="flex items-center gap-2">{t("openPortal")} <ExternalLink className="w-4 h-4" /></span>}
                      </Button>
                 </GlassCard>
             </div>
 
             <h2 className="text-2xl font-bold text-foreground">{t("availablePlans")}</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-                 <GlassCard className="border-t-4 border-t-gray-500 flex flex-col gap-4">
-                     <div>
-                        <h3 className="text-xl font-bold">{t("free")}</h3>
-                        <div className="text-3xl font-bold mt-2">$0<span className="text-sm font-normal text-text-secondary">{t("perMonth")}</span></div>
-                     </div>
-                     <ul className="space-y-2 text-sm text-text-subtle flex-1">
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-success-text"/> {t("features.diagrams5")}</li>
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-success-text"/> {t("features.basicAI")}</li>
-                     </ul>
-                     <Button variant="outline" disabled className="w-full border-glass-border text-text-secondary">{t("currentPlan")}</Button>
-                 </GlassCard>
-
-                 <GlassCard className="border-t-4 border-t-purple-500 bg-purple-500/5 flex flex-col gap-4 relative">
-                     <div className="absolute top-0 right-0 p-2 text-xs bg-purple-500 text-white font-bold rounded-bl-xl">{t("popular")}</div>
-                     <div>
-                        <h3 className="text-xl font-bold text-purple-400">{t("pro")}</h3>
-                        <div className="text-3xl font-bold mt-2">$29<span className="text-sm font-normal text-text-secondary">{t("perMonth")}</span></div>
-                     </div>
-                     <ul className="space-y-2 text-sm text-text-subtle flex-1">
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-purple-400"/> {t("features.unlimitedDiagrams")}</li>
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-purple-400"/> {t("features.advancedAI")}</li>
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-purple-400"/> {t("features.prioritySupport")}</li>
-                     </ul>
-                     <Button className="w-full bg-purple-500 hover:bg-purple-600" onClick={() => handleUpgrade('pro')}>{t("upgrade")}</Button>
-                 </GlassCard>
-
-                 <GlassCard className="border-t-4 border-t-blue-500 flex flex-col gap-4">
-                     <div>
-                        <h3 className="text-xl font-bold text-blue-400">{t("enterprise")}</h3>
-                        <div className="text-3xl font-bold mt-2">{t("custom")}</div>
-                     </div>
-                     <ul className="space-y-2 text-sm text-text-subtle flex-1">
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-blue-400"/> {t("features.sso")}</li>
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-blue-400"/> {t("features.customModels")}</li>
-                        <li className="flex gap-2"><CheckCircle className="w-4 h-4 text-blue-400"/> {t("features.sla")}</li>
-                     </ul>
-                     <Button variant="outline" className="w-full border-glass-border hover:bg-glass-bg-hover" onClick={() => handleUpgrade('enterprise')}>{t("contactSales")}</Button>
-                 </GlassCard>
-            </div>
+            {plans.length === 0 ? (
+                <GlassCard className="p-8 text-center text-text-subtle">
+                    {t("noPlans")}
+                </GlassCard>
+            ) : (
+                <div className="grid md:grid-cols-3 gap-6">
+                    {plans.map((plan) => {
+                        const price = plan.prices.find((p) => p.is_active);
+                        const isCurrent = subscription?.plan.code === plan.code;
+                        return (
+                            <GlassCard key={plan.id} className="border-t-4 border-t-purple-500 flex flex-col gap-4">
+                                <div>
+                                    <h3 className="text-xl font-bold">{plan.name}</h3>
+                                    <div className="text-3xl font-bold mt-2">
+                                        {price ? `$${price.amount}` : t("custom")}
+                                        {price && (
+                                            <span className="text-sm font-normal text-text-secondary">
+                                                /{price.interval}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <ul className="space-y-2 text-sm text-text-subtle flex-1">
+                                    {plan.description && <li>{plan.description}</li>}
+                                    <li className="flex gap-2">
+                                        <CheckCircle className="w-4 h-4 text-success-text"/>
+                                        {t("planItems", { count: plan.max_items })}
+                                    </li>
+                                    <li className="flex gap-2">
+                                        <CheckCircle className="w-4 h-4 text-success-text"/>
+                                        {t("planRequests", { count: plan.max_requests })}
+                                    </li>
+                                    {plan.seat_limit != null && (
+                                        <li className="flex gap-2">
+                                            <CheckCircle className="w-4 h-4 text-success-text"/>
+                                            {t("planSeats", { count: plan.seat_limit })}
+                                        </li>
+                                    )}
+                                </ul>
+                                {isCurrent ? (
+                                    <Button variant="outline" disabled className="w-full border-glass-border text-text-secondary">
+                                        {t("currentPlan")}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="w-full bg-purple-500 hover:bg-purple-600"
+                                        disabled={!price || redirecting}
+                                        onClick={() => price && handleCheckout(price.id)}
+                                    >
+                                        {t("upgrade")}
+                                    </Button>
+                                )}
+                            </GlassCard>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }

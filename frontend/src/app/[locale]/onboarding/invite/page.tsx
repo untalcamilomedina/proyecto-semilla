@@ -59,7 +59,7 @@ export default function OnboardingInvitePage() {
         try {
             await apiPost("/onboarding/invite/", { emails: [] });
             router.push("/onboarding/done");
-        } catch (err) {
+        } catch {
             router.push("/onboarding/done");
         }
     };

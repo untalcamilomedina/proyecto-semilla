@@ -27,4 +27,3 @@ def role_permissions_changed(sender, instance: Role, action: str, **kwargs):
         action=RoleAuditLog.Action.PERMS_CHANGED,
         after=_export_role(instance),
     )
-

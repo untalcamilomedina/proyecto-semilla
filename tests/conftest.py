@@ -54,7 +54,7 @@ def admin_user(db) -> User:
 
 
 @pytest.fixture
-def tenant(db) -> "Tenant":
+def tenant(db) -> Tenant:
     """Create and return a test tenant."""
     from multitenant.models import Tenant
 
@@ -64,15 +64,15 @@ def tenant(db) -> "Tenant":
         schema_name="test_org",
     )
     # Create schema if using schema-based multitenancy
-    try:
+    import contextlib
+
+    with contextlib.suppress(Exception):  # schema may already exist
         tenant.create_schema(check_if_exists=True)
-    except Exception:
-        pass  # Schema might already exist or not be needed
     return tenant
 
 
 @pytest.fixture
-def owner_role(db, tenant: "Tenant") -> "Role":
+def owner_role(db, tenant: Tenant) -> Role:
     """Create and return the owner role for the tenant."""
     from core.models import Role
 
@@ -90,7 +90,7 @@ def owner_role(db, tenant: "Tenant") -> "Role":
 
 
 @pytest.fixture
-def member_role(db, tenant: "Tenant") -> "Role":
+def member_role(db, tenant: Tenant) -> Role:
     """Create and return the member role for the tenant."""
     from core.models import Role
 
@@ -108,7 +108,7 @@ def member_role(db, tenant: "Tenant") -> "Role":
 
 
 @pytest.fixture
-def owner_membership(db, user: User, tenant: "Tenant", owner_role: "Role") -> "Membership":
+def owner_membership(db, user: User, tenant: Tenant, owner_role: Role) -> Membership:
     """Create and return an owner membership for the test user."""
     from core.models import Membership
 
@@ -121,7 +121,7 @@ def owner_membership(db, user: User, tenant: "Tenant", owner_role: "Role") -> "M
 
 
 @pytest.fixture
-def member_membership(db, tenant: "Tenant", member_role: "Role") -> "Membership":
+def member_membership(db, tenant: Tenant, member_role: Role) -> Membership:
     """Create a member user with membership."""
     from core.models import Membership
 
@@ -150,8 +150,8 @@ def authenticated_client(api_client: APIClient, user: User) -> APIClient:
 def tenant_client(
     api_client: APIClient,
     user: User,
-    tenant: "Tenant",
-    owner_membership: "Membership",
+    tenant: Tenant,
+    owner_membership: Membership,
 ) -> APIClient:
     """Return an authenticated API client with tenant context.
 

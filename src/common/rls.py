@@ -70,19 +70,21 @@ def enable_rls_sql() -> list[str]:
     statements = []
     for table in TENANT_SCOPED_TABLES:
         fk_col = get_fk_column(table)
-        statements.extend([
-            f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;",
-            f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;",
-            # Policy: tenant isolation
-            f"DROP POLICY IF EXISTS tenant_isolation ON {table};",
-            f"""CREATE POLICY tenant_isolation ON {table}
+        statements.extend(
+            [
+                f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;",
+                f"ALTER TABLE {table} FORCE ROW LEVEL SECURITY;",
+                # Policy: tenant isolation
+                f"DROP POLICY IF EXISTS tenant_isolation ON {table};",
+                f"""CREATE POLICY tenant_isolation ON {table}
                 USING ({fk_col}::text = current_setting('app.tenant_id', true))
                 WITH CHECK ({fk_col}::text = current_setting('app.tenant_id', true));""",
-            # Policy: superuser bypass
-            f"DROP POLICY IF EXISTS superuser_bypass ON {table};",
-            f"""CREATE POLICY superuser_bypass ON {table}
+                # Policy: superuser bypass
+                f"DROP POLICY IF EXISTS superuser_bypass ON {table};",
+                f"""CREATE POLICY superuser_bypass ON {table}
                 USING (current_setting('app.rls_bypass', true) = 'true');""",
-        ])
+            ]
+        )
     return statements
 
 
@@ -90,11 +92,13 @@ def disable_rls_sql() -> list[str]:
     """Generate SQL statements to disable RLS (for rollback)."""
     statements = []
     for table in TENANT_SCOPED_TABLES:
-        statements.extend([
-            f"DROP POLICY IF EXISTS tenant_isolation ON {table};",
-            f"DROP POLICY IF EXISTS superuser_bypass ON {table};",
-            f"ALTER TABLE {table} DISABLE ROW LEVEL SECURITY;",
-        ])
+        statements.extend(
+            [
+                f"DROP POLICY IF EXISTS tenant_isolation ON {table};",
+                f"DROP POLICY IF EXISTS superuser_bypass ON {table};",
+                f"ALTER TABLE {table} DISABLE ROW LEVEL SECURITY;",
+            ]
+        )
     return statements
 
 

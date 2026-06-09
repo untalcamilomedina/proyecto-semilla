@@ -2,11 +2,8 @@
 
 import { useTransition, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
-import { Loader2, Mail, Plus, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,14 +21,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { memberService } from "@/services/members";
-
-const formSchema = z.object({
-    emails: z.array(z.string().email()).min(1, "Debes agregar al menos un email"),
-    role: z.string().min(1, "Selecciona un rol"),
-});
 
 interface InviteMemberModalProps {
     open: boolean;
@@ -47,7 +38,12 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
 
     const [role, setRole] = useState("member");
 
-    const handleAddEmail = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent) => {
+    const handleAddEmail = (
+        e:
+            | React.KeyboardEvent<HTMLInputElement>
+            | React.MouseEvent
+            | React.FocusEvent<HTMLInputElement>,
+    ) => {
         if ('key' in e) {
             if (e.key !== "Enter" && e.key !== ",") return;
         }
@@ -124,7 +120,7 @@ export function InviteMemberModal({ open, onOpenChange }: InviteMemberModalProps
                                 onChange={(e) => setCurrentEmail(e.target.value)}
                                 onKeyDown={handleAddEmail}
                                 onBlur={(e) => {
-                                    if(currentEmail) handleAddEmail(e as any)
+                                    if(currentEmail) handleAddEmail(e)
                                 }}
                             />
                         </div>

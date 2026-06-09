@@ -9,7 +9,15 @@ from community.models import MemberProfile, Post, Reaction, Space, Topic
 
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):
-    list_display = ["name", "slug", "icon_emoji", "is_active", "is_public", "position", "organization"]
+    list_display = [
+        "name",
+        "slug",
+        "icon_emoji",
+        "is_active",
+        "is_public",
+        "position",
+        "organization",
+    ]
     list_filter = ["organization", "is_active", "is_public"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
@@ -17,7 +25,16 @@ class SpaceAdmin(admin.ModelAdmin):
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ["title", "space", "topic_type", "author", "reply_count", "like_count", "is_pinned", "created_at"]
+    list_display = [
+        "title",
+        "space",
+        "topic_type",
+        "author",
+        "reply_count",
+        "like_count",
+        "is_pinned",
+        "created_at",
+    ]
     list_filter = ["organization", "space", "topic_type", "is_pinned", "is_answered"]
     search_fields = ["title"]
     raw_id_fields = ["author", "organization"]

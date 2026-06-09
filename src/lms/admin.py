@@ -10,8 +10,15 @@ from lms.models import Certificate, Course, Enrollment, Lesson, LessonProgress, 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = [
-        "title", "slug", "status", "pricing_type", "price",
-        "level", "instructor", "is_featured", "published_at",
+        "title",
+        "slug",
+        "status",
+        "pricing_type",
+        "price",
+        "level",
+        "instructor",
+        "is_featured",
+        "published_at",
     ]
     list_filter = ["organization", "status", "pricing_type", "level", "is_featured"]
     search_fields = ["title", "description"]
@@ -30,8 +37,14 @@ class SectionAdmin(admin.ModelAdmin):
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     list_display = [
-        "title", "course", "section", "order", "content_type",
-        "duration_minutes", "is_preview", "is_published",
+        "title",
+        "course",
+        "section",
+        "order",
+        "content_type",
+        "duration_minutes",
+        "is_preview",
+        "is_published",
     ]
     list_filter = ["organization", "content_type", "is_preview", "is_published"]
     search_fields = ["title"]

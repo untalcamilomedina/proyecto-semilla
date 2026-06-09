@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { apiGet, clearCsrfToken } from "@/lib/api";
+import { apiGet, clearCsrfToken, logout as apiLogout } from "@/lib/api";
 import type { User, Tenant } from "@/types";
 
 interface AuthState {
@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             // Use Django's built-in auth check endpoint
             const data = await apiGet<{ user: User; is_authenticated: boolean }>(
-                "/me/"
+                "/api/v1/me/"
             );
             if (data.is_authenticated && data.user) {
                 set({ user: data.user, isAuthenticated: true, isLoading: false });
@@ -46,7 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     loadTenant: async () => {
         try {
-            const tenant = await apiGet<Tenant>("/tenant/");
+            const tenant = await apiGet<Tenant>("/api/v1/tenant/");
             set({ tenant });
         } catch {
             set({ tenant: null });
@@ -55,14 +55,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     logout: async () => {
         set({ isLoading: true });
-        try {
-            await fetch("/logout/", {
-                method: "POST",
-                credentials: "include",
-            });
-        } catch {
-            // Ignore logout errors
-        }
+        // apiLogout invalida sesión + blacklistea el refresh token (JWT y CSRF incluidos).
+        await apiLogout();
         clearCsrfToken();
         set({
             user: null,

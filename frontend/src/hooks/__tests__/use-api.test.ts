@@ -44,8 +44,8 @@ describe("usePaginatedQuery", () => {
     it("fetches paginated data", async () => {
         const { result } = renderHook(
             () => usePaginatedQuery<{ id: string; name: string }>(
-                ["diagrams"],
-                "/api/v1/diagrams/"
+                ["roles"],
+                "/api/v1/roles/"
             ),
             { wrapper: createWrapper() }
         );
@@ -53,7 +53,7 @@ describe("usePaginatedQuery", () => {
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
         expect(result.current.data?.results).toHaveLength(1);
-        expect(result.current.data?.results[0].name).toBe("Test Diagram");
+        expect(result.current.data?.results[0].name).toBe("Test Role");
     });
 });
 
@@ -61,13 +61,13 @@ describe("useDeleteMutation", () => {
     it("accepts dynamic path function", async () => {
         const { result } = renderHook(
             () => useDeleteMutation(
-                (id: string) => `/api/v1/diagrams/${id}/`,
-                [["diagrams"]]
+                (id: string) => `/api/v1/roles/${id}/`,
+                [["roles"]]
             ),
             { wrapper: createWrapper() }
         );
 
-        result.current.mutate("d1");
+        result.current.mutate("r1");
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });
