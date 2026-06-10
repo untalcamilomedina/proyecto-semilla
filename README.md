@@ -1,5 +1,6 @@
 # 🌱 Proyecto Semilla
 
+[![CI](https://github.com/untalcamilomedina/proyecto-semilla/actions/workflows/ci.yml/badge.svg)](https://github.com/untalcamilomedina/proyecto-semilla/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.15.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-5.x-green.svg)](https://www.djangoproject.com/)

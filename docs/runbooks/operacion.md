@@ -132,3 +132,39 @@ en orden de recomendación:
    pushear o mientras no haya cuota. Los agentes de IA lo tienen vía MCP.
 5. **`act`** (github.com/nektos/act): ejecuta los workflows reales de
    `.github/workflows/` en Docker local — útil para depurar el propio CI.
+
+## Checklist de repo público — PRE-VUELO (completar ANTES de cambiar visibilidad)
+
+> Lección aprendida (2026-06): los workflows invocables (`@claude`) deben
+> blindarse ANTES de publicar, no después. Un repo público permite a cualquiera
+> abrir issues y disparar workflows: el orden correcto es este checklist →
+> merge → recién entonces Settings → Change visibility.
+
+0. **Workflows invocables blindados**: todo workflow disparable por comentarios
+   o issues debe filtrar por `author_association` (OWNER/MEMBER/COLLABORATOR).
+   Ya aplicado en `claude.yml` — replica el patrón en cualquier workflow nuevo.
+
+En GitHub → Settings del repo (5 minutos, en este orden):
+
+1. **Code security** → activa **Secret scanning** + **Push protection** +
+   **Dependabot alerts** (gratis en repos públicos). Push protection bloquea
+   commits con credenciales ANTES de que lleguen al historial.
+2. **Branches → Add branch ruleset** para `main`: ✅ Require a pull request
+   before merging · ✅ Require status checks to pass — selecciona:
+   `lint (3.12)`, `test (3.12)`, `security-audit`, `frontend`, `deploy-smoke`,
+   `docker-build` · ✅ Block force pushes. (El check `test (3.13)` solo existe
+   en push a main: NO lo marques como requerido en PRs.)
+3. **Actions → General**: Workflow permissions = **Read repository contents**
+   (los workflows que necesitan más ya lo declaran explícitamente).
+4. **General**: añade description y topics (`django`, `nextjs`, `saas`,
+   `boilerplate`, `multitenant`, `ai-first`, `mcp`) — es tu SEO en GitHub.
+   Activa **Discussions** (los issue templates ya enlazan ahí) y, si quieres
+   que cualquiera arranque su SaaS con un clic, marca **Template repository**.
+5. **Regla permanente**: JAMÁS registres un self-hosted runner en este repo
+   ahora que es público (los PRs de forks ejecutarían código en tu máquina).
+
+Notas de seguridad ya aplicadas en el código para el modo público:
+- `claude.yml` solo responde a OWNER/MEMBER/COLLABORATOR (sin esto, cualquier
+  persona podría gastar tu API key o intentar prompt injection).
+- Ningún workflow usa `pull_request_target` ni self-hosted runners.
+- Historial auditado: cero secretos (los env reales nunca se commitearon).

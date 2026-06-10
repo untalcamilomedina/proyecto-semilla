@@ -1,6 +1,10 @@
 # Desarrollo asistido por IA: menciona @claude en un issue/PR para invocar al agente.
 # Requiere el secret ANTHROPIC_API_KEY (o instalar la GitHub App de Claude).
 # Docs: https://code.claude.com/docs/en/github-actions
+#
+# SEGURIDAD (repo público): solo OWNER/MEMBER/COLLABORATOR pueden invocarlo.
+# Sin este gate, cualquier persona podría gastar tus créditos de API o intentar
+# prompt injection con permisos de escritura.
 name: Claude
 
 on:
@@ -14,12 +18,26 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   claude:
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      (
+        github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      ) || (
+        github.event_name == 'pull_request_review_comment' &&
+        contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      ) || (
+        github.event_name == 'issues' &&
+        contains(github.event.issue.body, '@claude') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: write
