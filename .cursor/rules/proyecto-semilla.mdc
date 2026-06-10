@@ -1,0 +1,18 @@
+---
+description: Reglas de Proyecto Semilla (guía canónica en AGENTS.md)
+alwaysApply: true
+---
+
+Lee `AGENTS.md` en la raíz: es la guía canónica para agentes (arquitectura,
+comandos, convenciones). Reglas no negociables:
+
+1. Todo viewset multitenant exige membresía (`IsTenantMember`/`PolicyPermission`);
+   nunca `IsAuthenticated` a secas en recursos de tenant.
+2. Querysets scopeados por `organization=request_tenant(self.request)`.
+3. Secretos solo por env; campos sensibles con `common.encryption.EncryptedCharField`.
+4. Cierre de tarea = `make lint && make typecheck && make test` (+
+   `make frontend-test` si tocaste frontend) en verde.
+5. Comentarios/docs en español; identificadores en inglés. i18n en es/en/pt.
+
+Procedimientos: `.claude/skills/*/SKILL.md` (markdown plano). Tools MCP del
+proyecto: `scripts/mcp/seed_server.py` (ver `.mcp.json`).

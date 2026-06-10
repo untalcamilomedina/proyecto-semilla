@@ -18,3 +18,5 @@ django-stubs>=5.0
 ipython>=8.26
 mkdocs>=1.6
 mkdocs-material>=9.5
+# SDK oficial de MCP — servidor del arnés (scripts/mcp/seed_server.py)
+mcp>=1.2,<2.0
