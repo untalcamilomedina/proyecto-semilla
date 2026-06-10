@@ -92,7 +92,7 @@ strict_optional = true
 # Plan: eliminarlos módulo a módulo (ver docs/auditoria/PLAN-ESTABILIZACION.md
 # Fase 3). El código nuevo debe pasar mypy SIN añadir entradas aquí.
 [[tool.mypy.overrides]]
-module = ["lms.*", "community.*", "mcp.*"]
+module = ["lms.*", "community.*", "mcp_registry.*"]
 disable_error_code = ["attr-defined", "dict-item"]
 
 [[tool.mypy.overrides]]
