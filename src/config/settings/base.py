@@ -24,6 +24,8 @@ FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY", default="")
 # Token Bearer para proteger /metrics fuera de DEBUG (vacío = endpoint cerrado).
 METRICS_TOKEN = env.str("METRICS_TOKEN", default="")
 
+PROJECT_NAME = env.str("PROJECT_NAME", default="Proyecto Semilla")
+
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 DOMAIN_BASE = env.str("DOMAIN_BASE", default="localhost")
@@ -47,9 +49,9 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    "allauth.mfa",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
-    "waffle",
     "rest_framework",
     "django_filters",
     "drf_spectacular",
@@ -89,6 +91,9 @@ MIDDLEWARE = [
 if MULTITENANT_MODE == "schema":
     MIDDLEWARE.append("multitenant.middleware.TenantMiddleware")
 MIDDLEWARE += [
+    # Correlación request_id+tenant en logs y header X-Request-ID
+    # (tras TenantMiddleware: necesita request.tenant resuelto).
+    "common.request_context.RequestContextMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "common.middleware.MetricsMiddleware",
     "django.middleware.gzip.GZipMiddleware",
@@ -189,6 +194,11 @@ SILKY_AUTHORISATION = True  # User must be staff
 
 # "optional" en dev; producción la fuerza a "mandatory" (ver prod.py, env-overridable)
 ACCOUNT_EMAIL_VERIFICATION = env.str("ACCOUNT_EMAIL_VERIFICATION", default="optional")
+
+# MFA (allauth.mfa): TOTP + códigos de recuperación en el seed abierto.
+# WebAuthn/passkeys y SSO SAML/OIDC quedan como módulo enterprise (ver ROADMAP).
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
+MFA_TOTP_ISSUER = PROJECT_NAME
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 LOGIN_REDIRECT_URL = "/"
@@ -271,8 +281,6 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
 }
 
-PROJECT_NAME = env.str("PROJECT_NAME", default="Proyecto Semilla")
-
 SPECTACULAR_SETTINGS = {
     "TITLE": f"{PROJECT_NAME} API",
     "DESCRIPTION": f"Versioned DRF API for {PROJECT_NAME}.",
@@ -304,6 +312,10 @@ CELERY_BROKER_URL = env.str(
     "CELERY_BROKER_URL", default=env.str("REDIS_URL", default="redis://localhost:6379/0")
 )
 CELERY_RESULT_BACKEND = env.str("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
+# En DEBUG/tests las tareas corren inline (sin worker); el compose dev lo
+# desactiva explícitamente para ejercitar el worker real.
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=DEBUG)
+CELERY_TASK_EAGER_PROPAGATES = True
 
 STORAGES = {
     "default": {
@@ -387,23 +399,59 @@ SECURE_REFERRER_POLICY = env.str("SECURE_REFERRER_POLICY", default="same-origin"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        # Inyecta request_id y tenant en cada registro (correlación).
+        "request_context": {"()": "common.request_context.RequestContextFilter"},
+    },
     "formatters": {
         "json": {
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
-            "fmt": "%(asctime)s %(levelname)s %(name)s %(message)s",
+            "fmt": "%(asctime)s %(levelname)s %(name)s %(request_id)s %(tenant)s %(message)s",
         },
         "verbose": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            "format": (
+                "%(asctime)s [%(levelname)s] %(name)s " "[%(request_id)s %(tenant)s]: %(message)s"
+            ),
         },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
+            "filters": ["request_context"],
             "formatter": env.str("LOG_FORMAT", default="json"),
         }
     },
     "root": {"handlers": ["console"], "level": env.str("LOG_LEVEL", default="INFO")},
 }
+
+# ── OpenTelemetry (opt-in) ───────────────────────────────────────────────
+# Se activa SOLO si OTEL_EXPORTER_OTLP_ENDPOINT está definido (Grafana Tempo,
+# Jaeger, Datadog, Honeycomb… cualquier backend OTLP). Sin endpoint: coste cero.
+OTEL_EXPORTER_OTLP_ENDPOINT = env.str("OTEL_EXPORTER_OTLP_ENDPOINT", default="")
+if OTEL_EXPORTER_OTLP_ENDPOINT:
+    try:  # pragma: no cover — requiere collector externo
+        from opentelemetry import trace
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+        from opentelemetry.instrumentation.django import DjangoInstrumentor
+        from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+        _otel_resource = Resource.create(
+            {
+                SERVICE_NAME: env.str(
+                    "OTEL_SERVICE_NAME", default=PROJECT_NAME.lower().replace(" ", "-")
+                )
+            }
+        )
+        _otel_provider = TracerProvider(resource=_otel_resource)
+        _otel_provider.add_span_processor(
+            BatchSpanProcessor(OTLPSpanExporter(endpoint=OTEL_EXPORTER_OTLP_ENDPOINT))
+        )
+        trace.set_tracer_provider(_otel_provider)
+        DjangoInstrumentor().instrument()
+    except Exception:  # noqa: S110 — la observabilidad nunca debe impedir el arranque
+        pass
 
 # Sentry (optional)
 SENTRY_ENVIRONMENT = env.str("SENTRY_ENVIRONMENT", default="dev" if DEBUG else "prod")
