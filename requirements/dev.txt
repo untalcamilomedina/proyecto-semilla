@@ -15,7 +15,7 @@ pip-audit>=2.7
 safety>=3.2
 mypy>=1.12
 django-stubs>=5.0
-ipython>=8.26
+ipython>=9.14.1
 mkdocs>=1.6
 mkdocs-material>=9.5
 # SDK oficial de MCP — servidor del arnés (scripts/mcp/seed_server.py)
