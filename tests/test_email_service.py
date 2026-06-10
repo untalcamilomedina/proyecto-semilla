@@ -16,7 +16,7 @@ class TestEmailService:
         EmailService.send_welcome_email(user)
 
         assert len(mail.outbox) == 1
-        assert mail.outbox[0].subject == "Welcome to Acme SaaS!"
+        assert mail.outbox[0].subject == "Welcome to Proyecto Semilla!"
         assert "test@example.com" in mail.outbox[0].body
         assert "test@example.com" in mail.outbox[0].to
 

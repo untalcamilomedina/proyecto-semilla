@@ -24,7 +24,7 @@ def optional_apps() -> list[str]:
     if ENABLE_COMMUNITY:
         apps.append("community")
     if ENABLE_MCP:
-        apps.append("mcp")
+        apps.append("mcp_registry")
     if ENABLE_CRM:
         apps.append("crm")
     return apps
@@ -39,7 +39,7 @@ def optional_api_urls() -> list[tuple[str, str]]:
     if ENABLE_COMMUNITY:
         urls.append(("community/", "community.urls"))
     if ENABLE_MCP:
-        urls.append(("mcp/", "mcp.urls"))
+        urls.append(("mcp/", "mcp_registry.urls"))
     if ENABLE_CRM:
         urls.append(("crm/", "crm.urls"))
     return urls
