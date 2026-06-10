@@ -133,7 +133,16 @@ en orden de recomendación:
 5. **`act`** (github.com/nektos/act): ejecuta los workflows reales de
    `.github/workflows/` en Docker local — útil para depurar el propio CI.
 
-## Checklist de repo público (hacer una sola vez tras cambiar visibilidad)
+## Checklist de repo público — PRE-VUELO (completar ANTES de cambiar visibilidad)
+
+> Lección aprendida (2026-06): los workflows invocables (`@claude`) deben
+> blindarse ANTES de publicar, no después. Un repo público permite a cualquiera
+> abrir issues y disparar workflows: el orden correcto es este checklist →
+> merge → recién entonces Settings → Change visibility.
+
+0. **Workflows invocables blindados**: todo workflow disparable por comentarios
+   o issues debe filtrar por `author_association` (OWNER/MEMBER/COLLABORATOR).
+   Ya aplicado en `claude.yml` — replica el patrón en cualquier workflow nuevo.
 
 En GitHub → Settings del repo (5 minutos, en este orden):
 
