@@ -22,6 +22,7 @@ nav:
   - API: api.md
   - MCP: mcp.md
   - Arnés de IA: arnes-ia.md
+  - Memoria (Basic Memory): memoria/proyecto-semilla-estado.md
   - Multitenancy: multitenancy.md
   - RBAC: rbac.md
   - Billing: billing.md
