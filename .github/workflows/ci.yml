@@ -188,7 +188,7 @@ jobs:
     needs: [deploy-smoke, frontend]
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build backend image
         run: docker build -t proyecto_semilla:ci .
       - name: Build frontend image (runner)
