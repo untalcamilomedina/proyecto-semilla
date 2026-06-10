@@ -108,3 +108,27 @@ make seed && make load-test     # k6: 20 VUs, 1 min, p95<500ms
 
 Versiona tus umbrales en `scripts/load/k6-baseline.js` y corre la prueba antes
 de cada release mayor. Sin números, "escala" es solo una promesa.
+
+## CI sin costo — alternativas a los minutos de GitHub Actions
+
+Los repos **privados** tienen minutos limitados (plan Free: 2.000/mes). Opciones,
+en orden de recomendación:
+
+1. **Hacer el repo público** → Actions pasa a ser **gratis e ilimitado**. Es
+   además la ruta open-core del proyecto (playbook cal.com/Supabase). Antes de
+   cambiar visibilidad: barrido de secretos (`git log -p | grep -iE "sk_live|AKIA"`,
+   y la pestaña Security → Secret scanning).
+2. **Optimizar consumo** (ya aplicado en este repo): `paths-ignore` para
+   docs/markdown (cero minutos en cambios documentales), matriz de Python
+   completa solo en push a `main`, Trivy solo en `main`, Dependabot mensual
+   con máximo 3 PRs por ecosistema, `concurrency` con cancelación.
+3. **Self-hosted runner**: un VPS de ~5 USD o tu propia máquina ejecuta los
+   jobs (minutos ilimitados). `Settings → Actions → Runners → New self-hosted
+   runner` y cambia `runs-on: ubuntu-latest` por `runs-on: self-hosted`.
+   ⚠️ NUNCA uses self-hosted en un repo público que acepte PRs de forks
+   (ejecución de código ajeno en tu máquina).
+4. **`make ci-local`**: reproduce los gates del CI en tu máquina sin gastar
+   un minuto (lint, mypy, pytest, frontend, build). Para validar antes de
+   pushear o mientras no haya cuota. Los agentes de IA lo tienen vía MCP.
+5. **`act`** (github.com/nektos/act): ejecuta los workflows reales de
+   `.github/workflows/` en Docker local — útil para depurar el propio CI.

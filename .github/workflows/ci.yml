@@ -3,7 +3,23 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".claude/**"
+      - ".cursor/**"
+      - "GEMINI.md"
+      - "mkdocs.yml"
+      - "LICENSE"
   pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".claude/**"
+      - ".cursor/**"
+      - "GEMINI.md"
+      - "mkdocs.yml"
+      - "LICENSE"
 
 permissions:
   contents: read
@@ -59,7 +75,8 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        # PRs: solo 3.12 (rápido y barato); push a main: matriz completa.
+        python-version: ${{ github.event_name == 'push' && fromJSON('["3.12", "3.13"]') || fromJSON('["3.12"]') }}
     services:
       postgres:
         image: postgres:16
@@ -194,6 +211,7 @@ jobs:
       - name: Build frontend image (runner)
         run: docker build --target runner -t proyecto_semilla-frontend:ci frontend
       - name: Scan backend image (Trivy)
+        if: github.event_name == 'push'
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: proyecto_semilla:ci
@@ -201,6 +219,7 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: "0"
       - name: Scan frontend image (Trivy)
+        if: github.event_name == 'push'
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: proyecto_semilla-frontend:ci
