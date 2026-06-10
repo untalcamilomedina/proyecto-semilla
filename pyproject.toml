@@ -49,7 +49,8 @@ known_first_party = [
   "lms",
   "community",
   "api",
-  "mcp",
+  "mcp_registry",
+  "crm",
 ]
 skip_gitignore = true
 
