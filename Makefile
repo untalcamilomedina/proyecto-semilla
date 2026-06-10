@@ -71,3 +71,13 @@ backup:
 
 mcp-server:
 	$(PYTHON) scripts/mcp/seed_server.py
+
+# CI completo en local — cero minutos de GitHub Actions.
+# Requiere Postgres y Redis arriba (make dev) y deps instaladas.
+ci-local:
+	$(MAKE) lint
+	$(MAKE) typecheck
+	$(MAKE) test
+	$(MAKE) frontend-test
+	cd frontend && npm run build
+	@echo "✅ ci-local completo: los mismos gates que el CI, sin consumir minutos."
