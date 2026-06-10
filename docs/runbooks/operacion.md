@@ -87,3 +87,24 @@ El repo está preparado para que un agente haga el mantenimiento contigo:
 | Usuarios deslogueados masivamente | ¿Rotaste `DJANGO_SECRET_KEY` o `JWT_SIGNING_KEY`? | Esperado: re-login |
 | 429 en login | Rate limiting (nginx `auth_zone` + axes) | Verifica origen; ajusta zonas si es legítimo |
 | Webhooks Stripe sin efecto | Evento duplicado (idempotencia) o metadata inválida | Logs del worker: `Stripe event ... already processed` / `metadata inconsistente` |
+
+## GDPR — derechos del interesado
+
+| Solicitud | Comando |
+| --- | --- |
+| Acceso/portabilidad (art. 15/20) | `python manage.py export_user_data --email X [--output f.json]` |
+| Olvido (art. 17) | `python manage.py delete_user_data --email X --yes` |
+
+El borrado **anonimiza** (email/username/nombres irreversibles, cuenta
+desactivada, contraseña inutilizable) conservando la fila para integridad de
+auditoría y billing. Ejecuta ambos comandos dentro del contenedor web. Plazo
+legal de respuesta: 30 días — deja registro de cada solicitud atendida.
+
+## Prueba de carga (línea base)
+
+```bash
+make seed && make load-test     # k6: 20 VUs, 1 min, p95<500ms
+```
+
+Versiona tus umbrales en `scripts/load/k6-baseline.js` y corre la prueba antes
+de cada release mayor. Sin números, "escala" es solo una promesa.
