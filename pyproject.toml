@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proyecto-semilla"
-version = "0.14.0"
+version = "0.15.0"
 description = "Boilerplate SaaS multitenant, seguro y AI-first (Django 5 + Next.js)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -49,7 +49,8 @@ known_first_party = [
   "lms",
   "community",
   "api",
-  "mcp",
+  "mcp_registry",
+  "crm",
 ]
 skip_gitignore = true
 
@@ -92,7 +93,7 @@ strict_optional = true
 # Plan: eliminarlos módulo a módulo (ver docs/auditoria/PLAN-ESTABILIZACION.md
 # Fase 3). El código nuevo debe pasar mypy SIN añadir entradas aquí.
 [[tool.mypy.overrides]]
-module = ["lms.*", "community.*", "mcp.*"]
+module = ["lms.*", "community.*", "mcp_registry.*"]
 disable_error_code = ["attr-defined", "dict-item"]
 
 [[tool.mypy.overrides]]

@@ -62,3 +62,12 @@ frontend-test:
 
 frontend-build:
 	cd frontend && npm run build
+
+load-test:
+	k6 run scripts/load/k6-baseline.js
+
+backup:
+	bash scripts/ops/backup.sh
+
+mcp-server:
+	$(PYTHON) scripts/mcp/seed_server.py

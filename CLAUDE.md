@@ -1,6 +1,8 @@
 # CLAUDE.md — Guía para agentes de IA
 
 > Proyecto Semilla: boilerplate SaaS multitenant (Django 5 + DRF + Next.js 16), seguro y AI-first.
+> **`AGENTS.md` es la versión canónica y agnóstica de esta guía** (misma información,
+> válida para cualquier agente) — mantenlas en sincronía si editas reglas.
 > Idioma del proyecto: **español** (comentarios, docs, commits descriptivos); identificadores de código en inglés.
 
 ## Arquitectura en 60 segundos

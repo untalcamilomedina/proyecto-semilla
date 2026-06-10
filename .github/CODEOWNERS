@@ -1,3 +1,22 @@
-# Default owners for all files.
-* @your-org/maintainers
+# CODEOWNERS — revisores obligatorios por ruta.
+# Documentación: https://docs.github.com/articles/about-code-owners
 
+# Propietario por defecto de todo el repositorio.
+* @untalcamilomedina
+
+# Rutas sensibles: requieren revisión explícita del maintainer.
+
+# Permisos, cifrado de campos (EncryptedCharField), políticas RLS y middleware compartido.
+/src/common/ @untalcamilomedina
+
+# Autenticación de la API (JWT, API Keys): cualquier cambio afecta a toda la superficie /api/v1/.
+/src/api/authentication.py @untalcamilomedina
+
+# Multitenancy (schema-per-tenant + RLS): un error aquí puede filtrar datos entre tenants.
+/src/multitenant/ @untalcamilomedina
+
+# Workflows de CI/CD: controlan permisos, secretos y releases.
+/.github/workflows/ @untalcamilomedina
+
+# Orquestación Docker del stack (web, postgres, redis, minio, mailpit).
+/compose/ @untalcamilomedina

@@ -5,7 +5,7 @@ the Model Context Protocol specification. Each ViewSet action becomes
 an MCP tool with auto-generated input schemas from serializer fields.
 
 Usage:
-    from mcp.tool_registry import discover_tools, execute_tool
+    from mcp_registry.tool_registry import discover_tools, execute_tool
     tools = discover_tools()
     result = execute_tool("courses_list", {}, request)
 """

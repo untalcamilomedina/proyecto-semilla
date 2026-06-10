@@ -1,6 +1,6 @@
 # 🌱 Proyecto Semilla
 
-[![Version](https://img.shields.io/badge/version-0.14.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.15.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-5.x-green.svg)](https://www.djangoproject.com/)
 [![Next.js](https://img.shields.io/badge/next.js-16-black.svg)](https://nextjs.org/)
@@ -58,15 +58,22 @@ API interactiva en `http://localhost:8000/api/docs/`.
 | **Infra** | Docker multi-stage non-root, compose dev/prod, deploy blue-green con nginx, receta Fly.io |
 | **Calidad** | CI (lint, mypy, tests con Postgres real, build, pip-audit/npm audit, Trivy), pre-commit, 110+ tests backend + vitest |
 
-## Desarrollo AI-first
+## Desarrollo AI-first (arnés agnóstico de modelo)
 
-El seed está diseñado para construir software con agentes de IA desde el día uno:
+El seed trae un **arnés completo e independiente del proveedor de IA** — funciona
+con Claude, Cursor, Copilot, Gemini, Codex o el agente que exista mañana
+([docs/arnes-ia.md](docs/arnes-ia.md)):
 
-- **`CLAUDE.md`** — guía del proyecto para agentes (arquitectura, reglas de seguridad, convenciones).
-- **`.claude/skills/`** — 23 skills reutilizables: scaffolding full-stack, generación de tests, hardening, design system, i18n…
-- **Hooks** (`.claude/settings.json`) — contexto automático al iniciar sesión y lint inmediato tras cada edición Python.
-- **MCP** (`.mcp.json`) — servidor Postgres para que el agente inspeccione el schema en dev; módulo `mcp` opcional para exponer un catálogo de tools del API por tenant.
-- **Workflow `@claude`** (`.github/workflows/claude.yml`) — menciona `@claude` en issues/PRs para que el agente trabaje en GitHub (requiere `ANTHROPIC_API_KEY`).
+- **Contexto portable** — `AGENTS.md` (guía canónica) + punteros por ecosistema
+  (`CLAUDE.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, `GEMINI.md`).
+- **`.claude/skills/`** — 23 procedimientos en markdown plano, legibles por cualquier agente.
+- **Servidor MCP propio** (`scripts/mcp/seed_server.py`) — 8 tools: estado del repo,
+  lint/typecheck/tests (los mismos gates que el CI), skills y docs. Más MCP de
+  Postgres para inspeccionar el schema real (`.mcp.json`).
+- **Hooks** — contexto de sesión y lint inmediato tras cada edición (`scripts/ai/`).
+- **Guardrail final** — el CI: lo que un agente rompa (aislamiento multitenant,
+  seguridad, tipos), el pipeline lo bloquea.
+- **Workflow `@claude`** opcional para trabajar desde issues/PRs de GitHub.
 
 ## Arquitectura
 
@@ -140,7 +147,7 @@ dedicadas: `FIELD_ENCRYPTION_KEY`, `JWT_SIGNING_KEY`, `METRICS_TOKEN`).
 
 ## Estado del proyecto
 
-`v0.14.0` — ver [CHANGELOG.md](CHANGELOG.md). Auditoría de seguridad completa y plan
+`v0.15.0` — ver [CHANGELOG.md](CHANGELOG.md). Auditoría de seguridad completa y plan
 de estabilización vigente en [`docs/auditoria/`](docs/auditoria/). Roadmap en
 [ROADMAP.md](ROADMAP.md).
 

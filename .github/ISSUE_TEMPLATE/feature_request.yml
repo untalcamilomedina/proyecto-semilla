@@ -1,0 +1,53 @@
+name: "✨ Propuesta de funcionalidad"
+description: "Sugiere una idea o mejora para Proyecto Semilla."
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por proponer una mejora! 💡
+        Recuerda que Proyecto Semilla es un **boilerplate genérico**: las funcionalidades deben ser útiles
+        para cualquier SaaS derivado, no lógica de un producto concreto.
+
+        > 💬 ¿Aún es una idea difusa o una pregunta? Abre primero un hilo en
+        > [Discussions](https://github.com/untalcamilomedina/proyecto-semilla/discussions).
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema que resuelve
+      description: Describe el problema o la limitación actual. ¿Qué no puedes hacer hoy, o qué resulta incómodo?
+      placeholder: "Hoy no es posible exportar los miembros de una organización, lo que obliga a consultar la BD a mano cuando..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solucion
+    attributes:
+      label: Solución propuesta
+      description: Describe cómo te gustaría que funcionara. Incluye detalles de API, UI o configuración si los tienes.
+      placeholder: "Añadir un endpoint GET /api/v1/members/export que devuelva CSV, respetando el scoping por tenant..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas consideradas
+      description: ¿Qué otras soluciones o workarounds evaluaste y por qué no encajan?
+      placeholder: "Consideré un management command, pero los admins de tenant no tienen acceso al servidor..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: implementacion
+    attributes:
+      label: ¿Estás dispuesto/a a implementarla con un PR?
+      description: No es obligatorio, pero las propuestas con PR avanzan mucho más rápido. Consulta CONTRIBUTING.md.
+      options:
+        - Sí, puedo abrir un PR
+        - Sí, pero necesitaría orientación
+        - No, solo propongo la idea
+    validations:
+      required: true

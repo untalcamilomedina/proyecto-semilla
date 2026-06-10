@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "semilla": {
+      "command": "python3",
+      "args": ["scripts/mcp/seed_server.py"]
+    },
     "postgres-dev": {
       "command": "npx",
       "args": [

@@ -1,0 +1,98 @@
+name: "🐛 Reporte de bug"
+description: "Reporta un error reproducible en Proyecto Semilla."
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tomarte el tiempo de reportar un bug! 🙏
+        Cuanta más información aportes, más rápido podremos reproducirlo y corregirlo.
+
+        > ⚠️ **Seguridad**: si encontraste una vulnerabilidad, **NO abras un issue público**.
+        > Usa el [reporte privado de vulnerabilidades](https://github.com/untalcamilomedina/proyecto-semilla/security/advisories/new).
+
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción del bug
+      description: Explica de forma clara y concisa qué está fallando.
+      placeholder: "Al invitar a un usuario a una organización, el correo de invitación nunca llega y la API devuelve 500..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      description: Lista los pasos exactos para reproducir el problema.
+      placeholder: |
+        1. Levantar el stack con `make dev`
+        2. Iniciar sesión como admin del tenant
+        3. Ir a Ajustes → Miembros → Invitar
+        4. Enviar la invitación y observar el error
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamiento-esperado
+    attributes:
+      label: Comportamiento esperado
+      description: ¿Qué esperabas que ocurriera en su lugar?
+      placeholder: "La invitación debería enviarse y aparecer en Mailpit con estado 'pendiente'."
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión
+      description: Versión de Proyecto Semilla en la que ocurre (ver `CHANGELOG.md`) o SHA del commit.
+      placeholder: "0.15.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entorno-ejecucion
+    attributes:
+      label: Entorno de ejecución
+      description: ¿Cómo estás ejecutando el proyecto?
+      options:
+        - Docker (make dev / docker compose)
+        - Instalación local (sin Docker)
+        - Producción / despliegue propio
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: entorno-detalle
+    attributes:
+      label: Detalles del entorno
+      description: Sistema operativo, navegador y cualquier dato relevante del entorno.
+      value: |
+        - SO: (p. ej. Ubuntu 24.04 / macOS 15 / Windows 11 + WSL2)
+        - Navegador: (p. ej. Chrome 137, Firefox 139 — si aplica)
+        - Python / Node: (si no usas Docker)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs relevantes
+      description: Pega aquí logs, trazas de error o salida de consola. Se formateará automáticamente como código (no necesitas usar ```). **Recuerda eliminar secretos o datos sensibles.**
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist final
+      description: Antes de enviar, confirma lo siguiente.
+      options:
+        - label: He buscado issues duplicados (abiertos y cerrados) y este bug no está reportado.
+          required: true
+        - label: Puedo reproducir el problema en la rama `main` más reciente.
+          required: true

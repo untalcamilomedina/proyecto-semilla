@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "🔒 Reporte de seguridad (privado)"
+    url: "https://github.com/untalcamilomedina/proyecto-semilla/security/advisories/new"
+    about: "Reporta vulnerabilidades de forma privada mediante GitHub Security Advisories. NO abras un issue público para temas de seguridad."
+  - name: "💬 Preguntas e ideas"
+    url: "https://github.com/untalcamilomedina/proyecto-semilla/discussions"
+    about: "¿Tienes una duda, una idea sin pulir o quieres mostrar lo que construiste? Usa la pestaña Discussions del repositorio."

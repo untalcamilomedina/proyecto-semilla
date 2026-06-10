@@ -5,6 +5,44 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## v0.15.0 - (2026-06-10) - Talla mundial: MFA, GDPR, gobernanza y arnés agnóstico
+
+### Security
+- **MFA/2FA** (allauth.mfa): TOTP + códigos de recuperación en `/accounts/2fa/`.
+  WebAuthn/passkeys y SSO SAML/OIDC quedan definidos como módulo enterprise (ROADMAP).
+- **GDPR**: `manage.py export_user_data` (acceso/portabilidad, JSON cross-schema)
+  y `manage.py delete_user_data` (olvido: anonimización irreversible en todos los
+  schemas), con tests y runbook.
+
+### Added
+- **Arnés de IA agnóstico de modelo** (`docs/arnes-ia.md`): servidor MCP propio
+  (`scripts/mcp/seed_server.py`, 8 tools: status, lint, typecheck, tests backend/
+  frontend, list/read skills, read docs — los mismos gates que el CI, consumibles
+  por Claude/Cursor/Copilot/Gemini/Codex); `AGENTS.md` elevado a guía canónica
+  agnóstica + punteros por ecosistema (`.github/copilot-instructions.md`,
+  `GEMINI.md`, `.cursor/rules/`).
+- **Trazabilidad**: header `X-Request-ID` + request_id y tenant en TODOS los logs
+  JSON (`common.request_context`); OpenTelemetry opt-in vía
+  `OTEL_EXPORTER_OTLP_ENDPOINT` (Tempo/Jaeger/Datadog, coste cero si no se define).
+- **Gobernanza de comunidad**: issue forms (bug/feature), plantilla de PR,
+  CODEOWNERS por rutas sensibles, Dependabot (pip/npm/actions semanal),
+  workflow de Release en tags `v*`, CONTRIBUTING profesional.
+- **Operación**: `scripts/load/k6-baseline.js` (línea base con umbrales p95) +
+  `make load-test`; `scripts/ops/backup.sh` y `restore.sh` con simulacro DR
+  documentado; sección GDPR y carga en el runbook de operación.
+- ADR 0014 (deny-by-default + binding JWT) y ADR 0015 (techo de
+  schema-per-tenant y ruta a row-level: decisión y disparadores).
+
+### Changed
+- **Celery real**: los emails (welcome/invite) salen por tareas con reintentos y
+  patrón tenant-aware (`schema_name` + `schema_context` — plantilla para tasks
+  nuevas en `core/tasks.py`); inline en DEBUG/tests, worker real en compose.
+- Emails sin marca hardcodeada ("Acme SaaS" residual → `PROJECT_NAME`).
+
+### Removed
+- `django-waffle` (instalado sin un solo uso): el seed ya tiene dos niveles de
+  flags reales — `ENABLE_*` por entorno y `Tenant.enabled_modules` por tenant.
+
 ## v0.14.0 - (2026-06-09) - Auditoría, saneamiento y estabilización
 
 > Release de saneamiento tras auditoría completa (informe en `docs/auditoria/`).

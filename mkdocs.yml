@@ -21,6 +21,7 @@ nav:
   - Architecture: architecture.md
   - API: api.md
   - MCP: mcp.md
+  - Arnés de IA: arnes-ia.md
   - Multitenancy: multitenancy.md
   - RBAC: rbac.md
   - Billing: billing.md

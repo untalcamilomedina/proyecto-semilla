@@ -26,6 +26,11 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # y produce 403 espurios. El comportamiento de ratelimit se cubre aparte.
 RATELIMIT_ENABLE = False
 
+# Tareas Celery inline en tests (explícito: el default depende del env DEBUG,
+# que pytest-django modifica DESPUÉS de cargar settings).
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
 # PostgreSQL ONLY — this project does not support SQLite.
 # Tests must run inside Docker: docker compose exec web pytest tests/
 

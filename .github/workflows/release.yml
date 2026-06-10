@@ -1,0 +1,28 @@
+# Release — crea un GitHub Release al pushear un tag v* (p. ej. v0.15.0).
+# No compila nada: la CI ya valida cada PR antes de llegar a main.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Crear GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Crear release con notas generadas
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            Consulta el [CHANGELOG.md](https://github.com/untalcamilomedina/proyecto-semilla/blob/main/CHANGELOG.md)
+            para el detalle completo de cambios de esta versión.

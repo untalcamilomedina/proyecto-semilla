@@ -7,11 +7,10 @@ drf-spectacular>=0.28,<1.0
 # Authentication & Authorization
 # >=65.14.1 corrige PYSEC-2025-110/111 y PYSEC-2026-56 (los settings ya usan
 # el formato moderno: ACCOUNT_LOGIN_METHODS / ACCOUNT_SIGNUP_FIELDS).
-django-allauth>=65.14.1,<66.0
+django-allauth[mfa]>=65.14.1,<66.0
 django-guardian>=2.4,<3.0
 djangorestframework-simplejwt>=5.3,<6.0
 rules>=3.3,<4.0
-django-waffle>=4.0,<5.0
 
 # Database
 psycopg[binary]>=3.1,<4.0
@@ -41,6 +40,10 @@ prometheus-client>=0.20,<1.0
 python-json-logger>=2.0,<3.0
 django-silk>=5.0,<6.0
 django-health-check>=3.18,<4.0
+# OpenTelemetry opt-in (se activa con OTEL_EXPORTER_OTLP_ENDPOINT)
+opentelemetry-sdk>=1.27,<2.0
+opentelemetry-exporter-otlp-proto-grpc>=1.27,<2.0
+opentelemetry-instrumentation-django>=0.48b0,<1.0
 
 # Billing
 stripe>=11.0,<12.0
